@@ -7,74 +7,196 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Roshta</title>
+    <meta name="description" content="Rosheta - Professional prescription management system for healthcare providers. Streamline your practice with comprehensive medical software." />
+    <meta name="keywords" content="prescription management, medical software, healthcare, EMR, electronic medical records" />
+    <meta name="author" content="Rosheta Development Team" />
+    <meta name="robots" content="noindex, nofollow" />
+    
+    <title>@ViewData["Title"] - Rosheta</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="~/favicon.ico" />
+    
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <!-- Add reference to Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <!-- Add reference to Select2 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" /> <!-- Optional: Bootstrap 5 theme for Select2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Roshta.styles.css" asp-append-version="true" />
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="~/lib/bootstrap/dist/css/bootstrap.min.css" as="style" />
+    <link rel="preload" href="~/css/site.css" as="style" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+    <!-- Skip Navigation Link for Accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <header class="modern-header">
+        <!-- Main Navigation Bar -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-gradient-primary border-bottom shadow-sm">
             <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">Roshta</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                <!-- Brand Section with Logo and Tagline -->
+                <div class="navbar-brand-section d-flex align-items-center">
+                    <a class="navbar-brand d-flex align-items-center text-decoration-none" asp-area="" asp-page="/Index">
+                        <div class="brand-logo me-2">
+                            <i class="bi bi-prescription2 text-primary fs-2"></i>
+                        </div>
+                        <div class="brand-text">
+                            <h4 class="mb-0 fw-bold text-primary">Rosheta</h4>
+                            <small class="text-muted d-none d-md-block">Prescription Management</small>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Mobile Toggle Button -->
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+                        aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+
+                <!-- Main Navigation Content -->
+                <div class="collapse navbar-collapse" id="navbarContent">
+                    <!-- Primary Navigation -->
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Dashboard</a>
+                            <a class="nav-link px-3 py-2 rounded-pill mx-1" asp-area="" asp-page="/Index">
+                                <i class="bi bi-speedometer2 me-1"></i>Dashboard
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Medications/Index">Medications</a>
+                            <a class="nav-link px-3 py-2 rounded-pill mx-1" asp-area="" asp-page="/Medications/Index">
+                                <i class="bi bi-capsule me-1"></i>Medications
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Patients/Index">Patients</a>
+                            <a class="nav-link px-3 py-2 rounded-pill mx-1" asp-area="" asp-page="/Patients/Index">
+                                <i class="bi bi-people me-1"></i>Patients
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Prescriptions/Index">Prescriptions</a>
+                            <a class="nav-link px-3 py-2 rounded-pill mx-1" asp-area="" asp-page="/Prescriptions/Index">
+                                <i class="bi bi-file-medical me-1"></i>Prescriptions
+                            </a>
                         </li>
                     </ul>
-                    
-                    @if (LicenseService.IsActivated() && LicenseService.IsProfileSetup())
-                    {
-                        var currentDoctorId = LicenseService.GetCurrentDoctorId();
-                        var doctor = currentDoctorId.HasValue ? await DoctorService.GetDoctorProfileAsync(currentDoctorId.Value) : null;
-                        
-                        <ul class="navbar-nav">
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle text-dark" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-person-circle me-1"></i>
-                                    @(doctor?.Name ?? "Doctor")
+
+                    <!-- Header Tools Section -->
+                    <div class="navbar-nav d-flex flex-row align-items-center">
+                        <!-- Global Search -->
+                        <div class="nav-item me-3 d-none d-lg-block">
+                            <div class="header-search">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-search text-muted"></i>
+                                    </span>
+                                    <input type="text" class="form-control border-start-0 bg-light"
+                                           placeholder="Search patients, medications..." aria-label="Global search">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Status Indicators -->
+                        @if (LicenseService.IsActivated())
+                        {
+                            <div class="nav-item me-3">
+                                <div class="status-indicators d-flex align-items-center">
+                                    <!-- License Status -->
+                                    <div class="status-indicator me-2" data-bs-toggle="tooltip"
+                                         title="License Status: @(LicenseService.IsActivated() ? "Active" : "Inactive")">
+                                        <i class="bi bi-shield-check text-success fs-6"></i>
+                                    </div>
+                                    <!-- Connection Status -->
+                                    <div class="status-indicator me-2" data-bs-toggle="tooltip" title="System Status: Online">
+                                        <i class="bi bi-wifi text-success fs-6"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        <!-- Notification Bell -->
+                        <div class="nav-item me-3">
+                            <button class="btn btn-outline-secondary btn-sm position-relative border-0"
+                                    type="button" data-bs-toggle="tooltip" title="Notifications">
+                                <i class="bi bi-bell"></i>
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
+                                    3
+                                    <span class="visually-hidden">unread notifications</span>
+                                </span>
+                            </button>
+                        </div>
+
+                        <!-- User Menu -->
+                        @if (LicenseService.IsActivated() && LicenseService.IsProfileSetup())
+                        {
+                            var currentDoctorId = LicenseService.GetCurrentDoctorId();
+                            var doctor = currentDoctorId.HasValue ? await DoctorService.GetDoctorProfileAsync(currentDoctorId.Value) : null;
+                            
+                            <div class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle d-flex align-items-center text-decoration-none"
+                                   href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <div class="user-avatar me-2">
+                                        <i class="bi bi-person-circle fs-4 text-primary"></i>
+                                    </div>
+                                    <div class="user-info d-none d-md-block">
+                                        <div class="fw-semibold text-dark">@(doctor?.Name ?? "Doctor")</div>
+                                        <small class="text-muted">@(doctor?.Specialization ?? "Physician")</small>
+                                    </div>
                                 </a>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                    <li>
-                                        <a class="dropdown-item" asp-area="" asp-page="/DoctorProfile/Edit">
-                                            <i class="bi bi-gear me-2"></i>Profile & Settings
-                                        </a>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0" aria-labelledby="userDropdown">
+                                    <li class="dropdown-item-text">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-person-circle fs-3 text-primary me-3"></i>
+                                            <div>
+                                                <div class="fw-semibold">@(doctor?.Name ?? "Doctor")</div>
+                                                <small class="text-muted">@(doctor?.Specialization ?? "Physician")</small>
+                                                <div class="small text-muted">License: @(doctor?.LicenseNumber ?? "N/A")</div>
+                                            </div>
+                                        </div>
                                     </li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li>
-                                        <h6 class="dropdown-header">
-                                            <i class="bi bi-info-circle me-1"></i>About
-                                        </h6>
+                                        <a class="dropdown-item" asp-area="" asp-page="/DoctorProfile/Edit">
+                                            <i class="bi bi-person-gear me-2"></i>Profile & Settings
+                                        </a>
                                     </li>
                                     <li>
-                                        <span class="dropdown-item-text small text-muted">
-                                            Rosheta v1.0.0<br>
-                                            Prescription Management System
-                                        </span>
+                                        <a class="dropdown-item" href="#" onclick="showQuickActions()">
+                                            <i class="bi bi-lightning me-2"></i>Quick Actions
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="#" onclick="showSystemInfo()">
+                                            <i class="bi bi-info-circle me-2"></i>System Info
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li class="dropdown-item-text small">
+                                        <div class="text-muted">
+                                            <i class="bi bi-shield-check me-1 text-success"></i>
+                                            License: Active until @DateTime.Now.AddMonths(6).ToString("MMM yyyy")
+                                        </div>
+                                        <div class="text-muted mt-1">
+                                            <i class="bi bi-code-square me-1"></i>
+                                            Version: 1.0.0
+                                        </div>
                                     </li>
                                 </ul>
-                            </li>
-                        </ul>
-                    }
+                            </div>
+                        }
+                        else
+                        {
+                            <!-- Not Activated State -->
+                            <div class="nav-item">
+                                <a class="btn btn-outline-warning btn-sm" asp-area="" asp-page="/Activate">
+                                    <i class="bi bi-key me-1"></i>Activate License
+                                </a>
+                            </div>
+                        }
+                    </div>
                 </div>
             </div>
         </nav>
@@ -117,15 +239,199 @@
     }
     
     <div class="container">
-        <main role="main" class="pb-3">
+        <main id="main-content" role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; @DateTime.Now.Year - Roshta 
-            @* Removed Privacy Link from footer *@
+    <!-- Professional Footer -->
+    <footer class="modern-footer bg-dark text-light mt-5">
+        <!-- Main Footer Content -->
+        <div class="footer-main bg-gradient-dark py-5">
+            <div class="container">
+                <div class="row g-4">
+                    <!-- Company Information -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="footer-section">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="bi bi-prescription2 text-primary fs-3 me-2"></i>
+                                <h5 class="mb-0 text-white">Rosheta</h5>
+                            </div>
+                            <p class="text-light-emphasis mb-3">
+                                Professional prescription management system designed for healthcare providers.
+                                Streamline your practice with our comprehensive medical software solution.
+                            </p>
+                            <div class="contact-info">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="bi bi-envelope me-2 text-primary"></i>
+                                    <span class="text-light-emphasis">support@rosheta.com</span>
+                                </div>
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="bi bi-telephone me-2 text-primary"></i>
+                                    <span class="text-light-emphasis">+1 (555) 123-4567</span>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-clock me-2 text-primary"></i>
+                                    <span class="text-light-emphasis">24/7 Support Available</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Links -->
+                    <div class="col-lg-2 col-md-6">
+                        <div class="footer-section">
+                            <h6 class="text-white mb-3">Quick Access</h6>
+                            <ul class="list-unstyled footer-links">
+                                <li class="mb-2">
+                                    <a asp-area="" asp-page="/Index" class="text-light-emphasis text-decoration-none">
+                                        <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a asp-area="" asp-page="/Patients/Create" class="text-light-emphasis text-decoration-none">
+                                        <i class="bi bi-person-plus me-2"></i>New Patient
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a asp-area="" asp-page="/Prescriptions/Create" class="text-light-emphasis text-decoration-none">
+                                        <i class="bi bi-file-medical me-2"></i>New Prescription
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a asp-area="" asp-page="/Medications/Index" class="text-light-emphasis text-decoration-none">
+                                        <i class="bi bi-capsule me-2"></i>Drug Database
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Support & Resources -->
+                    <div class="col-lg-3 col-md-6">
+                        <div class="footer-section">
+                            <h6 class="text-white mb-3">Support & Resources</h6>
+                            <ul class="list-unstyled footer-links">
+                                <li class="mb-2">
+                                    <a href="#" class="text-light-emphasis text-decoration-none" onclick="showUserGuide()">
+                                        <i class="bi bi-book me-2"></i>User Guide
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="#" class="text-light-emphasis text-decoration-none" onclick="showDocumentation()">
+                                        <i class="bi bi-file-text me-2"></i>Documentation
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="#" class="text-light-emphasis text-decoration-none" onclick="contactSupport()">
+                                        <i class="bi bi-headset me-2"></i>Contact Support
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="#" class="text-light-emphasis text-decoration-none" onclick="showKeyboardShortcuts()">
+                                        <i class="bi bi-keyboard me-2"></i>Keyboard Shortcuts
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="#" class="text-light-emphasis text-decoration-none" onclick="showSystemStatus()">
+                                        <i class="bi bi-activity me-2"></i>System Status
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- System Information -->
+                    <div class="col-lg-3 col-md-6">
+                        <div class="footer-section">
+                            <h6 class="text-white mb-3">System Information</h6>
+                            <div class="system-info">
+                                <div class="info-item mb-2">
+                                    <small class="text-light-emphasis">
+                                        <i class="bi bi-code-square me-2"></i>Version: 1.0.0
+                                    </small>
+                                </div>
+                                <div class="info-item mb-2">
+                                    <small class="text-light-emphasis">
+                                        <i class="bi bi-calendar3 me-2"></i>Build: @DateTime.Now.ToString("yyyy.MM.dd")
+                                    </small>
+                                </div>
+                                @if (LicenseService.IsActivated())
+                                {
+                                    <div class="info-item mb-2">
+                                        <small class="text-success">
+                                            <i class="bi bi-shield-check me-2"></i>License: Active
+                                        </small>
+                                    </div>
+                                    <div class="info-item mb-2">
+                                        <small class="text-light-emphasis">
+                                            <i class="bi bi-calendar-check me-2"></i>Expires: @DateTime.Now.AddMonths(6).ToString("MMM dd, yyyy")
+                                        </small>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="info-item mb-2">
+                                        <small class="text-warning">
+                                            <i class="bi bi-exclamation-triangle me-2"></i>License: Not Activated
+                                        </small>
+                                    </div>
+                                }
+                                <div class="info-item mb-3">
+                                    <small class="text-light-emphasis">
+                                        <i class="bi bi-server me-2"></i>Status:
+                                        <span class="text-success">Online</span>
+                                    </small>
+                                </div>
+                                
+                                <!-- Social Media Links -->
+                                <div class="social-links">
+                                    <h6 class="text-white mb-2 small">Follow Us</h6>
+                                    <div class="d-flex gap-2">
+                                        <a href="#" class="btn btn-outline-light btn-sm" data-bs-toggle="tooltip" title="Twitter">
+                                            <i class="bi bi-twitter"></i>
+                                        </a>
+                                        <a href="#" class="btn btn-outline-light btn-sm" data-bs-toggle="tooltip" title="LinkedIn">
+                                            <i class="bi bi-linkedin"></i>
+                                        </a>
+                                        <a href="#" class="btn btn-outline-light btn-sm" data-bs-toggle="tooltip" title="YouTube">
+                                            <i class="bi bi-youtube"></i>
+                                        </a>
+                                        <a href="#" class="btn btn-outline-light btn-sm" data-bs-toggle="tooltip" title="Email">
+                                            <i class="bi bi-envelope"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Bottom -->
+        <div class="footer-bottom bg-darker py-3 border-top border-secondary">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <div class="copyright text-light-emphasis">
+                            <small>
+                                &copy; @DateTime.Now.Year Rosheta. All rights reserved.
+                                Professional medical software solution.
+                            </small>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="footer-links-bottom text-md-end">
+                            <small>
+                                <a href="#" class="text-light-emphasis text-decoration-none me-3" onclick="showPrivacyPolicy()">Privacy Policy</a>
+                                <a href="#" class="text-light-emphasis text-decoration-none me-3" onclick="showTermsOfService()">Terms of Service</a>
+                                <a href="#" class="text-light-emphasis text-decoration-none" onclick="showLicenseAgreement()">License Agreement</a>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </footer>
 
@@ -135,6 +441,7 @@
     <script src="https://unpkg.com/imask"></script>
     <script src="~/js/validation-helpers.js" asp-append-version="true"></script>
     <script src="~/js/live-search.js" asp-append-version="true"></script>
+    <script src="~/js/header-footer.js" asp-append-version="true"></script>
     <!-- Add reference to Select2 JS (after jQuery and Bootstrap Bundle) -->
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> @* Corrected tag back to script *@
 
