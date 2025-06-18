@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Roshta.Data;
 using Roshta.Models;
 using Roshta.Services.Interfaces;
+using Roshta.ViewModels;
 using Microsoft.AspNetCore.Mvc.Rendering; // Keep if needed elsewhere, otherwise remove
 
 namespace Roshta.Pages_Patients
@@ -71,6 +72,36 @@ namespace Roshta.Pages_Patients
             Patient = await _patientService.GetPatientsPagedAsync(CurrentPage, PageSize, SearchString, CurrentSort);
 
             // Note: The old logic using SearchPatientsAsync/GetAllPatientsAsync is replaced by the paged call.
+        }
+
+        public async Task<IActionResult> OnGetSearchAsync(string searchTerm)
+        {
+            try
+            {
+                // Handle empty/null search terms
+                if (string.IsNullOrWhiteSpace(searchTerm))
+                {
+                    return new JsonResult(new List<PatientSearchDto>());
+                }
+
+                // Get patients using existing service method, limit to 10 for autocomplete
+                var patients = await _patientService.GetPatientsPagedAsync(1, 10, searchTerm, null);
+                
+                // Map to DTO
+                var patientDtos = patients.Select(p => new PatientSearchDto
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    ContactInfo = p.ContactInfo
+                }).ToList();
+
+                return new JsonResult(patientDtos);
+            }
+            catch (Exception)
+            {
+                // Return empty result on error
+                return new JsonResult(new List<PatientSearchDto>());
+            }
         }
     }
 }

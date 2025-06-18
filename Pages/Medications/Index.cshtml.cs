@@ -2,9 +2,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Roshta.Models;
 using Roshta.Services.Interfaces;
+using Roshta.ViewModels;
 using System.Collections.Generic;
 using System; // Added for Math.Ceiling
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Roshta.Pages_Medications
 {
@@ -65,6 +67,36 @@ namespace Roshta.Pages_Medications
             Medication = await _medicationService.GetMedicationsPagedAsync(CurrentPage, PageSize, SearchString, CurrentSort);
 
             // Note: The old logic using SearchMedicationsAsync/GetAllMedicationsAsync is replaced.
+        }
+
+        public async Task<IActionResult> OnGetSearchAsync(string searchTerm)
+        {
+            try
+            {
+                // Handle empty/null search terms
+                if (string.IsNullOrWhiteSpace(searchTerm))
+                {
+                    return new JsonResult(new List<MedicationSearchDto>());
+                }
+
+                // Get medications using existing service method, limit to 10 for autocomplete
+                var medications = await _medicationService.GetMedicationsPagedAsync(1, 10, searchTerm, null);
+                
+                // Map to DTO
+                var medicationDtos = medications.Select(m => new MedicationSearchDto
+                {
+                    Id = m.Id,
+                    Name = m.Name,
+                    Dosage = m.Dosage
+                }).ToList();
+
+                return new JsonResult(medicationDtos);
+            }
+            catch (Exception)
+            {
+                // Return empty result on error
+                return new JsonResult(new List<MedicationSearchDto>());
+            }
         }
     }
 }

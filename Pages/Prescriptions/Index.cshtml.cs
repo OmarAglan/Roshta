@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Roshta.Models;
 using Roshta.Services.Interfaces;
+using Roshta.ViewModels;
 using Microsoft.Extensions.Logging;
 using System; // Added for Math.Ceiling
 using System.Collections.Generic; // Added for List<>
@@ -71,6 +72,38 @@ public class IndexModel : PageModel
         PrescriptionList = await _prescriptionService.GetPrescriptionsPagedAsync(CurrentPage, PageSize, SearchString, CurrentSort);
 
         // Note: The old logic using SearchPrescriptionsAsync/GetAllPrescriptionsAsync is replaced.
+    }
+
+    public async Task<IActionResult> OnGetSearchAsync(string searchTerm)
+    {
+        try
+        {
+            // Handle empty/null search terms
+            if (string.IsNullOrWhiteSpace(searchTerm))
+            {
+                return new JsonResult(new List<PrescriptionSearchDto>());
+            }
+
+            // Get prescriptions using existing service method, limit to 10 for autocomplete
+            var prescriptions = await _prescriptionService.GetPrescriptionsPagedAsync(1, 10, searchTerm, null);
+            
+            // Map to DTO
+            var prescriptionDtos = prescriptions.Select(p => new PrescriptionSearchDto
+            {
+                Id = p.Id,
+                PatientName = p.Patient?.Name ?? "Unknown Patient",
+                Date = p.DateIssued,
+                Status = p.Status
+            }).ToList();
+
+            return new JsonResult(prescriptionDtos);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred during prescription search for term: {SearchTerm}", searchTerm);
+            // Return empty result on error
+            return new JsonResult(new List<PrescriptionSearchDto>());
+        }
     }
 
     public async Task<IActionResult> OnPostCancelAsync(int id)
