@@ -16,7 +16,19 @@
 
 <form method="get" class="mb-3">
     <div class="input-group">
-        <input type="text" class="form-control" placeholder="Search by Patient Name..." name="SearchString" value="@Model.SearchString">
+        <div class="live-search-container">
+            <input type="text"
+                   class="form-control live-search-input"
+                   placeholder="Search by Patient Name..."
+                   name="SearchString"
+                   value="@Model.SearchString"
+                   data-live-search="/Prescriptions?handler=Search"
+                   data-live-search-dropdown="prescriptions-search-dropdown"
+                   data-live-search-display="patientName"
+                   data-live-search-secondary="date"
+                   autocomplete="off">
+            <div id="prescriptions-search-dropdown" class="live-search-dropdown" aria-label="Search suggestions"></div>
+        </div>
         <button class="btn btn-outline-primary" type="submit">Search</button>
         @if (!string.IsNullOrEmpty(Model.SearchString))
         {

@@ -4,6 +4,30 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.9.9.6] - 2025-06-18
+
+### Added
+
+* Implemented backend API endpoints for live search functionality across all main entities.
+* Added [`PatientSearchDto`](ViewModels/PatientSearchDto.cs:1) class for optimized patient search responses.
+* Added [`MedicationSearchDto`](ViewModels/MedicationSearchDto.cs:1) class for optimized medication search responses.
+* Added [`PrescriptionSearchDto`](ViewModels/PrescriptionSearchDto.cs:1) class for optimized prescription search responses.
+* Added [`OnGetSearchAsync`](Pages/Patients/Index.cshtml.cs:1) method to Patients Index page for JSON API endpoint.
+* Added [`OnGetSearchAsync`](Pages/Medications/Index.cshtml.cs:1) method to Medications Index page for JSON API endpoint.
+* Added [`OnGetSearchAsync`](Pages/Prescriptions/Index.cshtml.cs:1) method to Prescriptions Index page for JSON API endpoint.
+
+### Changed
+
+* Prepared backend infrastructure for live search/autocomplete implementation.
+* Updated project documentation to reflect current development progress.
+
+### Technical Notes
+
+* Backend API endpoints ready for frontend JavaScript integration.
+* Search DTOs provide lightweight, optimized data transfer for AJAX requests.
+* JSON endpoints support query parameter-based search functionality.
+* **Next Phase:** Frontend JavaScript implementation with debounced search and fetch API integration.
+
 ## [0.9.9.5] - 2025-05-01
 
 ### Added
