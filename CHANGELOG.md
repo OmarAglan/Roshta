@@ -4,6 +4,43 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.9.9.7] - 2025-06-18
+
+### Added
+
+* **COMPLETED LIVE SEARCH FUNCTIONALITY** - Full integration of frontend and backend components.
+* Created [`live-search.js`](wwwroot/js/live-search.js:1) with comprehensive autocomplete functionality:
+  * Debounced search with 300ms delay to optimize performance
+  * Keyboard navigation support (arrow keys, enter, escape)
+  * Accessibility features with ARIA attributes
+  * Loading states, error handling, and "no results" messaging
+  * Configurable display and secondary properties
+  * Auto-initialization via data attributes
+* Enhanced all Index pages with live search integration:
+  * [`Patients/Index.cshtml`](Pages/Patients/Index.cshtml:1) with name and contact info autocomplete
+  * [`Medications/Index.cshtml`](Pages/Medications/Index.cshtml:1) with medication name autocomplete
+  * [`Prescriptions/Index.cshtml`](Pages/Prescriptions/Index.cshtml:1) with patient and medication search
+* Added comprehensive CSS styling for autocomplete dropdowns in [`site.css`](wwwroot/css/site.css:1):
+  * Responsive dropdown positioning and sizing
+  * Hover and keyboard selection highlighting
+  * Loading, error, and no-results state styling
+  * Bootstrap-consistent design language
+* Updated [`_Layout.cshtml`](Pages/Shared/_Layout.cshtml:1) to include live-search.js
+
+### Changed
+
+* Enhanced search experience from form-based to real-time autocomplete
+* Improved user workflow efficiency with instant search suggestions
+* Maintained backward compatibility with existing form-based search as fallback
+
+### Technical Notes
+
+* **Live search feature is now COMPLETE and fully functional**
+* Debouncing prevents excessive API calls and improves performance
+* Keyboard navigation enhances accessibility and user experience
+* Error handling ensures graceful degradation when API calls fail
+* All three main entities (Patients, Medications, Prescriptions) support live search
+
 ## [0.9.9.6] - 2025-06-18
 
 ### Added
@@ -26,7 +63,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 * Backend API endpoints ready for frontend JavaScript integration.
 * Search DTOs provide lightweight, optimized data transfer for AJAX requests.
 * JSON endpoints support query parameter-based search functionality.
-* **Next Phase:** Frontend JavaScript implementation with debounced search and fetch API integration.
 
 ## [0.9.9.5] - 2025-05-01
 
