@@ -4,6 +4,64 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.9.9.8] - 2025-06-18
+
+### Added
+
+* **COMPREHENSIVE SETTINGS FUNCTIONALITY & ENHANCED NAVIGATION** - Complete implementation of user settings management and improved navigation system.
+* Created [`ISettingsService`](Services/Interfaces/ISettingsService.cs:1) interface and [`SettingsService`](Services/SettingsService.cs:1) implementation:
+  * File-based settings persistence using JSON in LocalApplicationData
+  * GetUserSettingsAsync, SaveUserSettingsAsync, and GetDefaultSettings methods
+  * Comprehensive error handling and logging
+* Created [`UserSettingsModel`](ViewModels/UserSettingsModel.cs:1) with extensive configuration options:
+  * Display settings: date/time formats, search results per page, table density, theme preferences
+  * Prescription defaults: duration, dosage frequency
+  * Notification preferences: success/warning/error notifications, auto-hide, duration
+  * Application preferences: auto-save drafts, delete confirmation, advanced options, keyboard shortcuts
+* **Enhanced Navigation System** in [`_Layout.cshtml`](Pages/Shared/_Layout.cshtml:1):
+  * User dropdown menu with doctor name and profile icon
+  * "Profile & Settings" link with gear icon
+  * About section with version information
+  * Responsive breadcrumb navigation component
+* **Tabbed Settings Interface** - Complete redesign of [`DoctorProfile/Edit.cshtml`](Pages/DoctorProfile/Edit.cshtml:1):
+  * Five-tab interface: Profile Information, Display Settings, Prescription Defaults, Notifications, Application Preferences
+  * Bootstrap 5 tab components with proper ARIA attributes
+  * Individual forms for each settings category with proper validation
+  * Tab persistence using localStorage
+* Enhanced CSS styling in [`site.css`](wwwroot/css/site.css:164):
+  * Navigation dropdown styling with shadows and hover effects
+  * Breadcrumb navigation with proper separators and links
+  * Tab interface styling with active states and transitions
+  * Enhanced form styling with focus states and validation
+  * Responsive design improvements for mobile devices
+* Created [`settings.js`](wwwroot/js/settings.js:1) with advanced functionality:
+  * Tab persistence across page reloads
+  * Live preview for date/time format settings
+  * Notification settings preview
+  * Form validation and loading states
+  * Theme preview preparation for future implementation
+* Added settings service registration to [`Program.cs`](Program.cs:39)
+
+### Changed
+
+* Extended [`DoctorProfile/Edit.cshtml.cs`](Pages/DoctorProfile/Edit.cshtml.cs:1) with settings functionality:
+  * Added ISettingsService dependency injection
+  * Added UserSettingsModel property binding
+  * Implemented OnPostSaveSettingsAsync handler for settings persistence
+  * Enhanced error handling and user feedback
+* Updated page title to "Profile & Settings" with proper breadcrumb integration
+* Improved form layout and user experience with card-based design
+* Enhanced mobile responsiveness across all settings components
+
+### Technical Notes
+
+* **Settings are persisted locally** using JSON files in user's LocalApplicationData folder
+* **Backward compatibility maintained** - existing profile functionality unchanged
+* **Comprehensive validation** implemented for all settings with proper error messaging
+* **Accessibility enhanced** with proper ARIA attributes and keyboard navigation
+* **Performance optimized** with debounced validation and efficient tab switching
+* **Future-ready** theme system prepared for light/dark mode implementation
+
 ## [0.9.9.7] - 2025-06-18
 
 ### Added
