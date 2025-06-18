@@ -179,33 +179,102 @@ document.addEventListener('DOMContentLoaded', function () {
         updatePreviewText('notificationPreview', previewText);
     }
 
-    // Theme preview (placeholder for future implementation)
+    // Enhanced theme functionality with actual theme switching
     function initializeThemePreview() {
         const themeSelect = document.getElementById('UserSettings_ThemePreference');
         if (themeSelect) {
+            // Load saved theme or detect system preference
+            const savedTheme = localStorage.getItem('theme') || 'auto';
+            themeSelect.value = savedTheme;
+            applyTheme(savedTheme);
+            
             themeSelect.addEventListener('change', function() {
                 const theme = this.value;
-                let previewText = '';
-                
-                switch(theme) {
-                    case 'light':
-                        previewText = 'Light theme - bright background with dark text';
-                        break;
-                    case 'dark':
-                        previewText = 'Dark theme - dark background with light text (coming soon)';
-                        break;
-                    case 'auto':
-                        previewText = 'Auto theme - follows your system preference (coming soon)';
-                        break;
-                }
-                
-                updatePreviewText('themePreview', previewText);
+                applyTheme(theme);
+                localStorage.setItem('theme', theme);
+                updateThemePreview(theme);
             });
             
             // Initial preview
-            const event = new Event('change');
-            themeSelect.dispatchEvent(event);
+            updateThemePreview(savedTheme);
+            
+            // Listen for system theme changes when in auto mode
+            if (window.matchMedia) {
+                const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+                mediaQuery.addEventListener('change', function() {
+                    if (themeSelect.value === 'auto') {
+                        applyTheme('auto');
+                    }
+                });
+            }
         }
+    }
+
+    function updateThemePreview(theme) {
+        let previewText = '';
+        
+        switch(theme) {
+            case 'light':
+                previewText = 'Light theme - bright background with dark text for optimal readability';
+                break;
+            case 'dark':
+                previewText = 'Dark theme - dark background with light text, easier on the eyes';
+                break;
+            case 'auto':
+                const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                previewText = `Auto theme - currently using ${isDarkMode ? 'dark' : 'light'} based on system preference`;
+                break;
+        }
+        
+        updatePreviewText('themePreview', previewText);
+    }
+
+    function applyTheme(theme) {
+        // Add transitioning class to prevent flicker
+        document.body.classList.add('theme-transitioning');
+        
+        // Remove existing theme classes
+        document.documentElement.removeAttribute('data-theme');
+        
+        // Apply new theme
+        if (theme === 'auto') {
+            // Let CSS handle auto theme via media queries
+            document.documentElement.setAttribute('data-theme', 'auto');
+        } else {
+            document.documentElement.setAttribute('data-theme', theme);
+        }
+        
+        // Remove transitioning class after a brief delay
+        setTimeout(() => {
+            document.body.classList.remove('theme-transitioning');
+        }, 50);
+        
+        // Update any theme-specific UI elements
+        updateThemeSpecificElements(theme);
+    }
+
+    function updateThemeSpecificElements(theme) {
+        // Update any elements that need special handling for theme changes
+        const themeMetaTag = document.querySelector('meta[name="theme-color"]');
+        if (themeMetaTag) {
+            const isDark = theme === 'dark' || (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            themeMetaTag.setAttribute('content', isDark ? '#121212' : '#ffffff');
+        }
+        
+        // Dispatch custom event for other components that might need to react to theme changes
+        const themeChangeEvent = new CustomEvent('themeChanged', {
+            detail: { theme: theme }
+        });
+        document.dispatchEvent(themeChangeEvent);
+    }
+
+    // Utility function to get current effective theme
+    function getCurrentTheme() {
+        const savedTheme = localStorage.getItem('theme') || 'auto';
+        if (savedTheme === 'auto') {
+            return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        return savedTheme;
     }
 
     // Initialize all settings functionality
@@ -225,5 +294,20 @@ window.SettingsJS = {
     },
     updateTimePreview: function(format) {
         // Function available globally if needed
+    },
+    applyTheme: function(theme) {
+        applyTheme(theme);
+    },
+    getCurrentTheme: function() {
+        return getCurrentTheme();
     }
 };
+
+// Initialize theme on page load (for pages without settings form)
+document.addEventListener('DOMContentLoaded', function() {
+    // Only initialize theme if not already handled by settings page
+    if (!document.getElementById('profileTabs')) {
+        const savedTheme = localStorage.getItem('theme') || 'auto';
+        applyTheme(savedTheme);
+    }
+});

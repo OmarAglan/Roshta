@@ -11,6 +11,7 @@
     <meta name="keywords" content="prescription management, medical software, healthcare, EMR, electronic medical records" />
     <meta name="author" content="Rosheta Development Team" />
     <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#ffffff" />
     
     <title>@ViewData["Title"] - Rosheta</title>
     
@@ -32,10 +33,12 @@
     <link rel="preload" href="~/css/site.css" as="style" />
 </head>
 <body>
-    <!-- Skip Navigation Link for Accessibility -->
-    <a href="#main-content" class="skip-link">Skip to main content</a>
-    
-    <header class="modern-header">
+    <!-- Page Wrapper for Sticky Footer -->
+    <div class="page-wrapper">
+        <!-- Skip Navigation Link for Accessibility -->
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+        
+        <header class="modern-header">
         <!-- Main Navigation Bar -->
         <nav class="navbar navbar-expand-lg navbar-light bg-gradient-primary border-bottom shadow-sm">
             <div class="container">
@@ -238,14 +241,16 @@
         </div>
     }
     
-    <div class="container">
-        <main id="main-content" role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+        <div class="main-content">
+            <div class="container">
+                <main id="main-content" role="main" class="pb-3">
+                    @RenderBody()
+                </main>
+            </div>
+        </div>
 
-    <!-- Professional Footer -->
-    <footer class="modern-footer bg-dark text-light mt-5">
+        <!-- Professional Footer -->
+        <footer class="modern-footer bg-dark text-light">
         <!-- Main Footer Content -->
         <div class="footer-main bg-gradient-dark py-5">
             <div class="container">
@@ -442,6 +447,7 @@
     <script src="~/js/validation-helpers.js" asp-append-version="true"></script>
     <script src="~/js/live-search.js" asp-append-version="true"></script>
     <script src="~/js/header-footer.js" asp-append-version="true"></script>
+    <script src="~/js/settings.js" asp-append-version="true"></script>
     <!-- Add reference to Select2 JS (after jQuery and Bootstrap Bundle) -->
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> @* Corrected tag back to script *@
 
@@ -450,6 +456,7 @@
     <!-- Toast Container -->
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
         <!-- Toasts will be appended here -->
+        </div>
     </div>
 </body>
 </html>
