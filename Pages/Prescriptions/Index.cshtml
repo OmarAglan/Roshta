@@ -4,157 +4,286 @@
 
 @{ 
     ViewData["Title"] = "Prescriptions";
+    ViewData["PageDescription"] = "Manage prescription records and status";
+    ViewData["BreadcrumbItems"] = new List<(string Text, string? Url)>
+    {
+        ("Prescriptions", null)
+    };
 }
 
-<h1>@ViewData["Title"]</h1>
-
-@* TempData messages will now be shown as toasts via JavaScript below *@
-
-<p>
-    <a asp-page="./Create" class="btn btn-primary"><i class="bi bi-plus-circle-fill me-1"></i>Create New Prescription</a> @* Added icon *@
-</p>
-
-<form method="get" class="mb-3">
-    <div class="input-group">
-        <div class="live-search-container">
-            <input type="text"
-                   class="form-control live-search-input"
-                   placeholder="Search by Patient Name..."
-                   name="SearchString"
-                   value="@Model.SearchString"
-                   data-live-search="/Prescriptions?handler=Search"
-                   data-live-search-dropdown="prescriptions-search-dropdown"
-                   data-live-search-display="patientName"
-                   data-live-search-secondary="date"
-                   autocomplete="off">
-            <div id="prescriptions-search-dropdown" class="live-search-dropdown" aria-label="Search suggestions"></div>
+<!-- Page Header -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h2 mb-1">
+                    <i class="bi bi-file-earmark-medical me-2 text-info"></i>Prescriptions
+                </h1>
+                <p class="text-muted mb-0">Manage prescription records and status</p>
+            </div>
+            <div>
+                <a asp-page="./Create" class="btn btn-info">
+                    <i class="bi bi-plus-circle-fill me-1"></i>
+                    <span class="d-none d-sm-inline">Create New Prescription</span>
+                    <span class="d-sm-none">New</span>
+                </a>
+            </div>
         </div>
-        <button class="btn btn-outline-primary" type="submit">Search</button>
-        @if (!string.IsNullOrEmpty(Model.SearchString))
+    </div>
+</div>
+
+<!-- Search Section -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-8">
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-search me-1"></i>Search Prescriptions
+                    </label>
+                    <div class="input-group">
+                        <div class="live-search-container">
+                            <input type="text"
+                                   class="form-control live-search-input"
+                                   placeholder="Search by Patient Name..."
+                                   name="SearchString"
+                                   value="@Model.SearchString"
+                                   data-live-search="/Prescriptions?handler=Search"
+                                   data-live-search-dropdown="prescriptions-search-dropdown"
+                                   data-live-search-display="patientName"
+                                   data-live-search-secondary="date"
+                                   autocomplete="off">
+                            <div id="prescriptions-search-dropdown" class="live-search-dropdown" aria-label="Search suggestions"></div>
+                        </div>
+                        <button class="btn btn-outline-info" type="submit">
+                            <i class="bi bi-search"></i>
+                            <span class="d-none d-sm-inline ms-1">Search</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    @if (!string.IsNullOrEmpty(Model.SearchString))
+                    {
+                        <div class="d-grid">
+                            <a asp-page="./Index" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle me-1"></i>Clear Search
+                            </a>
+                        </div>
+                        <small class="text-muted mt-1 d-block">
+                            Searching for: "<strong>@Model.SearchString</strong>"
+                        </small>
+                    }
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Results Section -->
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-transparent border-bottom">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">
+                <i class="bi bi-list-ul me-2"></i>Prescription Records
+            </h5>
+            @if (Model.Count > 0)
+            {
+                <span class="badge bg-info rounded-pill">@Model.Count total</span>
+            }
+        </div>
+    </div>
+    <div class="card-body p-0">
+        @if (Model.PrescriptionList != null && Model.PrescriptionList.Any())
         {
-            <a asp-page="./Index" class="btn btn-outline-secondary">Clear</a>
+            <!-- Desktop Table -->
+            <div class="table-responsive d-none d-lg-block">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="border-0">
+                                <a asp-page="./Index" asp-route-sortOrder="@Model.NameSort"
+                                   asp-route-CurrentPage="@Model.CurrentPage"
+                                   asp-route-SearchString="@Model.SearchString"
+                                   class="text-decoration-none">
+                                    @Html.DisplayNameFor(model => model.PrescriptionList[0].Patient.Name)
+                                    <i class="bi bi-arrow-down-up ms-1 text-muted"></i>
+                                </a>
+                            </th>
+                            <th class="border-0">@Html.DisplayNameFor(model => model.PrescriptionList[0].Doctor.Name)</th>
+                            <th class="border-0">
+                                <a asp-page="./Index" asp-route-sortOrder="@Model.DateSort"
+                                   asp-route-CurrentPage="@Model.CurrentPage"
+                                   asp-route-SearchString="@Model.SearchString"
+                                   class="text-decoration-none">
+                                    @Html.DisplayNameFor(model => model.PrescriptionList[0].DateIssued)
+                                    <i class="bi bi-arrow-down-up ms-1 text-muted"></i>
+                                </a>
+                            </th>
+                            <th class="border-0">@Html.DisplayNameFor(model => model.PrescriptionList[0].ExpiryDate)</th>
+                            <th class="border-0 text-center">@Html.DisplayNameFor(model => model.PrescriptionList[0].Status)</th>
+                            <th class="border-0 text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.PrescriptionList)
+                        {
+                            <tr class="@(item.Status == PrescriptionStatus.Cancelled ? "table-secondary text-muted" : "")">
+                                <td class="fw-semibold">
+                                    <i class="bi bi-person me-2 text-muted"></i>@Html.DisplayFor(modelItem => item.Patient.Name)
+                                </td>
+                                <td>@Html.DisplayFor(modelItem => item.Doctor.Name)</td>
+                                <td>@Html.DisplayFor(modelItem => item.DateIssued)</td>
+                                <td>@Html.DisplayFor(modelItem => item.ExpiryDate)</td>
+                                <td class="text-center">
+                                    <span class="badge @(item.Status == PrescriptionStatus.Active ? "bg-success" : item.Status == PrescriptionStatus.Cancelled ? "bg-danger" : "bg-secondary")">
+                                        <i class="bi @(item.Status == PrescriptionStatus.Active ? "bi-check-circle" : item.Status == PrescriptionStatus.Cancelled ? "bi-x-circle" : "bi-clock") me-1"></i>
+                                        @Html.DisplayFor(modelItem => item.Status)
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group" role="group">
+                                        <a asp-page="./Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info" title="View Details">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a asp-page="./Create" asp-route-copyFromId="@item.Id" class="btn btn-sm btn-outline-secondary" title="Copy Prescription">
+                                            <i class="bi bi-copy"></i>
+                                        </a>
+                                        @if (item.Status == PrescriptionStatus.Active)
+                                        {
+                                            <form method="post" asp-page-handler="Cancel" asp-route-id="@item.Id" style="display: inline;" onsubmit="return confirm('Are you sure you want to cancel this prescription?');">
+                                                <button type="submit" class="btn btn-sm btn-outline-warning" title="Cancel Prescription">
+                                                    <i class="bi bi-x-circle"></i>
+                                                </button>
+                                            </form>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mobile Cards -->
+            <div class="d-lg-none">
+                @foreach (var item in Model.PrescriptionList)
+                {
+                    <div class="border-bottom p-3 @(item.Status == PrescriptionStatus.Cancelled ? "opacity-75" : "")">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="mb-1 fw-semibold">
+                                <i class="bi bi-person me-2 text-info"></i>@Html.DisplayFor(modelItem => item.Patient.Name)
+                            </h6>
+                            <span class="badge @(item.Status == PrescriptionStatus.Active ? "bg-success" : item.Status == PrescriptionStatus.Cancelled ? "bg-danger" : "bg-secondary")">
+                                <i class="bi @(item.Status == PrescriptionStatus.Active ? "bi-check-circle" : item.Status == PrescriptionStatus.Cancelled ? "bi-x-circle" : "bi-clock") me-1"></i>
+                                @Html.DisplayFor(modelItem => item.Status)
+                            </span>
+                        </div>
+                        <div class="row g-2 text-sm">
+                            <div class="col-6">
+                                <small class="text-muted d-block">Doctor</small>
+                                <span>@Html.DisplayFor(modelItem => item.Doctor.Name)</span>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted d-block">Date Issued</small>
+                                <span>@Html.DisplayFor(modelItem => item.DateIssued)</span>
+                            </div>
+                            <div class="col-12">
+                                <small class="text-muted d-block">Expiry Date</small>
+                                <span>@Html.DisplayFor(modelItem => item.ExpiryDate)</span>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2 mt-3">
+                            <a asp-page="./Details" asp-route-id="@item.Id" 
+                               class="btn btn-sm btn-outline-info flex-fill">
+                                <i class="bi bi-eye me-1"></i>Details
+                            </a>
+                            <a asp-page="./Create" asp-route-copyFromId="@item.Id" 
+                               class="btn btn-sm btn-outline-secondary flex-fill">
+                                <i class="bi bi-copy me-1"></i>Copy
+                            </a>
+                            @if (item.Status == PrescriptionStatus.Active)
+                            {
+                                <form method="post" asp-page-handler="Cancel" asp-route-id="@item.Id" style="display: inline;" onsubmit="return confirm('Are you sure you want to cancel this prescription?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-warning">
+                                        <i class="bi bi-x-circle"></i>
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="bi bi-file-earmark-medical text-muted mb-3" style="font-size: 3rem;"></i>
+                <h5 class="text-muted mb-3">No Prescriptions Found</h5>
+                @if (!string.IsNullOrEmpty(Model.SearchString))
+                {
+                    <p class="text-muted mb-4">No prescriptions match your search criteria. Try a different search term.</p>
+                    <a asp-page="./Index" class="btn btn-outline-secondary me-2">
+                        <i class="bi bi-x-circle me-1"></i>Clear Search
+                    </a>
+                }
+                else
+                {
+                    <p class="text-muted mb-4">Start by creating your first prescription to begin managing patient treatments.</p>
+                }
+                <a asp-page="./Create" class="btn btn-info">
+                    <i class="bi bi-plus-circle-fill me-1"></i>Create New Prescription
+                </a>
+            </div>
         }
     </div>
-</form>
+</div>
 
-@if (Model.PrescriptionList == null || !Model.PrescriptionList.Any())
-{
-    <div class="alert alert-info">No prescriptions found.</div>
+<!-- Pagination -->
+@{
+    var prevDisabled = Model.CurrentPage <= 1 ? "disabled" : "";
+    var nextDisabled = Model.CurrentPage >= Model.TotalPages ? "disabled" : "";
 }
-else
-{
-    <table class="table table-striped table-hover">
-        <thead>
-            <tr>
-                <th>
-                    <a asp-page="./Index" asp-route-sortOrder="@Model.NameSort"
-                       asp-route-CurrentPage="@Model.CurrentPage"
-                       asp-route-SearchString="@Model.SearchString">
-                        @Html.DisplayNameFor(model => model.PrescriptionList[0].Patient.Name)
-                    </a>
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.PrescriptionList[0].Doctor.Name) 
-                </th>
-                <th>
-                    <a asp-page="./Index" asp-route-sortOrder="@Model.DateSort"
-                       asp-route-CurrentPage="@Model.CurrentPage"
-                       asp-route-SearchString="@Model.SearchString">
-                        @Html.DisplayNameFor(model => model.PrescriptionList[0].DateIssued)
-                    </a>
-                </th>
-                 <th>
-                    @Html.DisplayNameFor(model => model.PrescriptionList[0].ExpiryDate)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.PrescriptionList[0].Status)
-                </th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-    @foreach (var item in Model.PrescriptionList) {
-            <tr class="@(item.Status == PrescriptionStatus.Cancelled ? "table-secondary text-muted" : "")">
-                <td>
-                    @Html.DisplayFor(modelItem => item.Patient.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Doctor.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.DateIssued)
-                </td>
-                 <td>
-                    @Html.DisplayFor(modelItem => item.ExpiryDate)
-                </td>
-                <td>
-                    <span class="badge @(item.Status == PrescriptionStatus.Active ? "bg-success" : item.Status == PrescriptionStatus.Cancelled ? "bg-danger" : "bg-secondary")">
-                        @Html.DisplayFor(modelItem => item.Status)
-                    </span>
-                </td>
-                <td>
-                    <a asp-page="./Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info me-1" title="Details">
-                        <i class="bi bi-info-circle"></i>
-                    </a>
-                    <a asp-page="./Create" asp-route-copyFromId="@item.Id" class="btn btn-sm btn-outline-secondary me-1" title="Copy">
-                        <i class="bi bi-copy"></i>
-                    </a>
-                    @if (item.Status == PrescriptionStatus.Active)
-                    {
-                        <form method="post" asp-page-handler="Cancel" asp-route-id="@item.Id" style="display: inline;" onsubmit="return confirm('Are you sure you want to cancel this prescription?');">
-                            <button type="submit" class="btn btn-sm btn-outline-warning" title="Cancel">
-                                <i class="bi bi-x-circle"></i>
-                            </button>
-                        </form>
-                    }
-                    @* Edit/Delete might be added later based on status or permissions *@
-                </td>
-            </tr>
-    }
-        </tbody>
-    </table>
 
-    @if (Model.TotalPages > 1)
-    {
-        var prevDisabled = Model.CurrentPage <= 1 ? "disabled" : "";
-        var nextDisabled = Model.CurrentPage >= Model.TotalPages ? "disabled" : "";
+@if (Model.TotalPages > 1)
+{
+    <div class="d-flex justify-content-between align-items-center mt-4">
+        <div class="text-muted small">
+            Showing page @Model.CurrentPage of @Model.TotalPages (@Model.Count total prescriptions)
+        </div>
         <nav aria-label="Page navigation">
-            <ul class="pagination justify-content-center">
+            <ul class="pagination pagination-sm mb-0">
                 <li class="page-item @prevDisabled">
                     <a asp-page="./Index"
                        asp-route-SearchString="@Model.SearchString"
                        asp-route-CurrentPage="@(Model.CurrentPage - 1)"
                        asp-route-sortOrder="@Model.CurrentSort"
                        class="page-link" aria-label="Previous">
-                        <span aria-hidden="true">&laquo; Previous</span>
+                        <i class="bi bi-chevron-left"></i>
+                        <span class="d-none d-sm-inline ms-1">Previous</span>
                     </a>
                 </li>
-
                 <li class="page-item active" aria-current="page">
-                     <span class="page-link">Page @Model.CurrentPage of @Model.TotalPages</span>
+                     <span class="page-link">@Model.CurrentPage</span>
                 </li>
-
                 <li class="page-item @nextDisabled">
                     <a asp-page="./Index"
                        asp-route-SearchString="@Model.SearchString"
                        asp-route-CurrentPage="@(Model.CurrentPage + 1)"
                        asp-route-sortOrder="@Model.CurrentSort"
                        class="page-link" aria-label="Next">
-                        <span aria-hidden="true">Next &raquo;</span>
+                        <span class="d-none d-sm-inline me-1">Next</span>
+                        <i class="bi bi-chevron-right"></i>
                     </a>
                 </li>
             </ul>
         </nav>
-        <div class="text-center text-muted small">
-            Total Prescriptions: @Model.Count
-        </div>
-    }
-    else if (Model.Count > 0)
-    {
-         <div class="text-center text-muted small">
-            Total Prescriptions: @Model.Count
-        </div>
-    }
+    </div>
+}
+else if (Model.Count > 0)
+{
+    <div class="text-center text-muted small mt-3">
+        Total Prescriptions: @Model.Count
+    </div>
 }
 
 @section Scripts {

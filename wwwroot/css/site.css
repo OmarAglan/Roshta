@@ -397,6 +397,575 @@ body {
 .toast-container {
   z-index: 1060;
 }
+/* ====== PHASE 3: ADVANCED FEATURES & POLISH STYLES ====== */
+
+/* Details Pages Enhancements */
+.stat-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Loading States & Animations */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loading-spinner {
+    text-align: center;
+    color: white;
+}
+
+.loading-skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.skeleton-text {
+    height: 1rem;
+    border-radius: 0.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.skeleton-text.wide {
+    width: 100%;
+}
+
+.skeleton-text.medium {
+    width: 75%;
+}
+
+.skeleton-text.narrow {
+    width: 50%;
+}
+
+/* Enhanced Card Animations */
+.card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.card-fade-in {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Button Enhancements with Loading States */
+.btn-loading {
+    position: relative;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.btn-loading::after {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Advanced Table Features */
+.table-enhanced {
+    position: relative;
+}
+
+.table-enhanced .table-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.bulk-actions-toolbar {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 0.375rem;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    display: none;
+}
+
+.bulk-actions-toolbar.show {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.table-sort-indicator {
+    margin-left: 0.5rem;
+    opacity: 0.5;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.table-sort-indicator.active {
+    opacity: 1;
+}
+
+/* Advanced Filter Panel */
+.filter-panel {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.filter-panel.collapsed {
+    padding: 0.75rem 1.5rem;
+}
+
+.filter-panel.collapsed .filter-content {
+    display: none;
+}
+
+.filter-toggle {
+    background: none;
+    border: none;
+    color: #6c757d;
+    font-weight: 500;
+    transition: color 0.2s ease-in-out;
+}
+
+.filter-toggle:hover {
+    color: #495057;
+}
+
+.filter-toggle i {
+    transition: transform 0.2s ease-in-out;
+}
+
+.filter-toggle[aria-expanded="true"] i {
+    transform: rotate(180deg);
+}
+
+/* Empty State Designs */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    color: #6c757d;
+}
+
+.empty-state-icon {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    opacity: 0.5;
+}
+
+.empty-state h4 {
+    color: #495057;
+    margin-bottom: 1rem;
+}
+
+.empty-state p {
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+}
+
+/* Error States */
+.error-state {
+    text-align: center;
+    padding: 2rem;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 0.5rem;
+    color: #721c24;
+}
+
+.error-state-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #dc3545;
+}
+
+/* Success States */
+.success-state {
+    text-align: center;
+    padding: 2rem;
+    background-color: #d1edcc;
+    border: 1px solid #c3e6cb;
+    border-radius: 0.5rem;
+    color: #155724;
+}
+
+.success-state-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #28a745;
+}
+
+/* Accessibility Enhancements */
+.btn:focus,
+.btn-outline-primary:focus,
+.btn-outline-secondary:focus {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    outline: 2px solid transparent;
+}
+
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 6px;
+    background: #000;
+    color: #fff;
+    padding: 8px;
+    text-decoration: none;
+    z-index: 1000;
+    border-radius: 0.25rem;
+}
+
+.skip-link:focus {
+    top: 6px;
+    color: #fff;
+}
+
+/* Focus indicators for custom elements */
+.card:focus-within {
+    outline: 2px solid #0d6efd;
+    outline-offset: 2px;
+}
+
+.live-search-item:focus {
+    outline: 2px solid #0d6efd;
+    outline-offset: -2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .card {
+        border-width: 2px;
+    }
+    
+    .btn {
+        border-width: 2px;
+    }
+    
+    .badge {
+        border: 1px solid currentColor;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    .card:hover {
+        transform: none;
+    }
+    
+    .btn-primary:hover {
+        transform: none;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .btn-toolbar,
+    .quick-actions,
+    .loading-overlay,
+    .toast-container {
+        display: none !important;
+    }
+    
+    .card {
+        border: 1px solid #000 !important;
+        break-inside: avoid;
+        box-shadow: none !important;
+    }
+    
+    .card-header {
+        background-color: #f8f9fa !important;
+        -webkit-print-color-adjust: exact;
+    }
+    
+    body {
+        font-size: 12pt;
+        line-height: 1.4;
+    }
+    
+    h1, h2, h3, h4, h5, h6 {
+        break-after: avoid;
+    }
+    
+    .table {
+        border-collapse: collapse;
+    }
+    
+    .table th,
+    .table td {
+        border: 1px solid #000 !important;
+    }
+}
+
+/* Performance Optimizations */
+.card,
+.btn,
+.form-control {
+    will-change: auto;
+}
+
+.loading-skeleton,
+.card:hover,
+.btn:hover {
+    will-change: transform;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 576px) {
+    .stat-icon {
+        width: 32px;
+        height: 32px;
+    }
+/* Prescription Details Page Styles */
+.prescription-card .card-header {
+    border-bottom: 3px solid #0d6efd;
+}
+
+.prescription-info-block {
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+    border-left: 4px solid #0d6efd;
+}
+
+.medication-table {
+    font-size: 0.9rem;
+}
+
+.medication-row:hover {
+    background-color: #f8f9fa;
+}
+
+.medication-info {
+    min-width: 200px;
+}
+
+.medication-details td {
+    font-size: 0.875rem;
+    padding: 0.75rem;
+}
+
+@media (max-width: 768px) {
+    .btn-toolbar {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .prescription-info-block {
+        margin-bottom: 1rem;
+    }
+    
+    .table-responsive {
+        font-size: 0.8rem;
+    }
+}
+    
+    .empty-state {
+        padding: 2rem 1rem;
+    }
+    
+    .empty-state-icon {
+        font-size: 3rem;
+    }
+    
+    .filter-panel {
+        padding: 1rem;
+    }
+    
+    .bulk-actions-toolbar {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+/* Tooltip Enhancements */
+.tooltip-custom {
+    position: relative;
+    cursor: help;
+}
+
+.tooltip-custom::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #000;
+    color: #fff;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease-in-out;
+    z-index: 1060;
+}
+
+.tooltip-custom:hover::after {
+    opacity: 1;
+}
+
+/* Status Badge Enhancements */
+.badge {
+    font-size: 0.75em;
+    font-weight: 500;
+    letter-spacing: 0.025em;
+}
+
+.badge-pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(13, 110, 253, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(13, 110, 253, 0);
+    }
+}
+
+/* Form Enhancements */
+.form-floating .form-control:focus ~ label,
+.form-floating .form-control:not(:placeholder-shown) ~ label {
+    transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+    color: #0d6efd;
+}
+
+.input-group-enhanced {
+    position: relative;
+}
+
+.input-group-enhanced .form-control:focus {
+    z-index: 3;
+}
+
+/* Progress Indicators */
+.progress-steps {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+}
+
+.progress-step {
+    flex: 1;
+    text-align: center;
+    position: relative;
+}
+
+.progress-step::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: #e9ecef;
+    z-index: 1;
+}
+
+.progress-step.completed::before {
+    background-color: #28a745;
+}
+
+.progress-step-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.5rem;
+    position: relative;
+    z-index: 2;
+    font-weight: 600;
+}
+
+.progress-step.completed .progress-step-circle {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.progress-step.active .progress-step-circle {
+    background-color: #0d6efd;
+    color: #fff;
+}
 
 /* Utility Classes */
 .text-primary {
@@ -434,4 +1003,247 @@ body {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+/* Enhanced Mobile Responsive Styles */
+@media (max-width: 991.98px) {
+  /* Hide desktop table, show mobile cards */
+  .table-responsive.d-none.d-lg-block {
+    display: none !important;
+  }
+  
+  /* Improve mobile card spacing */
+  .card-body .border-bottom {
+    border-color: #e9ecef !important;
+  }
+  
+  /* Better button spacing on mobile */
+  .btn-group .btn {
+    margin-bottom: 0.25rem;
+  }
+}
+
+@media (max-width: 767.98px) {
+  /* Reduce card padding on smaller screens */
+  .card-body {
+    padding: 1rem;
+  }
+  
+  /* Stack form elements better */
+  .input-group {
+    flex-direction: column;
+  }
+  
+  .input-group .btn {
+    border-radius: 0.375rem !important;
+    margin-top: 0.5rem;
+  }
+  
+  /* Improve pagination on mobile */
+  .pagination {
+    justify-content: center;
+  }
+  
+  .pagination .page-item .page-link {
+    padding: 0.375rem 0.75rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  /* Further reduce spacing on very small screens */
+  .card-header,
+  .card-body {
+    padding: 0.75rem;
+  }
+  
+  /* Improve button sizes */
+  .btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8125rem;
+  }
+  
+  /* Better mobile form layout */
+  .row.g-3 {
+    --bs-gutter-x: 0.75rem;
+    --bs-gutter-y: 0.75rem;
+  }
+}
+
+/* Enhanced Card Styles */
+.card.border-0.shadow-sm {
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.075) !important;
+}
+
+.card.border-0.shadow-sm:hover {
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.15) !important;
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+/* Improved Badge Styles */
+.badge {
+  font-weight: 500;
+  letter-spacing: 0.025em;
+}
+
+.badge.bg-success {
+  background-color: #198754 !important;
+}
+
+.badge.bg-danger {
+  background-color: #dc3545 !important;
+}
+
+.badge.bg-info {
+  background-color: #0dcaf0 !important;
+}
+
+.badge.bg-warning {
+  background-color: #ffc107 !important;
+  color: #000 !important;
+}
+
+/* Enhanced Table Styles */
+.table-hover tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.025);
+}
+
+.table thead th {
+  border-bottom: 2px solid #dee2e6;
+  font-weight: 600;
+  color: #495057;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Improved Form Styles */
+.form-label.fw-semibold {
+  font-weight: 600 !important;
+  color: #495057;
+  margin-bottom: 0.5rem;
+}
+
+.form-control:focus {
+  border-color: #86b7fe;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+}
+
+.form-select:focus {
+  border-color: #86b7fe;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+}
+
+/* Enhanced Button Styles */
+.btn.btn-success {
+  background-color: #198754;
+  border-color: #198754;
+}
+
+.btn.btn-success:hover {
+  background-color: #146c43;
+  border-color: #13653f;
+}
+
+.btn.btn-info {
+  background-color: #0dcaf0;
+  border-color: #0dcaf0;
+  color: #000;
+}
+
+.btn.btn-info:hover {
+  background-color: #0bb5d6;
+  border-color: #0bb5d6;
+  color: #000;
+}
+
+/* Loading State Improvements */
+.btn.loading {
+  pointer-events: none;
+  opacity: 0.65;
+}
+
+/* Empty State Styling */
+.text-center.py-5 {
+  padding: 3rem 1rem !important;
+}
+
+.text-center.py-5 i {
+  opacity: 0.5;
+}
+
+/* Sticky Action Panel */
+.position-sticky {
+  top: 1rem !important;
+}
+
+@media (max-width: 991.98px) {
+  .position-sticky {
+    position: relative !important;
+    top: 0 !important;
+  }
+}
+
+/* Improved Search Highlighting */
+.live-search-item-primary {
+  color: #212529;
+  font-weight: 500;
+}
+
+.live-search-item-secondary {
+  color: #6c757d;
+  font-size: 0.875rem;
+}
+
+/* Better Focus States */
+.btn:focus,
+.btn:active:focus {
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.btn-success:focus,
+.btn-success:active:focus {
+  box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
+}
+
+.btn-info:focus,
+.btn-info:active:focus {
+  box-shadow: 0 0 0 0.25rem rgba(13, 202, 240, 0.25);
+}
+
+/* Accessibility Improvements */
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .btn,
+  .badge {
+    transition: none !important;
+  }
+  
+  .live-search-dropdown {
+    animation: none !important;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .btn,
+  .pagination,
+  .live-search-dropdown,
+  .toast-container {
+    display: none !important;
+  }
+  
+  .card {
+    border: 1px solid #dee2e6 !important;
+    box-shadow: none !important;
+  }
+  
+  .table {
+    border-collapse: collapse !important;
+  }
+  
+  .table td,
+  .table th {
+    border: 1px solid #dee2e6 !important;
+  }
 }

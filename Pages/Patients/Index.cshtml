@@ -3,173 +3,311 @@
 
 @{
     ViewData["Title"] = "Patients";
+    ViewData["PageDescription"] = "Manage and search patient records";
+    ViewData["BreadcrumbItems"] = new List<(string Text, string? Url)>
+    {
+        ("Patients", null)
+    };
 }
 
-<h1>Patients</h1>
-
-<p>
-    <a asp-page="Create" class="btn btn-primary"><i class="bi bi-plus-circle-fill me-1"></i>Create New Patient</a> @* Added btn class and icon *@
-</p>
-
-<form method="get" class="mb-3">
-    <div class="input-group">
-        <div class="live-search-container">
-            <input type="text"
-                   class="form-control live-search-input"
-                   placeholder="Search by Name, Email, or Phone..."
-                   name="SearchString"
-                   value="@Model.SearchString"
-                   data-live-search="/Patients?handler=Search"
-                   data-live-search-dropdown="patients-search-dropdown"
-                   data-live-search-display="name"
-                   data-live-search-secondary="contactInfo"
-                   autocomplete="off">
-            <div id="patients-search-dropdown" class="live-search-dropdown" aria-label="Search suggestions"></div>
-        </div>
-        <button class="btn btn-outline-primary" type="submit">Search</button>
-        @if (!string.IsNullOrEmpty(Model.SearchString))
-        {
-            <a asp-page="./Index" class="btn btn-outline-secondary">Clear</a>
-        }
-    </div>
-</form>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                <a asp-page="./Index" asp-route-sortOrder="@Model.NameSort"
-                   asp-route-CurrentPage="@Model.CurrentPage"
-                   asp-route-SearchString="@Model.SearchString">
-                    @Html.DisplayNameFor(model => model.Patient[0].Name)
+<!-- Page Header -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h2 mb-1">
+                    <i class="bi bi-people me-2 text-primary"></i>Patients
+                </h1>
+                <p class="text-muted mb-0">Manage and search patient records</p>
+            </div>
+            <div>
+                <a asp-page="Create" class="btn btn-primary">
+                    <i class="bi bi-plus-circle-fill me-1"></i>
+                    <span class="d-none d-sm-inline">Create New Patient</span>
+                    <span class="d-sm-none">New</span>
                 </a>
-                @* Optional: Add sort indicator icon here based on Model.CurrentSort *@
-            </th>
-            <th>
-                 <a asp-page="./Index" asp-route-sortOrder="@Model.DateSort"
-                   asp-route-CurrentPage="@Model.CurrentPage"
-                   asp-route-SearchString="@Model.SearchString">
-                    @Html.DisplayNameFor(model => model.Patient[0].DateOfBirth)
-                 </a>
-                 @* Optional: Add sort indicator icon here based on Model.CurrentSort *@
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Patient[0].ContactInfo)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Patient[0].VisitCount)
-            </th>
-            <th>
-                 <a asp-page="./Index" asp-route-sortOrder="@Model.VisitDateSort"
-                   asp-route-CurrentPage="@Model.CurrentPage"
-                   asp-route-SearchString="@Model.SearchString">
-                    @Html.DisplayNameFor(model => model.Patient[0].LastVisitDate)
-                 </a>
-                 @* Optional: Add sort indicator icon here based on Model.CurrentSort *@
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Patient[0].HasOutstandingBalance)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Patient[0].IsActive)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Patient[0].CreatedAt)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Patient[0].UpdatedAt)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model.Patient) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DateOfBirth)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ContactInfo)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.VisitCount)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LastVisitDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.HasOutstandingBalance)
-            </td>
-            <td>
-                @if (item.IsActive)
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search Section -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-8">
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-search me-1"></i>Search Patients
+                    </label>
+                    <div class="input-group">
+                        <div class="live-search-container">
+                            <input type="text"
+                                   class="form-control live-search-input"
+                                   placeholder="Search by Name, Email, or Phone..."
+                                   name="SearchString"
+                                   value="@Model.SearchString"
+                                   data-live-search="/Patients?handler=Search"
+                                   data-live-search-dropdown="patients-search-dropdown"
+                                   data-live-search-display="name"
+                                   data-live-search-secondary="contactInfo"
+                                   autocomplete="off">
+                            <div id="patients-search-dropdown" class="live-search-dropdown" aria-label="Search suggestions"></div>
+                        </div>
+                        <button class="btn btn-outline-primary" type="submit">
+                            <i class="bi bi-search"></i>
+                            <span class="d-none d-sm-inline ms-1">Search</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    @if (!string.IsNullOrEmpty(Model.SearchString))
+                    {
+                        <div class="d-grid">
+                            <a asp-page="./Index" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle me-1"></i>Clear Search
+                            </a>
+                        </div>
+                        <small class="text-muted mt-1 d-block">
+                            Searching for: "<strong>@Model.SearchString</strong>"
+                        </small>
+                    }
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Results Section -->
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-transparent border-bottom">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">
+                <i class="bi bi-list-ul me-2"></i>Patient Records
+            </h5>
+            @if (Model.Count > 0)
+            {
+                <span class="badge bg-primary rounded-pill">@Model.Count total</span>
+            }
+        </div>
+    </div>
+    <div class="card-body p-0">
+        @if (Model.Patient != null && Model.Patient.Any())
+        {
+            <!-- Desktop Table -->
+            <div class="table-responsive d-none d-lg-block">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="border-0">
+                                <a asp-page="./Index" asp-route-sortOrder="@Model.NameSort"
+                                   asp-route-CurrentPage="@Model.CurrentPage"
+                                   asp-route-SearchString="@Model.SearchString"
+                                   class="text-decoration-none">
+                                    @Html.DisplayNameFor(model => model.Patient[0].Name)
+                                    <i class="bi bi-arrow-down-up ms-1 text-muted"></i>
+                                </a>
+                            </th>
+                            <th class="border-0">
+                                <a asp-page="./Index" asp-route-sortOrder="@Model.DateSort"
+                                   asp-route-CurrentPage="@Model.CurrentPage"
+                                   asp-route-SearchString="@Model.SearchString"
+                                   class="text-decoration-none">
+                                    @Html.DisplayNameFor(model => model.Patient[0].DateOfBirth)
+                                    <i class="bi bi-arrow-down-up ms-1 text-muted"></i>
+                                </a>
+                            </th>
+                            <th class="border-0">@Html.DisplayNameFor(model => model.Patient[0].ContactInfo)</th>
+                            <th class="border-0 text-center">@Html.DisplayNameFor(model => model.Patient[0].VisitCount)</th>
+                            <th class="border-0">
+                                <a asp-page="./Index" asp-route-sortOrder="@Model.VisitDateSort"
+                                   asp-route-CurrentPage="@Model.CurrentPage"
+                                   asp-route-SearchString="@Model.SearchString"
+                                   class="text-decoration-none">
+                                    @Html.DisplayNameFor(model => model.Patient[0].LastVisitDate)
+                                    <i class="bi bi-arrow-down-up ms-1 text-muted"></i>
+                                </a>
+                            </th>
+                            <th class="border-0 text-center">Status</th>
+                            <th class="border-0 text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Patient)
+                        {
+                            <tr>
+                                <td class="fw-semibold">
+                                    <i class="bi bi-person me-2 text-muted"></i>@Html.DisplayFor(modelItem => item.Name)
+                                </td>
+                                <td>@Html.DisplayFor(modelItem => item.DateOfBirth)</td>
+                                <td class="text-muted">@Html.DisplayFor(modelItem => item.ContactInfo)</td>
+                                <td class="text-center">
+                                    <span class="badge bg-light text-dark">@Html.DisplayFor(modelItem => item.VisitCount)</span>
+                                </td>
+                                <td>@Html.DisplayFor(modelItem => item.LastVisitDate)</td>
+                                <td class="text-center">
+                                    @if (item.IsActive)
+                                    {
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-check-circle me-1"></i>Active
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">
+                                            <i class="bi bi-x-circle me-1"></i>Inactive
+                                        </span>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group" role="group">
+                                        <a asp-page="./Details" asp-route-id="@item.Id"
+                                           class="btn btn-sm btn-outline-info" title="View Details">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a asp-page="./Edit" asp-route-id="@item.Id"
+                                           class="btn btn-sm btn-outline-primary" title="Edit">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                        <a asp-page="./Delete" asp-route-id="@item.Id"
+                                           class="btn btn-sm btn-outline-danger" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mobile Cards -->
+            <div class="d-lg-none">
+                @foreach (var item in Model.Patient)
                 {
-                    <span class="badge bg-success">Active</span>
+                    <div class="border-bottom p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="mb-1 fw-semibold">
+                                <i class="bi bi-person me-2 text-primary"></i>@Html.DisplayFor(modelItem => item.Name)
+                            </h6>
+                            @if (item.IsActive)
+                            {
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-circle me-1"></i>Active
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">
+                                    <i class="bi bi-x-circle me-1"></i>Inactive
+                                </span>
+                            }
+                        </div>
+                        <div class="row g-2 text-sm">
+                            <div class="col-6">
+                                <small class="text-muted d-block">Date of Birth</small>
+                                <span>@Html.DisplayFor(modelItem => item.DateOfBirth)</span>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted d-block">Visits</small>
+                                <span class="badge bg-light text-dark">@Html.DisplayFor(modelItem => item.VisitCount)</span>
+                            </div>
+                            <div class="col-12">
+                                <small class="text-muted d-block">Contact Info</small>
+                                <span>@Html.DisplayFor(modelItem => item.ContactInfo)</span>
+                            </div>
+                            @if (item.LastVisitDate.HasValue)
+                            {
+                                <div class="col-12">
+                                    <small class="text-muted d-block">Last Visit</small>
+                                    <span>@Html.DisplayFor(modelItem => item.LastVisitDate)</span>
+                                </div>
+                            }
+                        </div>
+                        <div class="d-flex gap-2 mt-3">
+                            <a asp-page="./Details" asp-route-id="@item.Id"
+                               class="btn btn-sm btn-outline-info flex-fill">
+                                <i class="bi bi-eye me-1"></i>Details
+                            </a>
+                            <a asp-page="./Edit" asp-route-id="@item.Id"
+                               class="btn btn-sm btn-outline-primary flex-fill">
+                                <i class="bi bi-pencil-square me-1"></i>Edit
+                            </a>
+                            <a asp-page="./Delete" asp-route-id="@item.Id"
+                               class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="bi bi-people text-muted mb-3" style="font-size: 3rem;"></i>
+                <h5 class="text-muted mb-3">No Patients Found</h5>
+                @if (!string.IsNullOrEmpty(Model.SearchString))
+                {
+                    <p class="text-muted mb-4">No patients match your search criteria. Try a different search term.</p>
+                    <a asp-page="./Index" class="btn btn-outline-secondary me-2">
+                        <i class="bi bi-x-circle me-1"></i>Clear Search
+                    </a>
                 }
                 else
                 {
-                    <span class="badge bg-danger">Inactive</span>
+                    <p class="text-muted mb-4">Start by adding your first patient to begin managing their records.</p>
                 }
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedAt)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UpdatedAt)
-            </td>
-            <td>
-                <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary me-1" title="Edit">
-                    <i class="bi bi-pencil-square"></i>
+                <a asp-page="Create" class="btn btn-primary">
+                    <i class="bi bi-plus-circle-fill me-1"></i>Create New Patient
                 </a>
-                <a asp-page="./Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info me-1" title="Details">
-                    <i class="bi bi-info-circle"></i>
-                </a>
-                <a asp-page="./Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger" title="Delete">
-                    <i class="bi bi-trash"></i>
-                </a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+            </div>
+        }
+    </div>
+</div>
 
+<!-- Pagination -->
 @{
-    // Determine if Previous/Next buttons should be disabled
     var prevDisabled = Model.CurrentPage <= 1 ? "disabled" : "";
     var nextDisabled = Model.CurrentPage >= Model.TotalPages ? "disabled" : "";
 }
 
 @if (Model.TotalPages > 1)
 {
-    <nav aria-label="Page navigation">
-        <ul class="pagination justify-content-center">
-            <li class="page-item @prevDisabled">
-                <a asp-page="./Index"
-                   asp-route-SearchString="@Model.SearchString"
-                   asp-route-CurrentPage="@(Model.CurrentPage - 1)"
-                   class="page-link" aria-label="Previous">
-                    <span aria-hidden="true">&laquo; Previous</span>
-                </a>
-            </li>
-
-            @* Optional: Add page number links here if desired *@
-            <li class="page-item active" aria-current="page">
-                 <span class="page-link">Page @Model.CurrentPage of @Model.TotalPages</span>
-            </li>
-
-            <li class="page-item @nextDisabled">
-                <a asp-page="./Index"
-                   asp-route-SearchString="@Model.SearchString"
-                   asp-route-CurrentPage="@(Model.CurrentPage + 1)"
-                   class="page-link" aria-label="Next">
-                    <span aria-hidden="true">Next &raquo;</span>
-                </a>
-            </li>
-        </ul>
-    </nav>
-    <div class="text-center text-muted small">
+    <div class="d-flex justify-content-between align-items-center mt-4">
+        <div class="text-muted small">
+            Showing page @Model.CurrentPage of @Model.TotalPages (@Model.Count total patients)
+        </div>
+        <nav aria-label="Page navigation">
+            <ul class="pagination pagination-sm mb-0">
+                <li class="page-item @prevDisabled">
+                    <a asp-page="./Index"
+                       asp-route-SearchString="@Model.SearchString"
+                       asp-route-CurrentPage="@(Model.CurrentPage - 1)"
+                       class="page-link" aria-label="Previous">
+                        <i class="bi bi-chevron-left"></i>
+                        <span class="d-none d-sm-inline ms-1">Previous</span>
+                    </a>
+                </li>
+                <li class="page-item active" aria-current="page">
+                     <span class="page-link">@Model.CurrentPage</span>
+                </li>
+                <li class="page-item @nextDisabled">
+                    <a asp-page="./Index"
+                       asp-route-SearchString="@Model.SearchString"
+                       asp-route-CurrentPage="@(Model.CurrentPage + 1)"
+                       class="page-link" aria-label="Next">
+                        <span class="d-none d-sm-inline me-1">Next</span>
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+}
+else if (Model.Count > 0)
+{
+    <div class="text-center text-muted small mt-3">
         Total Patients: @Model.Count
     </div>
 }
@@ -178,7 +316,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // Check for TempData messages and display toasts
-            const successMessage = '@Html.Raw(TempData["SuccessMessage"])'; 
+            const successMessage = '@Html.Raw(TempData["SuccessMessage"])';
             const errorMessage = '@Html.Raw(TempData["ErrorMessage"])';
 
             if (successMessage) {
@@ -189,10 +327,4 @@
             }
         });
     </script>
-}
-else if (Model.Count > 0)
-{
-     <div class="text-center text-muted small">
-        Total Patients: @Model.Count
-    </div>
 }

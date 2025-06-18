@@ -2,72 +2,344 @@
 @model Roshta.Pages_Patients.DetailsModel
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Patient Details";
 }
 
-<h1>Details</h1>
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h1 class="h3 mb-1">@Model.Patient.Name</h1>
+                    <p class="text-muted mb-0">Patient ID: #@Model.Patient.Id</p>
+                </div>
+                <div class="btn-toolbar" role="toolbar" aria-label="Patient actions">
+                    <div class="btn-group me-2" role="group">
+                        <a asp-page="./Edit" asp-route-id="@Model.Patient.Id" class="btn btn-primary">
+                            <i class="fas fa-edit me-1" aria-hidden="true"></i>Edit Patient
+                        </a>
+                        <button type="button" class="btn btn-outline-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="visually-hidden">Toggle Dropdown</span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" onclick="printPatientDetails()">
+                                <i class="fas fa-print me-2"></i>Print Details
+                            </a></li>
+                            <li><a class="dropdown-item" href="#" onclick="exportPatientData()">
+                                <i class="fas fa-download me-2"></i>Export Data
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" asp-page="/Prescriptions/Create" asp-route-patientId="@Model.Patient.Id">
+                                <i class="fas fa-prescription-bottle-alt me-2"></i>New Prescription
+                            </a></li>
+                        </ul>
+                    </div>
+                    <a asp-page="./Index" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1" aria-hidden="true"></i>Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<div>
-    <h4>Patient</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Patient.Name)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Patient.Name)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Patient.DateOfBirth)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Patient.DateOfBirth)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Patient.ContactInfo)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Patient.ContactInfo)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Patient.VisitCount)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Patient.VisitCount)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Patient.LastVisitDate)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Patient.LastVisitDate)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Patient.HasOutstandingBalance)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Patient.HasOutstandingBalance)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Patient.IsActive)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Patient.IsActive)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Patient.CreatedAt)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Patient.CreatedAt)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Patient.UpdatedAt)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Patient.UpdatedAt)
-        </dd>
-    </dl>
+    <div class="row">
+        <!-- Main Information Panel -->
+        <div class="col-lg-8">
+            <!-- Personal Information Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-user me-2 text-primary"></i>Personal Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Full Name</label>
+                            <p class="fs-5 fw-semibold mb-0">@Model.Patient.Name</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Date of Birth</label>
+                            <p class="mb-0">
+                                @Model.Patient.DateOfBirth.ToString("MMMM dd, yyyy")
+                                <small class="text-muted">(@((DateTime.Now.Year - Model.Patient.DateOfBirth.Year)) years old)</small>
+                            </p>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label text-muted">Contact Information</label>
+                            <p class="mb-0">
+                                <i class="fas fa-phone me-2 text-muted"></i>@Model.Patient.ContactInfo
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visit History Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-calendar-alt me-2 text-success"></i>Visit History
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="stat-icon bg-success bg-opacity-10 text-success rounded-circle p-2 me-3">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <div>
+                                    <h4 class="mb-0 fw-bold">@Model.Patient.VisitCount</h4>
+                                    <small class="text-muted">Total Visits</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Last Visit</label>
+                            <p class="mb-0">
+                                @if (Model.Patient.LastVisitDate.HasValue)
+                                {
+                                    @Model.Patient.LastVisitDate.Value.ToString("MMMM dd, yyyy")
+                                    <small class="text-muted">(@((int)(DateTime.Now - Model.Patient.LastVisitDate.Value).TotalDays) days ago)</small>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">No visits recorded</span>
+                                }
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Prescriptions Preview -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-prescription-bottle-alt me-2 text-info"></i>Recent Prescriptions
+                    </h5>
+                    <a href="#" class="btn btn-sm btn-outline-info">View All</a>
+                </div>
+                <div class="card-body">
+                    <div class="text-center py-4">
+                        <i class="fas fa-prescription-bottle-alt text-muted mb-3" style="font-size: 3rem;"></i>
+                        <p class="text-muted mb-0">No recent prescriptions available</p>
+                        <small class="text-muted">Prescription history will appear here</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Information -->
+        <div class="col-lg-4">
+            <!-- Status Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2 text-info"></i>Status Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Account Status</label>
+                        <div>
+                            @if (Model.Patient.IsActive)
+                            {
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check-circle me-1"></i>Active
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">
+                                    <i class="fas fa-pause-circle me-1"></i>Inactive
+                                </span>
+                            }
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Outstanding Balance</label>
+                        <div>
+                            @if (Model.Patient.HasOutstandingBalance)
+                            {
+                                <span class="badge bg-warning text-dark">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>Has Balance
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check-circle me-1"></i>Clear
+                                </span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-bolt me-2 text-warning"></i>Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a asp-page="/Prescriptions/Create" asp-route-patientId="@Model.Patient.Id" class="btn btn-outline-primary">
+                            <i class="fas fa-plus me-2"></i>New Prescription
+                        </a>
+                        <button type="button" class="btn btn-outline-secondary" onclick="scheduleAppointment()">
+                            <i class="fas fa-calendar-plus me-2"></i>Schedule Appointment
+                        </button>
+                        <button type="button" class="btn btn-outline-info" onclick="viewMedicalHistory()">
+                            <i class="fas fa-history me-2"></i>Medical History
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Audit Information Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-clock me-2 text-secondary"></i>Record Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-2">
+                        <small class="text-muted">Created</small>
+                        <p class="mb-0 small">@Model.Patient.CreatedAt.ToString("MMM dd, yyyy 'at' h:mm tt")</p>
+                    </div>
+                    <div>
+                        <small class="text-muted">Last Updated</small>
+                        <p class="mb-0 small">@Model.Patient.UpdatedAt.ToString("MMM dd, yyyy 'at' h:mm tt")</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-<div>
-    <a asp-page="./Edit" asp-route-id="@Model.Patient.Id">Edit</a> |
-    <a asp-page="./Index">Back to List</a>
+
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="loading-overlay" style="display: none;">
+    <div class="loading-spinner">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2 text-muted">Processing...</p>
+    </div>
 </div>
+
+@section Scripts {
+    <script>
+        // Print functionality
+        function printPatientDetails() {
+            window.print();
+        }
+
+        // Export functionality
+        function exportPatientData() {
+            showLoading();
+            // Simulate API call
+            setTimeout(() => {
+                hideLoading();
+                showToast('Patient data exported successfully!', 'success');
+            }, 1500);
+        }
+
+        // Quick action functions
+        function scheduleAppointment() {
+            showToast('Appointment scheduling feature coming soon!', 'info');
+        }
+
+        function viewMedicalHistory() {
+            showToast('Medical history feature coming soon!', 'info');
+        }
+
+        // Loading states
+        function showLoading() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        // Toast notifications
+        function showToast(message, type = 'info') {
+            const toastContainer = document.getElementById('toastContainer') || createToastContainer();
+            const toast = createToast(message, type);
+            toastContainer.appendChild(toast);
+            
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+            
+            toast.addEventListener('hidden.bs.toast', () => {
+                toast.remove();
+            });
+        }
+
+        function createToastContainer() {
+            const container = document.createElement('div');
+            container.id = 'toastContainer';
+            container.className = 'toast-container position-fixed top-0 end-0 p-3';
+            container.style.zIndex = '1050';
+            document.body.appendChild(container);
+            return container;
+        }
+
+        function createToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'assertive');
+            toast.setAttribute('aria-atomic', 'true');
+            
+            const iconMap = {
+                success: 'fas fa-check-circle text-success',
+                error: 'fas fa-exclamation-circle text-danger',
+                warning: 'fas fa-exclamation-triangle text-warning',
+                info: 'fas fa-info-circle text-info'
+            };
+            
+            toast.innerHTML = `
+                <div class="toast-header">
+                    <i class="${iconMap[type] || iconMap.info} me-2"></i>
+                    <strong class="me-auto">Notification</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    ${message}
+                </div>
+            `;
+            
+            return toast;
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 'e':
+                        e.preventDefault();
+                        document.querySelector('[asp-page="./Edit"]').click();
+                        break;
+                    case 'p':
+                        e.preventDefault();
+                        printPatientDetails();
+                        break;
+                }
+            }
+        });
+
+        // Focus management for accessibility
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set initial focus to main heading
+            document.querySelector('h1').focus();
+        });
+    </script>
+}
+

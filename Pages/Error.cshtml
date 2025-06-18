@@ -4,23 +4,348 @@
     ViewData["Title"] = "Error";
 }
 
-<h1 class="text-danger">Error.</h1>
-<h2 class="text-danger">An error occurred while processing your request.</h2>
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-6">
+            <!-- Main Error Card -->
+            <div class="card border-0 shadow-lg mt-5">
+                <div class="card-body text-center py-5">
+                    <!-- Error Icon -->
+                    <div class="error-state-icon mb-4">
+                        <i class="fas fa-exclamation-triangle text-danger"></i>
+                    </div>
+                    
+                    <!-- Error Title -->
+                    <h1 class="display-6 text-danger mb-3">Oops! Something went wrong</h1>
+                    <h2 class="h5 text-muted mb-4">We encountered an error while processing your request</h2>
+                    
+                    <!-- Error Details (if available) -->
+                    @if (Model.ShowRequestId)
+                    {
+                        <div class="alert alert-light border mb-4" role="alert">
+                            <h6 class="alert-heading mb-2">
+                                <i class="fas fa-info-circle me-2"></i>Error Details
+                            </h6>
+                            <p class="mb-0">
+                                <strong>Request ID:</strong> 
+                                <code class="text-primary">@Model.RequestId</code>
+                            </p>
+                            <small class="text-muted">
+                                Please include this ID when contacting support
+                            </small>
+                        </div>
+                    }
+                    
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-center gap-3 mb-4">
+                        <button type="button" class="btn btn-primary" onclick="goBack()">
+                            <i class="fas fa-arrow-left me-2"></i>Go Back
+                        </button>
+                        <a href="/" class="btn btn-outline-primary">
+                            <i class="fas fa-home me-2"></i>Home
+                        </a>
+                        <button type="button" class="btn btn-outline-secondary" onclick="refreshPage()">
+                            <i class="fas fa-sync-alt me-2"></i>Try Again
+                        </button>
+                    </div>
+                    
+                    <!-- Help Section -->
+                    <div class="border-top pt-4">
+                        <h6 class="text-muted mb-3">Need Help?</h6>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-question-circle text-info me-2"></i>
+                                    <small>
+                                        <a href="#" onclick="showHelp()" class="text-decoration-none">
+                                            View Help
+                                        </a>
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-envelope text-primary me-2"></i>
+                                    <small>
+                                        <a href="#" onclick="contactSupport()" class="text-decoration-none">
+                                            Contact Support
+                                        </a>
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-bug text-warning me-2"></i>
+                                    <small>
+                                        <a href="#" onclick="reportBug()" class="text-decoration-none">
+                                            Report Bug
+                                        </a>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Development Information (Development Mode Only) -->
+            @if (ViewData["IsDevelopment"] as bool? == true)
+            {
+                <div class="card border-warning mt-4">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-code me-2"></i>Development Mode Information
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warning border-0" role="alert">
+                            <h6 class="alert-heading">
+                                <i class="fas fa-exclamation-triangle me-2"></i>Development Environment Detected
+                            </h6>
+                            <p class="mb-3">
+                                You're seeing this detailed error information because the application is running in 
+                                <strong>Development</strong> mode. This provides detailed debugging information 
+                                but should not be enabled in production environments.
+                            </p>
+                            <hr>
+                            <h6 class="mb-2">Quick Actions:</h6>
+                            <ul class="mb-0">
+                                <li>Check the application logs for detailed error information</li>
+                                <li>Verify database connectivity and migrations</li>
+                                <li>Ensure all required services are running</li>
+                                <li>Check for missing configuration values</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <h6 class="text-muted mb-2">Environment Configuration:</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <small class="text-muted">Environment:</small>
+                                    <p class="mb-1"><code>Development</code></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <small class="text-muted">Timestamp:</small>
+                                    <p class="mb-1"><code>@DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")</code></p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info border-0 mt-3" role="alert">
+                            <strong>Security Note:</strong> 
+                            Make sure to set <code>ASPNETCORE_ENVIRONMENT</code> to <code>Production</code> 
+                            when deploying to prevent sensitive information from being displayed to end users.
+                        </div>
+                    </div>
+                </div>
+            }
+            
+            <!-- Common Issues and Solutions -->
+            <div class="card border-0 bg-light mt-4">
+                <div class="card-body">
+                    <h6 class="card-title text-muted mb-3">
+                        <i class="fas fa-lightbulb me-2"></i>Common Issues & Solutions
+                    </h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="d-flex">
+                                <div class="me-3">
+                                    <i class="fas fa-wifi text-danger"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">Connection Issues</h6>
+                                    <small class="text-muted">
+                                        Check your internet connection and try again
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex">
+                                <div class="me-3">
+                                    <i class="fas fa-clock text-warning"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">Session Timeout</h6>
+                                    <small class="text-muted">
+                                        Your session may have expired, try logging in again
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex">
+                                <div class="me-3">
+                                    <i class="fas fa-server text-info"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">Server Maintenance</h6>
+                                    <small class="text-muted">
+                                        The system might be undergoing maintenance
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex">
+                                <div class="me-3">
+                                    <i class="fas fa-browser text-secondary"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">Browser Issues</h6>
+                                    <small class="text-muted">
+                                        Try clearing your browser cache and cookies
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-@if (Model.ShowRequestId)
-{
-    <p>
-        <strong>Request ID:</strong> <code>@Model.RequestId</code>
-    </p>
+@section Scripts {
+    <script>
+        // Navigation functions
+        function goBack() {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = '/';
+            }
+        }
+        
+        function refreshPage() {
+            window.location.reload();
+        }
+        
+        // Help functions
+        function showHelp() {
+            showToast('Help documentation coming soon!', 'info');
+        }
+        
+        function contactSupport() {
+            const requestId = '@Model.RequestId';
+            const subject = `Error Report - Request ID: ${requestId}`;
+            const body = `I encountered an error while using the Rosheta application.%0D%0A%0D%0ARequest ID: ${requestId}%0D%0ATimestamp: @DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")%0D%0A%0D%0APlease describe what you were trying to do when the error occurred:`;
+            
+            const mailtoLink = `mailto:support@rosheta.com?subject=${encodeURIComponent(subject)}&body=${body}`;
+            window.location.href = mailtoLink;
+        }
+        
+        function reportBug() {
+            showToast('Bug reporting system coming soon!', 'info');
+        }
+        
+        // Toast notification system
+        function showToast(message, type = 'info') {
+            const toastContainer = document.getElementById('toastContainer') || createToastContainer();
+            const toast = createToast(message, type);
+            toastContainer.appendChild(toast);
+            
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+            
+            toast.addEventListener('hidden.bs.toast', () => {
+                toast.remove();
+            });
+        }
+
+        function createToastContainer() {
+            const container = document.createElement('div');
+            container.id = 'toastContainer';
+            container.className = 'toast-container position-fixed top-0 end-0 p-3';
+            container.style.zIndex = '1050';
+            document.body.appendChild(container);
+            return container;
+        }
+
+        function createToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'assertive');
+            toast.setAttribute('aria-atomic', 'true');
+            
+            const iconMap = {
+                success: 'fas fa-check-circle text-success',
+                error: 'fas fa-exclamation-circle text-danger',
+                warning: 'fas fa-exclamation-triangle text-warning',
+                info: 'fas fa-info-circle text-info'
+            };
+            
+            toast.innerHTML = `
+                <div class="toast-header">
+                    <i class="${iconMap[type] || iconMap.info} me-2"></i>
+                    <strong class="me-auto">Notification</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    ${message}
+                </div>
+            `;
+            
+            return toast;
+        }
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            switch(e.key) {
+                case 'Escape':
+                    goBack();
+                    break;
+                case 'F5':
+                    e.preventDefault();
+                    refreshPage();
+                    break;
+            }
+            
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 'h':
+                        e.preventDefault();
+                        window.location.href = '/';
+                        break;
+                    case 'r':
+                        e.preventDefault();
+                        refreshPage();
+                        break;
+                }
+            }
+        });
+        
+        // Focus management for accessibility
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set focus to the primary action button
+            document.querySelector('.btn-primary').focus();
+        });
+        
+        // Auto-refresh functionality (optional)
+        function startAutoRefresh() {
+            let countdown = 30;
+            const button = document.querySelector('.btn-outline-secondary');
+            const originalText = button.innerHTML;
+            
+            const interval = setInterval(() => {
+                countdown--;
+                button.innerHTML = `<i class="fas fa-sync-alt me-2"></i>Auto-refresh (${countdown}s)`;
+                
+                if (countdown <= 0) {
+                    clearInterval(interval);
+                    refreshPage();
+                }
+            }, 1000);
+            
+            // Cancel auto-refresh if user interacts with page
+            document.addEventListener('click', () => {
+                clearInterval(interval);
+                button.innerHTML = originalText;
+            }, { once: true });
+        }
+        
+        // Uncomment to enable auto-refresh
+        // setTimeout(startAutoRefresh, 5000);
+    </script>
 }
-
-<h3>Development Mode</h3>
-<p>
-    Swapping to the <strong>Development</strong> environment displays detailed information about the error that occurred.
-</p>
-<p>
-    <strong>The Development environment shouldn't be enabled for deployed applications.</strong>
-    It can result in displaying sensitive information from exceptions to end users.
-    For local debugging, enable the <strong>Development</strong> environment by setting the <strong>ASPNETCORE_ENVIRONMENT</strong> environment variable to <strong>Development</strong>
-    and restarting the app.
-</p>

@@ -2,63 +2,140 @@
 @model IndexModel
 @{
     ViewData["Title"] = "Dashboard";
+    ViewData["PageDescription"] = "Overview of your prescription management system";
 }
 
+<!-- Page Header -->
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="display-4">Dashboard</h1>
     <div>
-        <a asp-page="/Prescriptions/Create" class="btn btn-primary me-2"><i class="bi bi-plus-circle-fill me-1"></i>New Prescription</a> @* Changed to primary *@
+        <h1 class="display-4 mb-2">Dashboard</h1>
+        <p class="text-muted mb-0">Welcome to your prescription management system</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-page="/Prescriptions/Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle-fill me-1"></i>New Prescription
+        </a>
         @if (Model.ShowEditProfileButton)
         {
-            <a asp-page="/DoctorProfile/Edit" class="btn btn-outline-secondary"><i class="bi bi-person-gear me-1"></i>Edit Profile</a> @* Changed to outline secondary *@
+            <a asp-page="/DoctorProfile/Edit" class="btn btn-outline-secondary">
+                <i class="bi bi-person-gear me-1"></i>Edit Profile
+            </a>
         }
     </div>
 </div>
 
-
-<div class="row mb-4">
+<!-- Statistics Cards -->
+<div class="row g-4 mb-5">
     <div class="col-md-4">
-        <div class="card text-center h-100">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-person-fill me-2"></i>Patients</h5>
-                <p class="card-text display-6">@Model.PatientCount</p>
-                <a asp-page="/Patients/Index" class="btn btn-outline-primary">View Patients</a> @* Removed btn-sm *@
-                <a asp-page="/Patients/Create" class="btn btn-primary">Add Patient</a> @* Removed btn-sm *@
+        <div class="card text-center h-100 border-0 shadow-sm">
+            <div class="card-body py-4">
+                <div class="mb-3">
+                    <i class="bi bi-person-fill text-primary" style="font-size: 2.5rem;"></i>
+                </div>
+                <h5 class="card-title text-dark mb-2">Patients</h5>
+                <p class="card-text display-6 text-primary fw-bold mb-3">@Model.PatientCount</p>
+                <div class="d-grid gap-2">
+                    <a asp-page="/Patients/Index" class="btn btn-outline-primary">View All</a>
+                    <a asp-page="/Patients/Create" class="btn btn-primary">Add New</a>
+                </div>
             </div>
         </div>
     </div>
     <div class="col-md-4">
-        <div class="card text-center h-100">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-capsule me-2"></i>Medications</h5>
-                <p class="card-text display-6">@Model.MedicationCount</p>
-                <a asp-page="/Medications/Index" class="btn btn-outline-primary">View Medications</a> @* Removed btn-sm *@
-                <a asp-page="/Medications/Create" class="btn btn-primary">Add Medication</a> @* Removed btn-sm *@
+        <div class="card text-center h-100 border-0 shadow-sm">
+            <div class="card-body py-4">
+                <div class="mb-3">
+                    <i class="bi bi-capsule text-success" style="font-size: 2.5rem;"></i>
+                </div>
+                <h5 class="card-title text-dark mb-2">Medications</h5>
+                <p class="card-text display-6 text-success fw-bold mb-3">@Model.MedicationCount</p>
+                <div class="d-grid gap-2">
+                    <a asp-page="/Medications/Index" class="btn btn-outline-success">View All</a>
+                    <a asp-page="/Medications/Create" class="btn btn-success">Add New</a>
+                </div>
             </div>
         </div>
     </div>
     <div class="col-md-4">
-        <div class="card text-center h-100">
-            <div class="card-body">
-                <h5 class="card-title"><i class="bi bi-file-earmark-medical-fill me-2"></i>Prescriptions</h5>
-                <p class="card-text display-6">@Model.PrescriptionCount</p>
-                <a asp-page="/Prescriptions/Index" class="btn btn-outline-primary">View Prescriptions</a> @* Removed btn-sm *@
-                <a asp-page="/Prescriptions/Create" class="btn btn-primary">New Prescription</a> @* Removed btn-sm *@
+        <div class="card text-center h-100 border-0 shadow-sm">
+            <div class="card-body py-4">
+                <div class="mb-3">
+                    <i class="bi bi-file-earmark-medical-fill text-info" style="font-size: 2.5rem;"></i>
+                </div>
+                <h5 class="card-title text-dark mb-2">Prescriptions</h5>
+                <p class="card-text display-6 text-info fw-bold mb-3">@Model.PrescriptionCount</p>
+                <div class="d-grid gap-2">
+                    <a asp-page="/Prescriptions/Index" class="btn btn-outline-info">View All</a>
+                    <a asp-page="/Prescriptions/Create" class="btn btn-info">New Prescription</a>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-@* Placeholder for future dashboard elements like recent activity or charts *@
-@*
-<div class="row">
-    <div class="col-md-6">
-        <h4>Recent Prescriptions</h4>
-        <!-- Add list here -->
+<!-- Quick Actions and Recent Activity -->
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-bottom">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-clock-history me-2"></i>Recent Activity
+                </h5>
+            </div>
+            <div class="card-body">
+                @if (Model.PatientCount == 0 && Model.MedicationCount == 0 && Model.PrescriptionCount == 0)
+                {
+                    <div class="text-center py-5">
+                        <i class="bi bi-clipboard-data text-muted mb-3" style="font-size: 3rem;"></i>
+                        <h5 class="text-muted mb-3">No Data Yet</h5>
+                        <p class="text-muted mb-4">Start by adding your first patient or medication to begin managing prescriptions.</p>
+                        <div class="d-flex gap-2 justify-content-center">
+                            <a asp-page="/Patients/Create" class="btn btn-primary">
+                                <i class="bi bi-person-plus me-1"></i>Add Patient
+                            </a>
+                            <a asp-page="/Medications/Create" class="btn btn-success">
+                                <i class="bi bi-capsule me-1"></i>Add Medication
+                            </a>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="d-flex align-items-center text-muted">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <span>Recent activity will appear here as you use the system</span>
+                    </div>
+                }
+            </div>
+        </div>
     </div>
-    <div class="col-md-6">
-        <h4>Quick Stats</h4>
-        <!-- Add more stats or charts -->
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-bottom">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-lightning-charge me-2"></i>Quick Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-3">
+                    <a asp-page="/Prescriptions/Create" class="btn btn-outline-primary text-start">
+                        <i class="bi bi-file-earmark-plus me-2"></i>Create Prescription
+                    </a>
+                    <a asp-page="/Patients/Create" class="btn btn-outline-primary text-start">
+                        <i class="bi bi-person-plus me-2"></i>Add New Patient
+                    </a>
+                    <a asp-page="/Medications/Create" class="btn btn-outline-primary text-start">
+                        <i class="bi bi-capsule me-2"></i>Add Medication
+                    </a>
+                    <hr class="my-2">
+                    <a asp-page="/Patients/Index" class="btn btn-outline-secondary text-start">
+                        <i class="bi bi-search me-2"></i>Search Patients
+                    </a>
+                    <a asp-page="/Prescriptions/Index" class="btn btn-outline-secondary text-start">
+                        <i class="bi bi-file-earmark-medical me-2"></i>View Prescriptions
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-*@

@@ -1,84 +1,162 @@
 @page
 @model Roshta.Pages_Medications.CreateModel
 
-        @{
-        ViewData["Title"] = "Create";
-        }
-        
-        <h1>Create</h1>
-        
-    <h4>Medication</h4>
-    <hr />
-    <div class="row">
-    <div class="col-md-4">
-    <form method="post">
-    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div> @* Added mb-3 *@
-            <div class="mb-3"> @* Replaced form-group with mb-3 *@
-                <label asp-for="Medication.Name" class="form-label"><span class="text-danger">*</span> @Html.DisplayNameFor(m => m.Medication.Name)</label> @* Added form-label, moved asterisk *@
-                <input asp-for="Medication.Name" class="form-control" id="Medication_Name" />
-                <span asp-validation-for="Medication.Name" class="text-danger d-block"></span> @* Added d-block *@
-            </div>
-            <div class="mb-3"> @* Replaced form-group with mb-3 *@
-                <label asp-for="Medication.Dosage" class="form-label"></label> @* Added form-label *@
-                <input asp-for="Medication.Dosage" class="form-control" />
-                <span asp-validation-for="Medication.Dosage" class="text-danger d-block"></span> @* Added d-block *@
-            </div>
-            <div class="mb-3"> @* Replaced form-group with mb-3 *@
-                <label asp-for="Medication.Form" class="form-label"></label> @* Added form-label *@
-                <input asp-for="Medication.Form" class="form-control" />
-                <span asp-validation-for="Medication.Form" class="text-danger d-block"></span> @* Added d-block *@
-            </div>
-            <div class="mb-3"> @* Replaced form-group with mb-3 *@
-                <label asp-for="Medication.Manufacturer" class="form-label"></label> @* Added form-label *@
-                <input asp-for="Medication.Manufacturer" class="form-control" />
-                <span asp-validation-for="Medication.Manufacturer" class="text-danger d-block"></span> @* Added d-block *@
-            </div>
-            @* Hide CreatedAt/UpdatedAt on Create form *@
-            @* <div class="mb-3"> 
-                <label asp-for="Medication.CreatedAt" class="form-label"></label>
-                <input asp-for="Medication.CreatedAt" class="form-control" />
-                <span asp-validation-for="Medication.CreatedAt" class="text-danger d-block"></span>
-            </div>
-            <div class="mb-3"> 
-                <label asp-for="Medication.UpdatedAt" class="form-label"></label>
-                <input asp-for="Medication.UpdatedAt" class="form-control" />
-                <span asp-validation-for="Medication.UpdatedAt" class="text-danger d-block"></span>
-            </div> *@
-            <div class="mt-4"> @* Replaced form-group with mt-4 for button spacing *@
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+@{
+    ViewData["Title"] = "Create Medication";
+    ViewData["PageDescription"] = "Add a new medication to the inventory";
+    ViewData["BreadcrumbItems"] = new List<(string Text, string? Url)>
+    {
+        ("Medications", "/Medications"),
+        ("Create", null)
+    };
+}
+
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h2 mb-1">
+            <i class="bi bi-capsule-pill me-2 text-success"></i>Create Medication
+        </h1>
+        <p class="text-muted mb-0">Add a new medication to the inventory</p>
+    </div>
+    <div>
+        <a asp-page="Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Back to List
+        </a>
     </div>
 </div>
 
-<div class="mt-3"> @* Added margin top for spacing *@
-    <a asp-page="Index" class="btn btn-outline-secondary">Back to List</a> @* Added btn classes *@
-</div>
+<form method="post">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+    
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <!-- Basic Information Card -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-transparent border-bottom">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-info-circle me-2"></i>Basic Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="Medication.Name" class="form-label fw-semibold">
+                                <span class="text-danger me-1">*</span>
+                                @Html.DisplayNameFor(m => m.Medication.Name)
+                            </label>
+                            <input asp-for="Medication.Name" class="form-control" id="Medication_Name" 
+                                   placeholder="Enter medication name" />
+                            <span asp-validation-for="Medication.Name" class="text-danger small d-block mt-1"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Medication.Dosage" class="form-label fw-semibold">
+                                @Html.DisplayNameFor(m => m.Medication.Dosage)
+                            </label>
+                            <input asp-for="Medication.Dosage" class="form-control" 
+                                   placeholder="e.g., 500mg, 10ml" />
+                            <div class="form-text">Specify the strength or concentration</div>
+                            <span asp-validation-for="Medication.Dosage" class="text-danger small d-block mt-1"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Medication.Form" class="form-label fw-semibold">
+                                @Html.DisplayNameFor(m => m.Medication.Form)
+                            </label>
+                            <select asp-for="Medication.Form" class="form-select">
+                                <option value="">Select form...</option>
+                                <option value="Tablet">Tablet</option>
+                                <option value="Capsule">Capsule</option>
+                                <option value="Syrup">Syrup</option>
+                                <option value="Injection">Injection</option>
+                                <option value="Cream">Cream</option>
+                                <option value="Ointment">Ointment</option>
+                                <option value="Drops">Drops</option>
+                                <option value="Inhaler">Inhaler</option>
+                                <option value="Suppository">Suppository</option>
+                                <option value="Patch">Patch</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <div class="form-text">Physical form of the medication</div>
+                            <span asp-validation-for="Medication.Form" class="text-danger small d-block mt-1"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Medication.Manufacturer" class="form-label fw-semibold">
+                                @Html.DisplayNameFor(m => m.Medication.Manufacturer)
+                            </label>
+                            <input asp-for="Medication.Manufacturer" class="form-control" 
+                                   placeholder="Pharmaceutical company name" />
+                            <div class="form-text">Name of the manufacturing company</div>
+                            <span asp-validation-for="Medication.Manufacturer" class="text-danger small d-block mt-1"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Action Panel -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm position-sticky" style="top: 1rem;">
+                <div class="card-header bg-transparent border-bottom">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-check-square me-2"></i>Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-3">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="bi bi-save me-2"></i>Create Medication
+                        </button>
+                        <a asp-page="Index" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle me-2"></i>Cancel
+                        </a>
+                    </div>
+                    
+                    <hr class="my-3">
+                    
+                    <div class="small text-muted">
+                        <p class="mb-2"><strong>Required fields:</strong></p>
+                        <ul class="list-unstyled mb-0">
+                            <li>• Medication Name</li>
+                        </ul>
+                        
+                        <p class="mb-2 mt-3"><strong>Tips:</strong></p>
+                        <ul class="list-unstyled mb-0 small">
+                            <li>• Use generic names when possible</li>
+                            <li>• Include complete dosage information</li>
+                            <li>• Specify form for accurate dispensing</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script src="~/js/validation-helpers.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Get form and submit button
+            // Get form and input elements
             const medicationForm = document.querySelector('form');
-            const submitButton = medicationForm ? medicationForm.querySelector('input[type="submit"], button[type="submit"]') : null;
-
-            // Get Name input and validation span
             const nameInput = document.getElementById('Medication_Name');
             const nameValidationSpan = document.querySelector('span[data-valmsg-for="Medication.Name"]');
 
             // Function to update submit button state
             function updateSubmitButtonState() {
-                if (!submitButton || !medicationForm) return;
+                if (!medicationForm) return;
+                const submitButton = medicationForm.querySelector('button[type="submit"]');
+                if (!submitButton) return;
+                
                 const isValid = isFormClientSideValid(medicationForm);
                 submitButton.disabled = !isValid;
             }
 
-            // Validation handler for Name
+            // Validation handlers
             const nameRequiredHandler = () => {
-                validateRequiredField(nameInput, nameValidationSpan, 'Name');
-                updateSubmitButtonState(); // Update button state after validation
+                validateRequiredField(nameInput, nameValidationSpan, 'Medication Name');
+                updateSubmitButtonState();
             };
 
             // Add listeners
@@ -87,16 +165,12 @@
                 nameInput.addEventListener('input', debounce(nameRequiredHandler, 500));
             }
 
-            // Initial checks on load
-            if (nameInput) nameRequiredHandler();
-            updateSubmitButtonState(); // Set initial button state
+            // Initial validation check
+            nameRequiredHandler();
+            updateSubmitButtonState();
 
-            // --- Add call for uniqueness check ---
-            setupMedicationNameUniquenessCheck('/Medications/Create'); 
-            // Note: The uniqueness check itself will also update the button state indirectly 
-            // by adding/removing 'is-invalid' class, which isFormClientSideValid checks.
-            // If more direct control is needed, the uniqueness check could also call updateSubmitButtonState.
-            // ---------------------------------------
+            // Setup uniqueness check for medication name
+            setupMedicationNameUniquenessCheck('/Medications/Create');
         });
     </script>
 }

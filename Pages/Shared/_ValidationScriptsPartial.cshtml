@@ -1,2 +1,326 @@
 ﻿<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
 <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+<script>
+    // Enhanced Validation Configuration
+    $(document).ready(function() {
+        // Configure jQuery Validation defaults
+        $.validator.setDefaults({
+            highlight: function(element, errorClass, validClass) {
+                $(element).addClass('is-invalid').removeClass('is-valid');
+                $(element).closest('.form-group, .mb-3').addClass('has-error');
+                
+                // Add error styling to input groups
+                if ($(element).closest('.input-group').length) {
+                    $(element).closest('.input-group').addClass('has-error');
+                }
+            },
+            unhighlight: function(element, errorClass, validClass) {
+                $(element).removeClass('is-invalid').addClass('is-valid');
+                $(element).closest('.form-group, .mb-3').removeClass('has-error');
+                
+                // Remove error styling from input groups
+                if ($(element).closest('.input-group').length) {
+                    $(element).closest('.input-group').removeClass('has-error');
+                }
+            },
+            errorElement: 'div',
+            errorClass: 'invalid-feedback',
+            errorPlacement: function(error, element) {
+                // Handle different input types
+                if (element.closest('.input-group').length) {
+                    error.insertAfter(element.closest('.input-group'));
+                } else if (element.closest('.form-check').length) {
+                    error.insertAfter(element.closest('.form-check'));
+                } else if (element.closest('.form-floating').length) {
+                    error.insertAfter(element.closest('.form-floating'));
+                } else {
+                    error.insertAfter(element);
+                }
+                
+                // Add error icon
+                error.prepend('<i class="fas fa-exclamation-circle me-1"></i>');
+            },
+            success: function(label, element) {
+                // Add success styling
+                $(element).removeClass('is-invalid').addClass('is-valid');
+                
+                // Remove any existing error messages
+                $(element).next('.invalid-feedback').remove();
+                
+                // Add success icon for better UX
+                if (!$(element).closest('.form-group, .mb-3').find('.valid-feedback').length) {
+                    var successMsg = $('<div class="valid-feedback d-block"><i class="fas fa-check-circle me-1"></i>Looks good!</div>');
+                    successMsg.insertAfter(element);
+                    
+                    // Auto-hide success message after 3 seconds
+                    setTimeout(function() {
+                        successMsg.fadeOut(300, function() {
+                            $(this).remove();
+                        });
+                    }, 3000);
+                }
+            },
+            submitHandler: function(form) {
+                // Add loading state to submit button
+                var $submitBtn = $(form).find('button[type="submit"], input[type="submit"]');
+                var originalText = $submitBtn.html();
+                
+                $submitBtn.prop('disabled', true).addClass('btn-loading');
+                
+                if ($submitBtn.is('button')) {
+                    $submitBtn.html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Processing...');
+                }
+                
+                // Submit the form
+                form.submit();
+            }
+        });
+        
+        // Custom validation methods
+        $.validator.addMethod("strongPassword", function(value, element) {
+            return this.optional(element) ||
+                   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@@$$!%*?&])[A-Za-z\d@@$$!%*?&]{8,}$$/.test(value);
+        }, "Password must contain at least 8 characters, including uppercase, lowercase, number and special character");
+        
+        $.validator.addMethod("phoneNumber", function(value, element) {
+            return this.optional(element) || 
+                   /^[\+]?[1-9][\d]{0,15}$/.test(value.replace(/[\s\-\(\)]/g, ''));
+        }, "Please enter a valid phone number");
+        
+        $.validator.addMethod("dateInFuture", function(value, element) {
+            return this.optional(element) || new Date(value) > new Date();
+        }, "Date must be in the future");
+        
+        $.validator.addMethod("dateInPast", function(value, element) {
+            return this.optional(element) || new Date(value) < new Date();
+        }, "Date must be in the past");
+        
+        // Real-time validation for better UX
+        $('form input, form select, form textarea').on('blur change', function() {
+            $(this).valid();
+        });
+        
+        // Enhanced form submission handling
+        $('form').on('submit', function(e) {
+            var $form = $(this);
+            var $submitBtn = $form.find('button[type="submit"], input[type="submit"]');
+            
+            // Prevent double submission
+            if ($submitBtn.prop('disabled')) {
+                e.preventDefault();
+                return false;
+            }
+            
+            // Validate form
+            if (!$form.valid()) {
+                e.preventDefault();
+                
+                // Focus on first error field
+                var $firstError = $form.find('.is-invalid').first();
+                if ($firstError.length) {
+                    $firstError.focus();
+                    
+                    // Scroll to error if needed
+                    $('html, body').animate({
+                        scrollTop: $firstError.offset().top - 100
+                    }, 300);
+                }
+                
+                // Show error toast
+                showValidationErrorToast();
+                return false;
+            }
+        });
+        
+        // Handle AJAX form validation errors
+        $(document).on('ajaxError', function(event, jqXHR, ajaxSettings, thrownError) {
+            if (jqXHR.status === 400 && jqXHR.responseJSON) {
+                displayServerValidationErrors(jqXHR.responseJSON);
+            }
+        });
+        
+        // Auto-save functionality for forms (optional)
+        function enableAutoSave($form) {
+            var autoSaveTimer;
+            var autoSaveDelay = 30000; // 30 seconds
+            
+            $form.find('input, textarea, select').on('input change', function() {
+                clearTimeout(autoSaveTimer);
+                autoSaveTimer = setTimeout(function() {
+                    saveFormDraft($form);
+                }, autoSaveDelay);
+            });
+        }
+        
+        // Form draft saving
+        function saveFormDraft($form) {
+            var formData = $form.serialize();
+            var formId = $form.attr('id') || 'form_' + Math.random().toString(36).substr(2, 9);
+            
+            localStorage.setItem('form_draft_' + formId, formData);
+            
+            // Show auto-save indicator
+            showToast('Draft saved automatically', 'success', 2000);
+        }
+        
+        // Load form draft
+        function loadFormDraft($form) {
+            var formId = $form.attr('id');
+            if (formId) {
+                var draftData = localStorage.getItem('form_draft_' + formId);
+                if (draftData) {
+                    // Parse and populate form
+                    var params = new URLSearchParams(draftData);
+                    params.forEach(function(value, key) {
+                        var $field = $form.find('[name="' + key + '"]');
+                        if ($field.length) {
+                            if ($field.is(':checkbox, :radio')) {
+                                $field.filter('[value="' + value + '"]').prop('checked', true);
+                            } else {
+                                $field.val(value);
+                            }
+                        }
+                    });
+                    
+                    showToast('Draft restored', 'info', 3000);
+                }
+            }
+        }
+        
+        // Clear form draft
+        function clearFormDraft($form) {
+            var formId = $form.attr('id');
+            if (formId) {
+                localStorage.removeItem('form_draft_' + formId);
+            }
+        }
+        
+        // Validation error toast
+        function showValidationErrorToast() {
+            showToast('Please correct the errors below', 'error', 5000);
+        }
+        
+        // Server validation error display
+        function displayServerValidationErrors(errors) {
+            $.each(errors, function(field, messages) {
+                var $field = $('[name="' + field + '"]');
+                if ($field.length) {
+                    $field.addClass('is-invalid');
+                    
+                    var errorHtml = '<div class="invalid-feedback d-block">';
+                    $.each(messages, function(index, message) {
+                        errorHtml += '<i class="fas fa-exclamation-circle me-1"></i>' + message + '<br>';
+                    });
+                    errorHtml += '</div>';
+                    
+                    $field.after(errorHtml);
+                }
+            });
+        }
+        
+        // Toast notification system
+        function showToast(message, type = 'info', duration = 4000) {
+            var toastContainer = $('#validationToastContainer');
+            if (!toastContainer.length) {
+                toastContainer = $('<div id="validationToastContainer" class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1060;"></div>');
+                $('body').append(toastContainer);
+            }
+            
+            var iconMap = {
+                success: 'fas fa-check-circle text-success',
+                error: 'fas fa-exclamation-circle text-danger',
+                warning: 'fas fa-exclamation-triangle text-warning',
+                info: 'fas fa-info-circle text-info'
+            };
+            
+            var toast = $(`
+                <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="${duration}">
+                    <div class="toast-header">
+                        <i class="${iconMap[type] || iconMap.info} me-2"></i>
+                        <strong class="me-auto">Validation</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                </div>
+            `);
+            
+            toastContainer.append(toast);
+            
+            // Initialize and show toast
+            var bsToast = new bootstrap.Toast(toast[0]);
+            bsToast.show();
+            
+            // Remove toast element when hidden
+            toast.on('hidden.bs.toast', function() {
+                $(this).remove();
+            });
+        }
+        
+        // Initialize auto-save for forms with data-auto-save attribute
+        $('form[data-auto-save]').each(function() {
+            enableAutoSave($(this));
+            loadFormDraft($(this));
+        });
+        
+        // Clear drafts on successful form submission
+        $('form').on('submit', function() {
+            var $form = $(this);
+            if ($form.valid()) {
+                clearFormDraft($form);
+            }
+        });
+        
+        // Enhanced accessibility features
+        $('form').each(function() {
+            var $form = $(this);
+            
+            // Add aria-describedby for form fields with help text
+            $form.find('.form-text').each(function() {
+                var helpId = 'help_' + Math.random().toString(36).substr(2, 9);
+                $(this).attr('id', helpId);
+                
+                var $relatedInput = $(this).prev('input, select, textarea');
+                if ($relatedInput.length) {
+                    var existingDescribedBy = $relatedInput.attr('aria-describedby') || '';
+                    $relatedInput.attr('aria-describedby', (existingDescribedBy + ' ' + helpId).trim());
+                }
+            });
+            
+            // Add required field indicators
+            $form.find('input[required], select[required], textarea[required]').each(function() {
+                var $label = $form.find('label[for="' + $(this).attr('id') + '"]');
+                if ($label.length && !$label.find('.required-indicator').length) {
+                    $label.append(' <span class="required-indicator text-danger">*</span>');
+                }
+            });
+        });
+        
+        // Character counter for textareas
+        $('textarea[maxlength]').each(function() {
+            var $textarea = $(this);
+            var maxLength = $textarea.attr('maxlength');
+            var counterId = 'counter_' + Math.random().toString(36).substr(2, 9);
+            
+            var $counter = $('<div class="form-text text-end" id="' + counterId + '">0 / ' + maxLength + ' characters</div>');
+            $textarea.after($counter);
+            
+            // Update aria-describedby
+            var existingDescribedBy = $textarea.attr('aria-describedby') || '';
+            $textarea.attr('aria-describedby', (existingDescribedBy + ' ' + counterId).trim());
+            
+            $textarea.on('input', function() {
+                var currentLength = $(this).val().length;
+                $counter.text(currentLength + ' / ' + maxLength + ' characters');
+                
+                if (currentLength > maxLength * 0.9) {
+                    $counter.addClass('text-warning').removeClass('text-muted');
+                } else {
+                    $counter.addClass('text-muted').removeClass('text-warning');
+                }
+            });
+        });
+    });
+</script>
