@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using Roshta.Models; // Assuming Doctor model is here
 using Roshta.Services.Interfaces;
+using Roshta.ViewModels;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -15,17 +16,22 @@ public class EditModel : PageModel, IValidatableObject
 {
     private readonly IDoctorService _doctorService;
     private readonly ILicenseService _licenseService;
+    private readonly ISettingsService _settingsService;
     private readonly ILogger<EditModel> _logger;
 
-    public EditModel(IDoctorService doctorService, ILicenseService licenseService, ILogger<EditModel> logger)
+    public EditModel(IDoctorService doctorService, ILicenseService licenseService, ISettingsService settingsService, ILogger<EditModel> logger)
     {
         _doctorService = doctorService;
         _licenseService = licenseService;
+        _settingsService = settingsService;
         _logger = logger;
     }
 
     [BindProperty]
     public DoctorProfileInputModel DoctorProfile { get; set; } = new DoctorProfileInputModel();
+
+    [BindProperty]
+    public UserSettingsModel UserSettings { get; set; } = new UserSettingsModel();
 
     // Reusing the same input model structure as Setup
     public class DoctorProfileInputModel
@@ -87,6 +93,9 @@ public class EditModel : PageModel, IValidatableObject
         DoctorProfile.ContactPhone = doctor.ContactPhone;
         DoctorProfile.ContactEmail = doctor.ContactEmail;
 
+        // Load user settings
+        UserSettings = await _settingsService.GetUserSettingsAsync(currentDoctorId.Value);
+
         return Page();
     }
 
@@ -136,6 +145,100 @@ public class EditModel : PageModel, IValidatableObject
         {
             _logger.LogError(ex, "Error updating doctor profile for Doctor ID: {DoctorId}", currentDoctorId.Value);
             ModelState.AddModelError(string.Empty, "An error occurred while saving the profile. Please try again.");
+            return Page();
+        }
+    }
+
+    public async Task<IActionResult> OnPostSaveSettingsAsync()
+    {
+        // Re-check activation/setup status on post
+        if (!_licenseService.IsActivated() || !_licenseService.IsProfileSetup())
+        {
+            return RedirectToPage(!_licenseService.IsActivated() ? "/Activate" : "/DoctorProfile/Setup");
+        }
+
+        int? currentDoctorId = _licenseService.GetCurrentDoctorId();
+        if (currentDoctorId == null)
+        {
+            _logger.LogError("Could not retrieve Doctor ID for settings update POST.");
+            TempData["ErrorMessage"] = "Your session expired or profile is invalid. Please login again.";
+            return RedirectToPage("/Index");
+        }
+
+        // Validate only the settings model
+        var settingsValidationResults = new List<ValidationResult>();
+        var settingsValidationContext = new ValidationContext(UserSettings, null, null);
+        bool isSettingsValid = Validator.TryValidateObject(UserSettings, settingsValidationContext, settingsValidationResults, true);
+
+        if (!isSettingsValid)
+        {
+            foreach (var validationResult in settingsValidationResults)
+            {
+                foreach (var memberName in validationResult.MemberNames)
+                {
+                    ModelState.AddModelError($"UserSettings.{memberName}", validationResult.ErrorMessage ?? "Invalid value");
+                }
+            }
+
+            // Reload profile data for display
+            var doctor = await _doctorService.GetDoctorProfileAsync(currentDoctorId.Value);
+            if (doctor != null)
+            {
+                DoctorProfile.Name = doctor.Name;
+                DoctorProfile.Specialization = doctor.Specialization;
+                DoctorProfile.LicenseNumber = doctor.LicenseNumber;
+                DoctorProfile.ContactPhone = doctor.ContactPhone;
+                DoctorProfile.ContactEmail = doctor.ContactEmail;
+            }
+
+            return Page();
+        }
+
+        try
+        {
+            bool success = await _settingsService.SaveUserSettingsAsync(currentDoctorId.Value, UserSettings);
+
+            if (success)
+            {
+                _logger.LogInformation("Settings updated successfully for Doctor ID: {DoctorId}", currentDoctorId.Value);
+                TempData["SuccessMessage"] = "Settings updated successfully!";
+                return RedirectToPage();
+            }
+            else
+            {
+                _logger.LogWarning("SaveUserSettingsAsync returned false for Doctor ID: {DoctorId}", currentDoctorId.Value);
+                ModelState.AddModelError(string.Empty, "Could not update the settings. Please try again.");
+                
+                // Reload profile data for display
+                var doctor = await _doctorService.GetDoctorProfileAsync(currentDoctorId.Value);
+                if (doctor != null)
+                {
+                    DoctorProfile.Name = doctor.Name;
+                    DoctorProfile.Specialization = doctor.Specialization;
+                    DoctorProfile.LicenseNumber = doctor.LicenseNumber;
+                    DoctorProfile.ContactPhone = doctor.ContactPhone;
+                    DoctorProfile.ContactEmail = doctor.ContactEmail;
+                }
+                
+                return Page();
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating settings for Doctor ID: {DoctorId}", currentDoctorId.Value);
+            ModelState.AddModelError(string.Empty, "An error occurred while saving the settings. Please try again.");
+            
+            // Reload profile data for display
+            var doctor = await _doctorService.GetDoctorProfileAsync(currentDoctorId.Value);
+            if (doctor != null)
+            {
+                DoctorProfile.Name = doctor.Name;
+                DoctorProfile.Specialization = doctor.Specialization;
+                DoctorProfile.LicenseNumber = doctor.LicenseNumber;
+                DoctorProfile.ContactPhone = doctor.ContactPhone;
+                DoctorProfile.ContactEmail = doctor.ContactEmail;
+            }
+            
             return Page();
         }
     }

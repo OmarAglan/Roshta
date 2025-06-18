@@ -1,66 +1,371 @@
 @page
 @model Roshta.Pages.DoctorProfile.EditModel
 @{
-    ViewData["Title"] = "Edit Doctor Profile";
+    ViewData["Title"] = "Profile & Settings";
+    ViewData["BreadcrumbItems"] = new List<(string Text, string? Url)>
+    {
+        ("Profile & Settings", null)
+    };
 }
 
-<h2>@ViewData["Title"]</h2>
-<hr />
-
-@* TempData messages will now be shown as toasts via JavaScript below *@
-
 <div class="row">
-    <div class="col-md-6">
-        <form method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div> @* Added mb-3 *@
-            
-            <div class="mb-3"> @* Standardized to mb-3 *@
-                <label asp-for="DoctorProfile.Name" class="form-label"></label> @* Changed to form-label *@
-                <input asp-for="DoctorProfile.Name" class="form-control" />
-                <span asp-validation-for="DoctorProfile.Name" class="text-danger d-block"></span> @* Added d-block *@
+    <div class="col-12">
+        <h2><i class="bi bi-person-gear me-2"></i>@ViewData["Title"]</h2>
+        <hr />
+
+        <!-- Tab Navigation -->
+        <ul class="nav nav-tabs" id="profileTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="true">
+                    <i class="bi bi-person me-1"></i>Profile Information
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="display-tab" data-bs-toggle="tab" data-bs-target="#display" type="button" role="tab" aria-controls="display" aria-selected="false">
+                    <i class="bi bi-display me-1"></i>Display Settings
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="prescriptions-tab" data-bs-toggle="tab" data-bs-target="#prescriptions" type="button" role="tab" aria-controls="prescriptions" aria-selected="false">
+                    <i class="bi bi-prescription2 me-1"></i>Prescription Defaults
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="notifications-tab" data-bs-toggle="tab" data-bs-target="#notifications" type="button" role="tab" aria-controls="notifications" aria-selected="false">
+                    <i class="bi bi-bell me-1"></i>Notifications
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="preferences-tab" data-bs-toggle="tab" data-bs-target="#preferences" type="button" role="tab" aria-controls="preferences" aria-selected="false">
+                    <i class="bi bi-gear me-1"></i>Application Preferences
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content mt-3" id="profileTabsContent">
+            <!-- Profile Information Tab -->
+            <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="bi bi-person-badge me-2"></i>Doctor Profile</h5>
+                            </div>
+                            <div class="card-body">
+                                <form method="post">
+                                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                                    
+                                    <div class="mb-3">
+                                        <label asp-for="DoctorProfile.Name" class="form-label"></label>
+                                        <input asp-for="DoctorProfile.Name" class="form-control" />
+                                        <span asp-validation-for="DoctorProfile.Name" class="text-danger d-block"></span>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label asp-for="DoctorProfile.Specialization" class="form-label"></label>
+                                        <input asp-for="DoctorProfile.Specialization" class="form-control" />
+                                        <span asp-validation-for="DoctorProfile.Specialization" class="text-danger d-block"></span>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label asp-for="DoctorProfile.LicenseNumber" class="form-label"></label>
+                                        <input asp-for="DoctorProfile.LicenseNumber" class="form-control" />
+                                        <span asp-validation-for="DoctorProfile.LicenseNumber" class="text-danger d-block"></span>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label asp-for="DoctorProfile.ContactPhone" class="form-label"></label>
+                                        <input asp-for="DoctorProfile.ContactPhone" class="form-control" />
+                                        <span asp-validation-for="DoctorProfile.ContactPhone" class="text-danger d-block"></span>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label asp-for="DoctorProfile.ContactEmail" class="form-label"></label>
+                                        <input asp-for="DoctorProfile.ContactEmail" class="form-control" />
+                                        <span asp-validation-for="DoctorProfile.ContactEmail" class="text-danger d-block"></span>
+                                    </div>
+
+                                    <div class="mt-4">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-check2 me-1"></i>Save Profile Changes
+                                        </button>
+                                        <a asp-page="/Index" class="btn btn-outline-secondary">
+                                            <i class="bi bi-arrow-left me-1"></i>Cancel
+                                        </a>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="mb-3"> @* Standardized to mb-3 *@
-                <label asp-for="DoctorProfile.Specialization" class="form-label"></label> @* Changed to form-label *@
-                <input asp-for="DoctorProfile.Specialization" class="form-control" />
-                <span asp-validation-for="DoctorProfile.Specialization" class="text-danger d-block"></span> @* Added d-block *@
+            <!-- Display Settings Tab -->
+            <div class="tab-pane fade" id="display" role="tabpanel" aria-labelledby="display-tab">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="bi bi-display me-2"></i>Display Settings</h5>
+                            </div>
+                            <div class="card-body">
+                                <form method="post" asp-page-handler="SaveSettings">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label asp-for="UserSettings.DateFormat" class="form-label"></label>
+                                                <select asp-for="UserSettings.DateFormat" class="form-select">
+                                                    <option value="dd/MM/yyyy">DD/MM/YYYY (31/12/2023)</option>
+                                                    <option value="MM/dd/yyyy">MM/DD/YYYY (12/31/2023)</option>
+                                                    <option value="yyyy-MM-dd">YYYY-MM-DD (2023-12-31)</option>
+                                                    <option value="dd-MM-yyyy">DD-MM-YYYY (31-12-2023)</option>
+                                                </select>
+                                                <span asp-validation-for="UserSettings.DateFormat" class="text-danger d-block"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label asp-for="UserSettings.TimeFormat" class="form-label"></label>
+                                                <select asp-for="UserSettings.TimeFormat" class="form-select">
+                                                    <option value="HH:mm">24-hour (14:30)</option>
+                                                    <option value="hh:mm tt">12-hour (02:30 PM)</option>
+                                                </select>
+                                                <span asp-validation-for="UserSettings.TimeFormat" class="text-danger d-block"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label asp-for="UserSettings.SearchResultsPerPage" class="form-label"></label>
+                                                <select asp-for="UserSettings.SearchResultsPerPage" class="form-select">
+                                                    <option value="5">5 results</option>
+                                                    <option value="10">10 results</option>
+                                                    <option value="20">20 results</option>
+                                                    <option value="50">50 results</option>
+                                                    <option value="100">100 results</option>
+                                                </select>
+                                                <span asp-validation-for="UserSettings.SearchResultsPerPage" class="text-danger d-block"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label asp-for="UserSettings.TableDensity" class="form-label"></label>
+                                                <select asp-for="UserSettings.TableDensity" class="form-select">
+                                                    <option value="compact">Compact</option>
+                                                    <option value="normal">Normal</option>
+                                                    <option value="comfortable">Comfortable</option>
+                                                </select>
+                                                <span asp-validation-for="UserSettings.TableDensity" class="text-danger d-block"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label asp-for="UserSettings.ThemePreference" class="form-label"></label>
+                                        <select asp-for="UserSettings.ThemePreference" class="form-select">
+                                            <option value="light">Light</option>
+                                            <option value="dark">Dark</option>
+                                            <option value="auto">Auto (System)</option>
+                                        </select>
+                                        <span asp-validation-for="UserSettings.ThemePreference" class="text-danger d-block"></span>
+                                        <div class="form-text">Dark theme support coming soon</div>
+                                    </div>
+
+                                    <div class="mt-4">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-check2 me-1"></i>Save Display Settings
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="mb-3"> @* Standardized to mb-3 *@
-                <label asp-for="DoctorProfile.LicenseNumber" class="form-label"></label> @* Changed to form-label *@
-                <input asp-for="DoctorProfile.LicenseNumber" class="form-control" />
-                <span asp-validation-for="DoctorProfile.LicenseNumber" class="text-danger d-block"></span> @* Added d-block *@
+            <!-- Prescription Defaults Tab -->
+            <div class="tab-pane fade" id="prescriptions" role="tabpanel" aria-labelledby="prescriptions-tab">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="bi bi-prescription2 me-2"></i>Prescription Defaults</h5>
+                            </div>
+                            <div class="card-body">
+                                <form method="post" asp-page-handler="SaveSettings">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label asp-for="UserSettings.DefaultPrescriptionDuration" class="form-label"></label>
+                                                <input asp-for="UserSettings.DefaultPrescriptionDuration" type="number" min="1" max="365" class="form-control" />
+                                                <span asp-validation-for="UserSettings.DefaultPrescriptionDuration" class="text-danger d-block"></span>
+                                                <div class="form-text">Number of days (1-365)</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label asp-for="UserSettings.DefaultDosageFrequency" class="form-label"></label>
+                                                <select asp-for="UserSettings.DefaultDosageFrequency" class="form-select">
+                                                    <option value="Once daily">Once daily</option>
+                                                    <option value="Twice daily">Twice daily</option>
+                                                    <option value="Three times daily">Three times daily</option>
+                                                    <option value="Four times daily">Four times daily</option>
+                                                    <option value="Every 4 hours">Every 4 hours</option>
+                                                    <option value="Every 6 hours">Every 6 hours</option>
+                                                    <option value="Every 8 hours">Every 8 hours</option>
+                                                    <option value="Every 12 hours">Every 12 hours</option>
+                                                    <option value="As needed">As needed</option>
+                                                </select>
+                                                <span asp-validation-for="UserSettings.DefaultDosageFrequency" class="text-danger d-block"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-4">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-check2 me-1"></i>Save Prescription Defaults
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-             <div class="mb-3"> @* Standardized to mb-3 *@
-                <label asp-for="DoctorProfile.ContactPhone" class="form-label"></label> @* Changed to form-label *@
-                <input asp-for="DoctorProfile.ContactPhone" class="form-control" />
-                <span asp-validation-for="DoctorProfile.ContactPhone" class="text-danger d-block"></span> @* Added d-block *@
+            <!-- Notifications Tab -->
+            <div class="tab-pane fade" id="notifications" role="tabpanel" aria-labelledby="notifications-tab">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="bi bi-bell me-2"></i>Notification Settings</h5>
+                            </div>
+                            <div class="card-body">
+                                <form method="post" asp-page-handler="SaveSettings">
+                                    <div class="mb-4">
+                                        <h6 class="fw-semibold mb-3">Notification Types</h6>
+                                        <div class="form-check mb-2">
+                                            <input asp-for="UserSettings.EnableSuccessNotifications" class="form-check-input" type="checkbox" />
+                                            <label asp-for="UserSettings.EnableSuccessNotifications" class="form-check-label">
+                                                Enable Success Notifications
+                                            </label>
+                                            <div class="form-text">Show notifications for successful operations</div>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input asp-for="UserSettings.EnableWarningNotifications" class="form-check-input" type="checkbox" />
+                                            <label asp-for="UserSettings.EnableWarningNotifications" class="form-check-label">
+                                                Enable Warning Notifications
+                                            </label>
+                                            <div class="form-text">Show notifications for warnings</div>
+                                        </div>
+                                        <div class="form-check mb-3">
+                                            <input asp-for="UserSettings.EnableErrorNotifications" class="form-check-input" type="checkbox" />
+                                            <label asp-for="UserSettings.EnableErrorNotifications" class="form-check-label">
+                                                Enable Error Notifications
+                                            </label>
+                                            <div class="form-text">Show notifications for errors</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <h6 class="fw-semibold mb-3">Notification Behavior</h6>
+                                        <div class="form-check mb-3">
+                                            <input asp-for="UserSettings.AutoHideSuccessMessages" class="form-check-input" type="checkbox" />
+                                            <label asp-for="UserSettings.AutoHideSuccessMessages" class="form-check-label">
+                                                Auto-hide Success Messages
+                                            </label>
+                                            <div class="form-text">Success messages will automatically disappear</div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label asp-for="UserSettings.NotificationDuration" class="form-label"></label>
+                                            <input asp-for="UserSettings.NotificationDuration" type="number" min="1" max="30" class="form-control" style="max-width: 120px;" />
+                                            <span asp-validation-for="UserSettings.NotificationDuration" class="text-danger d-block"></span>
+                                            <div class="form-text">Duration in seconds (1-30)</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-4">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-check2 me-1"></i>Save Notification Settings
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="mb-3"> @* Standardized to mb-3 *@
-                <label asp-for="DoctorProfile.ContactEmail" class="form-label"></label> @* Changed to form-label *@
-                <input asp-for="DoctorProfile.ContactEmail" class="form-control" />
-                <span asp-validation-for="DoctorProfile.ContactEmail" class="text-danger d-block"></span> @* Added d-block *@
-            </div>
+            <!-- Application Preferences Tab -->
+            <div class="tab-pane fade" id="preferences" role="tabpanel" aria-labelledby="preferences-tab">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0"><i class="bi bi-gear me-2"></i>Application Preferences</h5>
+                            </div>
+                            <div class="card-body">
+                                <form method="post" asp-page-handler="SaveSettings">
+                                    <div class="mb-4">
+                                        <h6 class="fw-semibold mb-3">General Preferences</h6>
+                                        <div class="form-check mb-2">
+                                            <input asp-for="UserSettings.AutoSaveDrafts" class="form-check-input" type="checkbox" />
+                                            <label asp-for="UserSettings.AutoSaveDrafts" class="form-check-label">
+                                                Auto-save Drafts
+                                            </label>
+                                            <div class="form-text">Automatically save form data while typing</div>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input asp-for="UserSettings.ConfirmBeforeDelete" class="form-check-input" type="checkbox" />
+                                            <label asp-for="UserSettings.ConfirmBeforeDelete" class="form-check-label">
+                                                Confirm Before Delete
+                                            </label>
+                                            <div class="form-text">Show confirmation dialog before deleting items</div>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input asp-for="UserSettings.ShowAdvancedOptions" class="form-check-input" type="checkbox" />
+                                            <label asp-for="UserSettings.ShowAdvancedOptions" class="form-check-label">
+                                                Show Advanced Options
+                                            </label>
+                                            <div class="form-text">Display advanced features and options</div>
+                                        </div>
+                                        <div class="form-check mb-3">
+                                            <input asp-for="UserSettings.EnableKeyboardShortcuts" class="form-check-input" type="checkbox" />
+                                            <label asp-for="UserSettings.EnableKeyboardShortcuts" class="form-check-label">
+                                                Enable Keyboard Shortcuts
+                                            </label>
+                                            <div class="form-text">Enable keyboard shortcuts for faster navigation</div>
+                                        </div>
+                                    </div>
 
-            <div class="mt-4"> @* Standardized to mt-4 *@
-                <button type="submit" class="btn btn-primary">Save Changes</button>
-                <a asp-page="/Index" class="btn btn-outline-secondary">Cancel</a> @* Changed to outline *@
+                                    <div class="mt-4">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-check2 me-1"></i>Save Application Preferences
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script src="~/lib/imask/imask.min.js"></script>
-    <script src="~/js/validation-helpers.js"></script> @* Include helpers *@
+    <script src="~/js/validation-helpers.js"></script>
     <script>
-        // Using shared validation helpers
         document.addEventListener('DOMContentLoaded', function () {
-            // Get form and submit button
-            const profileForm = document.querySelector('form');
+            // Get form and submit button for profile tab
+            const profileForm = document.querySelector('#profile form');
             const submitButton = profileForm ? profileForm.querySelector('button[type="submit"]') : null;
 
             const phoneInput = document.getElementById('DoctorProfile_ContactPhone');
@@ -72,7 +377,7 @@
             const nameInput = document.getElementById('DoctorProfile_Name');
             const nameValidationSpan = document.querySelector('span[data-valmsg-for="DoctorProfile.Name"]');
             
-             // Function to update submit button state
+            // Function to update submit button state for profile form
             function updateSubmitButtonState() {
                 if (!submitButton || !profileForm) return;
                 const isValid = isFormClientSideValid(profileForm);
@@ -82,63 +387,83 @@
             // Apply Input Masking for Phone Number
             if (phoneInput) {
                 const phoneMask = IMask(phoneInput, {
-                    mask: '+{20}1000000000', // Fixed country code + 10 digits
-                    lazy: false // Show mask immediately
+                    mask: '+{20}1000000000',
+                    lazy: false
                 });
             }
 
-            // Define the handler that calls the shared function for phone format
+            // Validation handlers for profile form
             const phoneFormatHandler = () => validatePhoneNumberFormat(phoneInput, phoneValidationSpan);
-            // License Handlers
             const licenseRequiredHandler = () => validateRequiredField(licenseInput, licenseValidationSpan, 'License Number');
-            const licenseFormatHandler = () => validateNumericRange(licenseInput, licenseValidationSpan, 4, 19, 'License Number'); 
-            // Name Handler
+            const licenseFormatHandler = () => validateNumericRange(licenseInput, licenseValidationSpan, 4, 19, 'License Number');
             const nameRequiredHandler = () => {
-                 validateRequiredField(nameInput, nameValidationSpan, 'Name');
-                 updateSubmitButtonState(); // Update after name check
+                validateRequiredField(nameInput, nameValidationSpan, 'Name');
+                updateSubmitButtonState();
             };
 
-            // Define combined handlers that also update submit button
-             const combinedContactHandler = () => {
+            const combinedContactHandler = () => {
                 validateContactMethodRequired(phoneInput, emailInput, phoneValidationSpan, emailValidationSpan);
-                updateSubmitButtonState(); 
+                updateSubmitButtonState();
             };
             const combinedPhoneFormatHandler = () => {
                 validatePhoneNumberFormat(phoneInput, phoneValidationSpan);
                 updateSubmitButtonState();
             };
             const combinedLicenseHandler = () => {
-                licenseRequiredHandler(); 
-                licenseFormatHandler();   
+                licenseRequiredHandler();
+                licenseFormatHandler();
                 updateSubmitButtonState();
             };
 
-            // Add listeners to fields
+            // Add listeners to profile form fields
             if (phoneInput) {
-                 phoneInput.addEventListener('blur', combinedContactHandler); // Checks required contact
-                 phoneInput.addEventListener('blur', combinedPhoneFormatHandler); // Checks format
+                phoneInput.addEventListener('blur', combinedContactHandler);
+                phoneInput.addEventListener('blur', combinedPhoneFormatHandler);
             }
             if (emailInput) {
-                emailInput.addEventListener('blur', combinedContactHandler); // Checks required contact
+                emailInput.addEventListener('blur', combinedContactHandler);
             }
             if (licenseInput) {
-                 licenseInput.addEventListener('blur', combinedLicenseHandler);
-                 licenseInput.addEventListener('input', debounce(combinedLicenseHandler, 500));
+                licenseInput.addEventListener('blur', combinedLicenseHandler);
+                licenseInput.addEventListener('input', debounce(combinedLicenseHandler, 500));
             }
             if (nameInput) {
                 nameInput.addEventListener('blur', nameRequiredHandler);
                 nameInput.addEventListener('input', debounce(nameRequiredHandler, 500));
             }
             
-            // Initial checks on load
-            combinedContactHandler();
-            combinedPhoneFormatHandler(); 
-            combinedLicenseHandler();
-            nameRequiredHandler();
-            updateSubmitButtonState(); // Final initial state check
+            // Initial checks on load for profile form
+            if (profileForm) {
+                combinedContactHandler();
+                combinedPhoneFormatHandler();
+                combinedLicenseHandler();
+                nameRequiredHandler();
+                updateSubmitButtonState();
+            }
+
+            // Handle tab switching and preserve active tab
+            const tabTriggerList = [].slice.call(document.querySelectorAll('#profileTabs button[data-bs-toggle="tab"]'));
+            tabTriggerList.forEach(function (tabTriggerEl) {
+                const tabTrigger = new bootstrap.Tab(tabTriggerEl);
+                
+                tabTriggerEl.addEventListener('click', function (event) {
+                    // Store active tab in localStorage
+                    localStorage.setItem('activeProfileTab', event.target.getAttribute('aria-controls'));
+                });
+            });
+
+            // Restore active tab from localStorage
+            const activeTab = localStorage.getItem('activeProfileTab');
+            if (activeTab) {
+                const tabButton = document.querySelector(`#profileTabs button[aria-controls="${activeTab}"]`);
+                if (tabButton) {
+                    const tab = new bootstrap.Tab(tabButton);
+                    tab.show();
+                }
+            }
 
             // Check for TempData messages and display toasts
-            const successMessage = '@Html.Raw(TempData["SuccessMessage"])'; 
+            const successMessage = '@Html.Raw(TempData["SuccessMessage"])';
             const errorMessage = '@Html.Raw(TempData["ErrorMessage"])';
 
             if (successMessage) {

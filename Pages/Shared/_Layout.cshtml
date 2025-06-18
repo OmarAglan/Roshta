@@ -1,5 +1,6 @@
 ﻿@using Roshta.Services.Interfaces
 @inject ILicenseService LicenseService
+@inject IDoctorService DoctorService
 
 <!DOCTYPE html>
 <html lang="en">
@@ -28,9 +29,8 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Dashboard</a> @* Changed text and target is already Index *@
+                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Dashboard</a>
                         </li>
-                        @* Removed Privacy Link *@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-page="/Medications/Index">Medications</a>
                         </li>
@@ -40,13 +40,82 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-page="/Prescriptions/Index">Prescriptions</a>
                         </li>
-                        @* Removed New Prescription Link *@
-                        @* Removed Edit Profile Link *@
                     </ul>
+                    
+                    @if (LicenseService.IsActivated() && LicenseService.IsProfileSetup())
+                    {
+                        var currentDoctorId = LicenseService.GetCurrentDoctorId();
+                        var doctor = currentDoctorId.HasValue ? await DoctorService.GetDoctorProfileAsync(currentDoctorId.Value) : null;
+                        
+                        <ul class="navbar-nav">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-person-circle me-1"></i>
+                                    @(doctor?.Name ?? "Doctor")
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                    <li>
+                                        <a class="dropdown-item" asp-area="" asp-page="/DoctorProfile/Edit">
+                                            <i class="bi bi-gear me-2"></i>Profile & Settings
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <h6 class="dropdown-header">
+                                            <i class="bi bi-info-circle me-1"></i>About
+                                        </h6>
+                                    </li>
+                                    <li>
+                                        <span class="dropdown-item-text small text-muted">
+                                            Rosheta v1.0.0<br>
+                                            Prescription Management System
+                                        </span>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    }
                 </div>
             </div>
         </nav>
     </header>
+    
+    <!-- Breadcrumb Navigation -->
+    @if (ViewData["ShowBreadcrumb"] as bool? ?? true)
+    {
+        <div class="container">
+            <nav aria-label="breadcrumb" class="pt-2">
+                <ol class="breadcrumb bg-light rounded px-3 py-2 mb-3">
+                    <li class="breadcrumb-item">
+                        <a href="/" class="text-decoration-none">
+                            <i class="bi bi-house-door me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    @if (ViewData["BreadcrumbItems"] != null)
+                    {
+                        @foreach (var item in (List<(string Text, string? Url)>)ViewData["BreadcrumbItems"]!)
+                        {
+                            @if (item.Url != null)
+                            {
+                                <li class="breadcrumb-item">
+                                    <a href="@item.Url" class="text-decoration-none">@item.Text</a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="breadcrumb-item active" aria-current="page">@item.Text</li>
+                            }
+                        }
+                    }
+                    else if (!string.IsNullOrEmpty(ViewData["Title"] as string) && ViewData["Title"] as string != "Dashboard")
+                    {
+                        <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"]</li>
+                    }
+                </ol>
+            </nav>
+        </div>
+    }
+    
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()

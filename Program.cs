@@ -36,6 +36,7 @@ builder.Services.AddScoped<IMedicationService, MedicationService>();
 builder.Services.AddScoped<IPatientService, PatientService>();
 builder.Services.AddScoped<ILicenseService, LicenseService>();
 builder.Services.AddScoped<IDoctorService, DoctorService>();
+builder.Services.AddScoped<ISettingsService, SettingsService>();
 // -----------------------------------
 
 // Configure Razor Pages and add the global filter
