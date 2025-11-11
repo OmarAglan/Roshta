@@ -1,5 +1,5 @@
 using Rosheta.ViewModels;
-using Roshta.Models;
+using Roshta.Models.Entities;
 using Roshta.Repositories.Interfaces;
 using Roshta.Services.Interfaces;
 using System.Threading.Tasks;
@@ -38,4 +38,4 @@ public class DoctorService : IDoctorService
         // Add any service-level validation or logic here if needed
         return await _doctorRepository.UpdateDoctorProfileAsync(doctorId, profileDto);
     }
-} 
+}

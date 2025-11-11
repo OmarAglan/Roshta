@@ -1,4 +1,4 @@
-using Roshta.Models;
+using Roshta.Models.Entities;
 using Roshta.Repositories.Interfaces;
 using Roshta.Services.Interfaces;
 using Roshta.ViewModels;

@@ -1,4 +1,4 @@
-using Roshta.Models;
+using Roshta.Models.Entities;
 
 namespace Roshta.ViewModels;
 

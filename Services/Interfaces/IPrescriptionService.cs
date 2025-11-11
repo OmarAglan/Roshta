@@ -1,4 +1,4 @@
-using Roshta.Models;
+using Roshta.Models.Entities;
 using Roshta.ViewModels;
 using System.Collections.Generic;
 using System.Threading.Tasks;
