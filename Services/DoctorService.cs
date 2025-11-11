@@ -1,8 +1,8 @@
+using Rosheta.ViewModels;
 using Roshta.Models;
 using Roshta.Repositories.Interfaces;
 using Roshta.Services.Interfaces;
 using System.Threading.Tasks;
-using static Roshta.Pages.DoctorProfile.EditModel;
 
 namespace Roshta.Services;
 
@@ -33,9 +33,9 @@ public class DoctorService : IDoctorService
         return await _doctorRepository.SaveDoctorProfileAsync(doctor);
     }
 
-    public async Task<bool> UpdateDoctorProfileAsync(int doctorId, DoctorProfileInputModel profileInput)
+    public async Task<bool> UpdateDoctorProfileAsync(int doctorId, UpdateDoctorProfileDto profileDto)
     {
         // Add any service-level validation or logic here if needed
-        return await _doctorRepository.UpdateDoctorProfileAsync(doctorId, profileInput);
+        return await _doctorRepository.UpdateDoctorProfileAsync(doctorId, profileDto);
     }
 } 

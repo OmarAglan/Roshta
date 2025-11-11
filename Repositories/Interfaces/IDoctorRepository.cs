@@ -1,6 +1,6 @@
 using Roshta.Models;
+using Rosheta.ViewModels;
 using System.Threading.Tasks;
-using static Roshta.Pages.DoctorProfile.EditModel;
 
 namespace Roshta.Repositories.Interfaces;
 
@@ -30,7 +30,7 @@ public interface IDoctorRepository
     /// Updates the Doctor profile stored in the database.
     /// </summary>
     /// <param name="doctorId">The ID of the Doctor to update.</param>
-    /// <param name="profileInput">The updated Doctor profile input model.</param>
+    /// <param name="profileDto">The updated Doctor profile data transfer object.</param>
     /// <returns>True if the update was successful, false otherwise.</returns>
-    Task<bool> UpdateDoctorProfileAsync(int doctorId, DoctorProfileInputModel profileInput);
+    Task<bool> UpdateDoctorProfileAsync(int doctorId, UpdateDoctorProfileDto profileDto);
 } 

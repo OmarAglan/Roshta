@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using Rosheta.ViewModels;
 
 namespace Roshta.Pages.DoctorProfile;
 
@@ -123,8 +124,17 @@ public class EditModel : PageModel, IValidatableObject
 
         try
         {
-            // Map the Input Model back to a Doctor object or specific update model/DTO
-            bool success = await _doctorService.UpdateDoctorProfileAsync(currentDoctorId.Value, DoctorProfile);
+            // Map the Input Model to DTO
+            var updateDto = new UpdateDoctorProfileDto
+            {
+                Name = DoctorProfile.Name,
+                Specialization = DoctorProfile.Specialization ?? string.Empty,
+                LicenseNumber = DoctorProfile.LicenseNumber ?? string.Empty,
+                Phone = DoctorProfile.ContactPhone ?? string.Empty,
+                Email = DoctorProfile.ContactEmail ?? string.Empty
+            };
+
+            bool success = await _doctorService.UpdateDoctorProfileAsync(currentDoctorId.Value, updateDto);
 
             if(success)
             {
@@ -132,7 +142,7 @@ public class EditModel : PageModel, IValidatableObject
                 TempData["SuccessMessage"] = "Profile updated successfully!";
                 // It's good practice to redirect after POST to prevent re-submission
                 // Redirect back to the same page to show the success message and updated data
-                return RedirectToPage(); 
+                return RedirectToPage();
             }
             else
             {

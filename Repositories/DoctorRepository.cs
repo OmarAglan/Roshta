@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+using Rosheta.ViewModels;
 using Roshta.Data;
 using Roshta.Models;
 using Roshta.Repositories.Interfaces;
-using static Roshta.Pages.DoctorProfile.EditModel;
 
 namespace Roshta.Repositories;
 
@@ -53,7 +53,7 @@ public class DoctorRepository : IDoctorRepository
     }
 
     // Implementation for UpdateDoctorProfileAsync
-    public async Task<bool> UpdateDoctorProfileAsync(int doctorId, DoctorProfileInputModel profileInput)
+    public async Task<bool> UpdateDoctorProfileAsync(int doctorId, UpdateDoctorProfileDto profileDto)
     {
         var doctorToUpdate = await _context.Doctors.FindAsync(doctorId);
 
@@ -62,12 +62,12 @@ public class DoctorRepository : IDoctorRepository
             return false; // Doctor not found
         }
 
-        // Update properties from the input model
-        doctorToUpdate.Name = profileInput.Name;
-        doctorToUpdate.Specialization = profileInput.Specialization;
-        doctorToUpdate.LicenseNumber = profileInput.LicenseNumber;
-        doctorToUpdate.ContactPhone = profileInput.ContactPhone;
-        doctorToUpdate.ContactEmail = profileInput.ContactEmail;
+        // Update properties from the DTO
+        doctorToUpdate.Name = profileDto.Name;
+        doctorToUpdate.Specialization = profileDto.Specialization;
+        doctorToUpdate.LicenseNumber = profileDto.LicenseNumber;
+        doctorToUpdate.ContactPhone = profileDto.Phone;
+        doctorToUpdate.ContactEmail = profileDto.Email;
         // Note: Do not update IsActive or IsSubscribed here unless intended
         // Keep them as they were.
 
