@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Roshta.Data;
-using Roshta.Models;
+using Roshta.Models.Entities;
 using Roshta.Repositories.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,7 +33,7 @@ public class PatientRepository : IPatientRepository
         var lowerCaseSearchTerm = searchTerm.Trim().ToLower();
 
         return await _context.Patients
-                             .Where(p => (p.Name != null && p.Name.ToLower().Contains(lowerCaseSearchTerm)) || 
+                             .Where(p => (p.Name != null && p.Name.ToLower().Contains(lowerCaseSearchTerm)) ||
                                          (p.ContactInfo != null && p.ContactInfo.ToLower().Contains(lowerCaseSearchTerm)))
                              .OrderBy(p => p.Name) // Keep consistent ordering
                              .ToListAsync();
@@ -78,7 +78,7 @@ public class PatientRepository : IPatientRepository
         {
             return false;
         }
-        
+
         _context.Patients.Remove(patient);
         try
         {
@@ -103,7 +103,7 @@ public class PatientRepository : IPatientRepository
         {
             // Consider empty/whitespace contact info as non-unique or handle based on requirements
             // If ContactInfo is nullable or not required, empty might be considered "unique"
-            return true; 
+            return true;
         }
 
         // Normalize for case-insensitive comparison
@@ -129,10 +129,10 @@ public class PatientRepository : IPatientRepository
 
         bool exists = await _context.Patients
             .Where(p => p.Name != null && p.Name.ToLower() == normalizedName)
-            .Where(p => currentId == null || p.Id != currentId.Value) 
+            .Where(p => currentId == null || p.Id != currentId.Value)
             .AnyAsync();
 
-        return !exists; 
+        return !exists;
     }
 
     // --- Implementation for Pagination Methods ---

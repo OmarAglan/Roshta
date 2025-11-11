@@ -1,4 +1,4 @@
-using Roshta.Models;
+using Roshta.Models.Entities;
 using Rosheta.ViewModels;
 using System.Threading.Tasks;
 
@@ -33,4 +33,4 @@ public interface IDoctorRepository
     /// <param name="profileDto">The updated Doctor profile data transfer object.</param>
     /// <returns>True if the update was successful, false otherwise.</returns>
     Task<bool> UpdateDoctorProfileAsync(int doctorId, UpdateDoctorProfileDto profileDto);
-} 
+}

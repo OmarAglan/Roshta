@@ -1,8 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using Roshta.Models; // Update namespace
+using Roshta.Models.Entities;
+using Roshta.Models.Base;
 using System.Reflection.Emit;
 
-namespace Roshta.Data; // Update namespace
+namespace Roshta.Data;
 
 public class ApplicationDbContext : DbContext
 {
@@ -102,42 +103,26 @@ public class ApplicationDbContext : DbContext
 
     private void OnBeforeSaving()
     {
-        var entries = ChangeTracker.Entries()
-            .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
-
+        var entries = ChangeTracker.Entries();
         var utcNow = DateTime.UtcNow;
 
         foreach (var entry in entries)
         {
-            // Check if the entity has 'CreatedAt' and 'UpdatedAt' properties
-            if (entry.Entity is Patient || entry.Entity is Doctor || entry.Entity is Medication || entry.Entity is Prescription || entry.Entity is PrescriptionItem)
+            // Use interface instead of type checking each entity
+            if (entry.Entity is IAuditable auditableEntity)
             {
-                var updatedAtProperty = entry.Property("UpdatedAt");
-                if (updatedAtProperty != null)
+                switch (entry.State)
                 {
-                    updatedAtProperty.CurrentValue = utcNow;
-                }
+                    case EntityState.Modified:
+                        auditableEntity.UpdatedAt = utcNow;
+                        break;
 
-                if (entry.State == EntityState.Added)
-                {
-                    var createdAtProperty = entry.Property("CreatedAt");
-                    if (createdAtProperty != null)
-                    {
-                        createdAtProperty.CurrentValue = utcNow;
-                    }
+                    case EntityState.Added:
+                        auditableEntity.CreatedAt = utcNow;
+                        auditableEntity.UpdatedAt = utcNow;
+                        break;
                 }
             }
-            // If you create a base class or interface for auditable entities,
-            // you can make this logic more generic and cleaner.
-            // Example with an interface IAuditable:
-            // if (entry.Entity is IAuditable auditableEntity)
-            // {
-            //     auditableEntity.UpdatedAt = utcNow;
-            //     if (entry.State == EntityState.Added)
-            //     {
-            //         auditableEntity.CreatedAt = utcNow;
-            //     }
-            // }
         }
     }
 }

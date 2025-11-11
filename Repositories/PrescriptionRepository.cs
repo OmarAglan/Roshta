@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Roshta.Data;
-using Roshta.Models;
+using Roshta.Models.Entities;
 using Roshta.Repositories.Interfaces;
 using System.Collections.Generic;
 using System.Linq;

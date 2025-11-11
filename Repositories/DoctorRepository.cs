@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Rosheta.ViewModels;
 using Roshta.Data;
-using Roshta.Models;
+using Roshta.Models.Entities;
 using Roshta.Repositories.Interfaces;
 
 namespace Roshta.Repositories;
@@ -35,7 +35,7 @@ public class DoctorRepository : IDoctorRepository
         {
             // No doctor exists, add this one
             // Reset ID to 0 to ensure EF Core assigns a new one if it was set somehow
-            doctor.Id = 0; 
+            doctor.Id = 0;
             await _context.Doctors.AddAsync(doctor);
         }
         else
@@ -45,7 +45,7 @@ public class DoctorRepository : IDoctorRepository
             doctor.Id = existingDoctor.Id;
             // Update properties (EF Core might need help tracking changes if the passed 'doctor' is not the tracked entity)
             _context.Entry(existingDoctor).CurrentValues.SetValues(doctor);
-            _context.Entry(existingDoctor).State = EntityState.Modified; 
+            _context.Entry(existingDoctor).State = EntityState.Modified;
         }
 
         await _context.SaveChangesAsync();
@@ -90,4 +90,4 @@ public class DoctorRepository : IDoctorRepository
             return false;
         }
     }
-} 
+}
