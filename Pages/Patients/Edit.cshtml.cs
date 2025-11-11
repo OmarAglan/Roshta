@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Roshta.Data;
-using Roshta.Models;
+using Roshta.Models.Entities;
 using Roshta.Services.Interfaces;
 
 namespace Roshta.Pages_Patients
@@ -31,7 +31,7 @@ namespace Roshta.Pages_Patients
                 return NotFound();
             }
 
-            var patient =  await _patientService.GetPatientByIdAsync(id.Value);
+            var patient = await _patientService.GetPatientByIdAsync(id.Value);
             if (patient == null)
             {
                 return NotFound();
@@ -58,11 +58,11 @@ namespace Roshta.Pages_Patients
                 }
                 if (!string.IsNullOrWhiteSpace(Patient.Name))
                 {
-                     bool isNameUnique = await _patientService.IsNameUniqueAsync(Patient.Name, Patient.Id);
-                     if (!isNameUnique)
-                     {
-                         ModelState.AddModelError("Patient.Name", "Patient Name already exists.");
-                     }
+                    bool isNameUnique = await _patientService.IsNameUniqueAsync(Patient.Name, Patient.Id);
+                    if (!isNameUnique)
+                    {
+                        ModelState.AddModelError("Patient.Name", "Patient Name already exists.");
+                    }
                 }
             }
 
@@ -95,7 +95,7 @@ namespace Roshta.Pages_Patients
 
         private async Task<bool> PatientExistsAsync(int id)
         {
-             return await _patientService.PatientExistsAsync(id);
+            return await _patientService.PatientExistsAsync(id);
         }
 
         // --- Handler for ContactInfo AJAX Uniqueness Check ---
@@ -116,7 +116,7 @@ namespace Roshta.Pages_Patients
         public async Task<IActionResult> OnGetCheckNameUniqueAsync(string name, int currentId)
         {
             // currentId is passed from the client-side JS for the item being edited
-             if (string.IsNullOrWhiteSpace(name))
+            if (string.IsNullOrWhiteSpace(name))
             {
                 return new JsonResult(new { isUnique = true });
             }

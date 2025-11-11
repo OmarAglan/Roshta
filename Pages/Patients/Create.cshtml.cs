@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Roshta.Data;
-using Roshta.Models;
+using Roshta.Models.Entities;
 using Roshta.Services.Interfaces;
 
 namespace Roshta.Pages_Patients
@@ -80,7 +80,7 @@ namespace Roshta.Pages_Patients
         // --- Handler for Name AJAX Uniqueness Check ---
         public async Task<IActionResult> OnGetCheckNameUniqueAsync(string name)
         {
-             if (string.IsNullOrWhiteSpace(name))
+            if (string.IsNullOrWhiteSpace(name))
             {
                 return new JsonResult(new { isUnique = true });
             }

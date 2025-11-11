@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Roshta.Data;
-using Roshta.Models;
+using Roshta.Models.Entities;
 using Roshta.Services.Interfaces;
 using Roshta.ViewModels;
 using Microsoft.AspNetCore.Mvc.Rendering; // Keep if needed elsewhere, otherwise remove
@@ -23,7 +23,7 @@ namespace Roshta.Pages_Patients
             _patientService = patientService;
         }
 
-        public List<Patient> Patient { get;set; } = new List<Patient>(); // Initialize as empty list
+        public List<Patient> Patient { get; set; } = new List<Patient>(); // Initialize as empty list
 
         [BindProperty(SupportsGet = true)]
         public string? SearchString { get; set; }
@@ -86,7 +86,7 @@ namespace Roshta.Pages_Patients
 
                 // Get patients using existing service method, limit to 10 for autocomplete
                 var patients = await _patientService.GetPatientsPagedAsync(1, 10, searchTerm, null);
-                
+
                 // Map to DTO
                 var patientDtos = patients.Select(p => new PatientSearchDto
                 {

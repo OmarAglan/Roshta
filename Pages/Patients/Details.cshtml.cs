@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Roshta.Data;
-using Roshta.Models;
+using Roshta.Models.Entities;
 using Roshta.Services.Interfaces;
 
 namespace Roshta.Pages_Patients
@@ -34,7 +34,7 @@ namespace Roshta.Pages_Patients
             {
                 return NotFound();
             }
-            else 
+            else
             {
                 Patient = patient;
             }

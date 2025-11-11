@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
-using Roshta.Models; // Assuming Doctor model is here
+using Roshta.Models.Entities;
 using Roshta.Services.Interfaces;
 using Roshta.ViewModels;
 using System.ComponentModel.DataAnnotations;
@@ -73,7 +73,7 @@ public class EditModel : PageModel, IValidatableObject
         if (currentDoctorId == null)
         {
             _logger.LogError("Could not retrieve Doctor ID for editing. User might not be properly associated with a profile.");
-             // This indicates a potentially inconsistent state
+            // This indicates a potentially inconsistent state
             TempData["ErrorMessage"] = "Could not load your profile. Please contact support.";
             return RedirectToPage("/Index");
         }
@@ -102,18 +102,18 @@ public class EditModel : PageModel, IValidatableObject
 
     public async Task<IActionResult> OnPostAsync()
     {
-         // Re-check activation/setup status on post
+        // Re-check activation/setup status on post
         if (!_licenseService.IsActivated() || !_licenseService.IsProfileSetup())
         {
-             return RedirectToPage(!_licenseService.IsActivated() ? "/Activate" : "/DoctorProfile/Setup");
+            return RedirectToPage(!_licenseService.IsActivated() ? "/Activate" : "/DoctorProfile/Setup");
         }
 
         int? currentDoctorId = _licenseService.GetCurrentDoctorId();
-         if (currentDoctorId == null)
+        if (currentDoctorId == null)
         {
-             _logger.LogError("Could not retrieve Doctor ID for profile update POST.");
-             TempData["ErrorMessage"] = "Your session expired or profile is invalid. Please login again.";
-             return RedirectToPage("/Index"); // Or login page
+            _logger.LogError("Could not retrieve Doctor ID for profile update POST.");
+            TempData["ErrorMessage"] = "Your session expired or profile is invalid. Please login again.";
+            return RedirectToPage("/Index"); // Or login page
         }
 
         if (!ModelState.IsValid)
@@ -136,7 +136,7 @@ public class EditModel : PageModel, IValidatableObject
 
             bool success = await _doctorService.UpdateDoctorProfileAsync(currentDoctorId.Value, updateDto);
 
-            if(success)
+            if (success)
             {
                 _logger.LogInformation("Doctor profile updated successfully for Doctor ID: {DoctorId}", currentDoctorId.Value);
                 TempData["SuccessMessage"] = "Profile updated successfully!";
@@ -146,9 +146,9 @@ public class EditModel : PageModel, IValidatableObject
             }
             else
             {
-                 _logger.LogWarning("UpdateDoctorProfileAsync returned false for Doctor ID: {DoctorId}", currentDoctorId.Value);
-                 ModelState.AddModelError(string.Empty, "Could not update the profile. The data might be invalid or unchanged.");
-                 return Page();
+                _logger.LogWarning("UpdateDoctorProfileAsync returned false for Doctor ID: {DoctorId}", currentDoctorId.Value);
+                ModelState.AddModelError(string.Empty, "Could not update the profile. The data might be invalid or unchanged.");
+                return Page();
             }
         }
         catch (Exception ex)
@@ -218,7 +218,7 @@ public class EditModel : PageModel, IValidatableObject
             {
                 _logger.LogWarning("SaveUserSettingsAsync returned false for Doctor ID: {DoctorId}", currentDoctorId.Value);
                 ModelState.AddModelError(string.Empty, "Could not update the settings. Please try again.");
-                
+
                 // Reload profile data for display
                 var doctor = await _doctorService.GetDoctorProfileAsync(currentDoctorId.Value);
                 if (doctor != null)
@@ -229,7 +229,7 @@ public class EditModel : PageModel, IValidatableObject
                     DoctorProfile.ContactPhone = doctor.ContactPhone;
                     DoctorProfile.ContactEmail = doctor.ContactEmail;
                 }
-                
+
                 return Page();
             }
         }
@@ -237,7 +237,7 @@ public class EditModel : PageModel, IValidatableObject
         {
             _logger.LogError(ex, "Error updating settings for Doctor ID: {DoctorId}", currentDoctorId.Value);
             ModelState.AddModelError(string.Empty, "An error occurred while saving the settings. Please try again.");
-            
+
             // Reload profile data for display
             var doctor = await _doctorService.GetDoctorProfileAsync(currentDoctorId.Value);
             if (doctor != null)
@@ -248,7 +248,7 @@ public class EditModel : PageModel, IValidatableObject
                 DoctorProfile.ContactPhone = doctor.ContactPhone;
                 DoctorProfile.ContactEmail = doctor.ContactEmail;
             }
-            
+
             return Page();
         }
     }
@@ -264,4 +264,4 @@ public class EditModel : PageModel, IValidatableObject
                 new[] { nameof(DoctorProfile.ContactPhone), nameof(DoctorProfile.ContactEmail) });
         }
     }
-} 
+}

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Roshta.Data;
-using Roshta.Models;
+using Roshta.Models.Entities;
 using Roshta.Services.Interfaces;
 
 namespace Roshta.Pages_Patients
@@ -36,7 +36,7 @@ namespace Roshta.Pages_Patients
             {
                 return NotFound();
             }
-            else 
+            else
             {
                 Patient = patient;
             }
@@ -49,7 +49,7 @@ namespace Roshta.Pages_Patients
             {
                 return NotFound();
             }
-            
+
             // Store the name before deleting for the message
             var patient = await _patientService.GetPatientByIdAsync(id.Value);
             var patientName = patient?.Name ?? $"ID {id.Value}"; // Fallback to ID if name not found

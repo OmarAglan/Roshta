@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Roshta.Models;
+using Roshta.Models.Entities;
 using Roshta.Services.Interfaces;
 using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
@@ -61,20 +61,20 @@ public class SetupModel : PageModel, IValidatableObject
         }
         if (_licenseService.IsProfileSetup())
         {
-             _logger.LogInformation("Profile already set up. Redirecting from Setup page.");
-             // Maybe redirect to an Edit page or dashboard later
-             return RedirectToPage("/Index"); 
+            _logger.LogInformation("Profile already set up. Redirecting from Setup page.");
+            // Maybe redirect to an Edit page or dashboard later
+            return RedirectToPage("/Index");
         }
 
         // Pre-fill form if a profile somehow exists but isn't marked as setup (edge case)
         var existingProfile = await _doctorService.GetDoctorProfileAsync();
-        if(existingProfile != null)
+        if (existingProfile != null)
         {
-             DoctorProfile.Name = existingProfile.Name;
-             DoctorProfile.Specialization = existingProfile.Specialization;
-             DoctorProfile.LicenseNumber = existingProfile.LicenseNumber;
-             DoctorProfile.ContactPhone = existingProfile.ContactPhone;
-             DoctorProfile.ContactEmail = existingProfile.ContactEmail;
+            DoctorProfile.Name = existingProfile.Name;
+            DoctorProfile.Specialization = existingProfile.Specialization;
+            DoctorProfile.LicenseNumber = existingProfile.LicenseNumber;
+            DoctorProfile.ContactPhone = existingProfile.ContactPhone;
+            DoctorProfile.ContactEmail = existingProfile.ContactEmail;
         }
 
         return Page();
@@ -83,13 +83,13 @@ public class SetupModel : PageModel, IValidatableObject
     public async Task<IActionResult> OnPostAsync()
     {
         // Re-check activation/setup status on post
-         if (!_licenseService.IsActivated())
+        if (!_licenseService.IsActivated())
         {
             return RedirectToPage("/Activate");
         }
         if (_licenseService.IsProfileSetup())
         {
-             return RedirectToPage("/Index"); 
+            return RedirectToPage("/Index");
         }
 
         if (!ModelState.IsValid)
@@ -99,24 +99,24 @@ public class SetupModel : PageModel, IValidatableObject
 
         // Map ViewModel to the actual Doctor model
         var doctorToSave = await _doctorService.GetDoctorProfileAsync() ?? new Doctor();
-        
+
         doctorToSave.Name = DoctorProfile.Name;
         doctorToSave.Specialization = DoctorProfile.Specialization;
         doctorToSave.LicenseNumber = DoctorProfile.LicenseNumber;
         doctorToSave.ContactPhone = DoctorProfile.ContactPhone;
         doctorToSave.ContactEmail = DoctorProfile.ContactEmail;
         // Keep existing IsSubscribed/IsActive flags or set defaults if new
-        doctorToSave.IsActive = true; 
+        doctorToSave.IsActive = true;
         // IsSubscribed would typically be managed elsewhere/later
         // doctorToSave.IsSubscribed = true; // Don't set here unless license implies subscription
 
         try
         {
             var savedDoctor = await _doctorService.SaveDoctorProfileAsync(doctorToSave);
-            
+
             // Mark profile as setup with the saved doctor's ID
             _licenseService.MarkProfileAsSetup(savedDoctor.Id);
-            
+
             _logger.LogInformation("Doctor profile setup completed for Doctor ID: {DoctorId}", savedDoctor.Id);
             TempData["SuccessMessage"] = "Doctor profile saved successfully!";
             return RedirectToPage("/Index"); // Redirect to main app page
@@ -136,8 +136,8 @@ public class SetupModel : PageModel, IValidatableObject
         {
             yield return new ValidationResult(
                 "Please provide at least one contact method (Phone or Email).",
-                new[] { nameof(DoctorProfile.ContactPhone), nameof(DoctorProfile.ContactEmail) }); 
-                // Associate error with both fields
+                new[] { nameof(DoctorProfile.ContactPhone), nameof(DoctorProfile.ContactEmail) });
+            // Associate error with both fields
         }
     }
-} 
+}

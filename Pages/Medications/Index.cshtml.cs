@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Roshta.Models;
+using Roshta.Models.Entities;
 using Roshta.Services.Interfaces;
 using Roshta.ViewModels;
 using System.Collections.Generic;
@@ -20,7 +20,7 @@ namespace Roshta.Pages_Medications
             _medicationService = medicationService;
         }
 
-        public List<Medication> Medication { get;set; } = new List<Medication>(); // Initialize
+        public List<Medication> Medication { get; set; } = new List<Medication>(); // Initialize
 
         [BindProperty(SupportsGet = true)]
         public string? SearchString { get; set; }
@@ -81,7 +81,7 @@ namespace Roshta.Pages_Medications
 
                 // Get medications using existing service method, limit to 10 for autocomplete
                 var medications = await _medicationService.GetMedicationsPagedAsync(1, 10, searchTerm, null);
-                
+
                 // Map to DTO
                 var medicationDtos = medications.Select(m => new MedicationSearchDto
                 {
