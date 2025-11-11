@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Roshta.Models;
+using Roshta.Models.Entities;
 using Roshta.Services.Interfaces;
 using Roshta.ViewModels;
 using Microsoft.Extensions.Logging;
@@ -23,7 +23,7 @@ public class IndexModel : PageModel
         _logger = logger;
     }
 
-    public List<Prescription> PrescriptionList { get;set; } = new List<Prescription>(); // Initialize
+    public List<Prescription> PrescriptionList { get; set; } = new List<Prescription>(); // Initialize
 
     [BindProperty(SupportsGet = true)]
     public string? SearchString { get; set; }
@@ -86,7 +86,7 @@ public class IndexModel : PageModel
 
             // Get prescriptions using existing service method, limit to 10 for autocomplete
             var prescriptions = await _prescriptionService.GetPrescriptionsPagedAsync(1, 10, searchTerm, null);
-            
+
             // Map to DTO
             var prescriptionDtos = prescriptions.Select(p => new PrescriptionSearchDto
             {
@@ -118,7 +118,7 @@ public class IndexModel : PageModel
         else
         {
             // Log error? Service/Repo should log specific DB errors.
-             _logger.LogWarning("Failed to cancel prescription ID {PrescriptionId}. It might not exist or was already cancelled.", id);
+            _logger.LogWarning("Failed to cancel prescription ID {PrescriptionId}. It might not exist or was already cancelled.", id);
             TempData["ErrorMessage"] = $"Could not cancel prescription ID {id}. It might have already been cancelled or an error occurred.";
         }
 

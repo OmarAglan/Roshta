@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Roshta.Models;
+using Roshta.Models.Entities;
 using Roshta.Services.Interfaces;
 
 namespace Roshta.Pages.Prescriptions;
@@ -32,4 +32,4 @@ public class DetailsModel : PageModel
         }
         return Page();
     }
-} 
+}

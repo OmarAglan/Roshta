@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering; // For SelectList
-using Roshta.Models; // Potentially for error handling or direct model use if needed
+using Roshta.Models.Entities;
 using Roshta.Repositories.Interfaces;
 using Roshta.Services.Interfaces;
 using Roshta.ViewModels;
@@ -64,7 +64,7 @@ namespace Roshta.Pages.Prescriptions
                     // ExpiryDate and NextAppointmentDate could be copied or left blank - let's copy for now
                     PrescriptionCreate.ExpiryDate = originalPrescription.ExpiryDate;
                     PrescriptionCreate.NextAppointmentDate = originalPrescription.NextAppointmentDate;
-                    
+
                     // Map the original items to the ViewModel items
                     PrescriptionCreate.Items = originalPrescription.PrescriptionItems.Select(item => new PrescriptionCreateModel.PrescriptionItemCreateModel
                     {
@@ -81,9 +81,9 @@ namespace Roshta.Pages.Prescriptions
                 }
                 else
                 {
-                     _logger.LogWarning("Could not find prescription ID {CopyFromId} to copy.", copyFromId.Value);
-                     // Optional: Add a TempData message if needed
-                     // TempData["ErrorMessage"] = "Could not find the prescription to copy.";
+                    _logger.LogWarning("Could not find prescription ID {CopyFromId} to copy.", copyFromId.Value);
+                    // Optional: Add a TempData message if needed
+                    // TempData["ErrorMessage"] = "Could not find the prescription to copy.";
                 }
             }
         }
@@ -101,21 +101,21 @@ namespace Roshta.Pages.Prescriptions
             {
                 // Ensure we have the select list available for looking up names
                 if (MedicationSelectList == null) { await OnGetAsync(null); } // Pass null to avoid re-copying if validation fails
-                
-                for(int i = 0; i < PrescriptionCreate.Items.Count; i++)
+
+                for (int i = 0; i < PrescriptionCreate.Items.Count; i++)
                 {
                     var item = PrescriptionCreate.Items[i];
                     if (!await _medicationRepository.ExistsAsync(item.MedicationId))
                     {
                         var medName = MedicationSelectList?.FirstOrDefault(m => m.Value == item.MedicationId.ToString())?.Text;
-                        var errorMsg = medName != null 
+                        var errorMsg = medName != null
                             ? $"Selected medication '{medName}' no longer exists or is invalid."
                             : $"Selected medication (ID: {item.MedicationId}) does not exist.";
-                        ModelState.AddModelError($"PrescriptionCreate.Items[{i}].MedicationId", errorMsg); 
+                        ModelState.AddModelError($"PrescriptionCreate.Items[{i}].MedicationId", errorMsg);
                     }
                 }
             }
-            
+
             // --- Check Model State AFTER custom checks --- 
             if (!ModelState.IsValid)
             {
@@ -149,7 +149,7 @@ namespace Roshta.Pages.Prescriptions
                 await OnGetAsync(null); // Re-populate lists
                 return Page();
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Error creating prescription for Patient ID {PatientId}", PrescriptionCreate.PatientId);
                 ModelState.AddModelError(string.Empty, "An unexpected error occurred while creating the prescription. Please try again or contact support.");
@@ -165,4 +165,4 @@ namespace Roshta.Pages.Prescriptions
             return new JsonResult(new { exists });
         }
     }
-} 
+}
