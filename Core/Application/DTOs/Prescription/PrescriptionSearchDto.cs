@@ -1,5 +1,7 @@
 using Rosheta.Core.Domain.Entities;
 
+using Rosheta.Core.Domain.Enums;
+
 namespace Rosheta.Core.Application.DTOs;
 
 public class PrescriptionSearchDto

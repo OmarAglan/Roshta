@@ -2,6 +2,8 @@ using Microsoft.Extensions.Logging;
 using Rosheta.Core.Application.Contracts.Infrastructure;
 using Rosheta.Core.Application.Contracts.Services;
 using Rosheta.Core.Application.DTOs;
+using Rosheta.Core.Application.DTOs.Doctor;
+using Rosheta.Core.Application.Models;
 using System.Text.Json;
 using System.Threading.Tasks;
 

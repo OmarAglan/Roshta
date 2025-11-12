@@ -1,5 +1,7 @@
 using Rosheta.Core.Domain.Entities;
 using Rosheta.Core.Application.DTOs;
+using Rosheta.Core.Application.DTOs.Doctor;
+using Rosheta.Core.Application.Models;
 using System.Threading.Tasks;
 
 namespace Rosheta.Core.Application.Contracts.Persistence;
