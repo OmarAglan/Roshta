@@ -4,7 +4,7 @@ using Rosheta.Core.Domain.Entities;
 using Rosheta.Core.Application.Contracts.Services;
 using System.Threading.Tasks;
 
-namespace Rosheta.Pages.Medications
+namespace Rosheta.Pages_Medications
 {
     public class DetailsModel : PageModel
     {
