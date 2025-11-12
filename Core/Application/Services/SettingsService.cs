@@ -1,11 +1,11 @@
 using Microsoft.Extensions.Logging;
-using Rosheta.Infrastructure.Storage.Interfaces;
-using Rosheta.Services.Interfaces;
-using Rosheta.ViewModels;
+using Rosheta.Core.Application.Contracts.Infrastructure;
+using Rosheta.Core.Application.Contracts.Services;
+using Rosheta.Core.Application.DTOs;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace Rosheta.Services;
+namespace Rosheta.Core.Application.Services;
 
 public class SettingsService : ISettingsService
 {

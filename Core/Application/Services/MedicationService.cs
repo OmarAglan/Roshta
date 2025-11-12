@@ -1,8 +1,8 @@
-using Rosheta.Models.Entities;
-using Rosheta.Repositories.Interfaces;
-using Rosheta.Services.Interfaces;
+using Rosheta.Core.Domain.Entities;
+using Rosheta.Core.Application.Contracts.Persistence;
+using Rosheta.Core.Application.Contracts.Services;
 
-namespace Rosheta.Services;
+namespace Rosheta.Core.Application.Services;
 
 public class MedicationService : IMedicationService
 {

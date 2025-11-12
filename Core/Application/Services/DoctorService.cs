@@ -1,10 +1,10 @@
-using Rosheta.ViewModels;
-using Rosheta.Models.Entities;
-using Rosheta.Repositories.Interfaces;
-using Rosheta.Services.Interfaces;
+using Rosheta.Core.Application.DTOs;
+using Rosheta.Core.Domain.Entities;
+using Rosheta.Core.Application.Contracts.Persistence;
+using Rosheta.Core.Application.Contracts.Services;
 using System.Threading.Tasks;
 
-namespace Rosheta.Services;
+namespace Rosheta.Core.Application.Services;
 
 public class DoctorService : IDoctorService
 {

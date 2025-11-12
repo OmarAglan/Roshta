@@ -1,10 +1,10 @@
-using Rosheta.Models.Entities;
-using Rosheta.Repositories.Interfaces;
-using Rosheta.Services.Interfaces;
-using Rosheta.ViewModels;
+using Rosheta.Core.Domain.Entities;
+using Rosheta.Core.Application.Contracts.Persistence;
+using Rosheta.Core.Application.Contracts.Services;
+using Rosheta.Core.Application.DTOs;
 using Microsoft.Extensions.Logging;
 
-namespace Rosheta.Services;
+namespace Rosheta.Core.Application.Services;
 
 public class PrescriptionService : IPrescriptionService
 {

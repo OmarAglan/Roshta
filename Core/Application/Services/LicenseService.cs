@@ -1,9 +1,9 @@
 using Microsoft.Extensions.Options; // Required for IOptions
-using Rosheta.Infrastructure.Storage.Interfaces;
-using Rosheta.Services.Interfaces;
+using Rosheta.Core.Application.Contracts.Infrastructure;
+using Rosheta.Core.Application.Contracts.Services;
 using Rosheta.Settings;
 
-namespace Rosheta.Services;
+namespace Rosheta.Core.Application.Services;
 
 public class LicenseService : ILicenseService
 {
