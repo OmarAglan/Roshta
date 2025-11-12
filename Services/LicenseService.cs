@@ -3,7 +3,7 @@ using Rosheta.Infrastructure.Storage.Interfaces;
 using Roshta.Services.Interfaces;
 using Roshta.Settings;
 
-namespace Roshta.Services;
+namespace Rosheta.Services;
 
 public class LicenseService : ILicenseService
 {

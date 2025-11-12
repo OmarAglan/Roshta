@@ -5,7 +5,7 @@ using Roshta.Services.Interfaces;
 using System.Threading.Tasks;
 using System;
 
-namespace Roshta.Filters;
+namespace Rosheta.Filters;
 
 public class ActivationCheckPageFilter : IAsyncPageFilter
 {

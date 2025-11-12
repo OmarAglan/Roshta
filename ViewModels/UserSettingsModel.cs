@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Roshta.ViewModels;
+namespace Rosheta.ViewModels;
 
 public class UserSettingsModel
 {

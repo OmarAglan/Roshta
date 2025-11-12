@@ -1,4 +1,4 @@
-namespace Roshta.Models.Base
+namespace Rosheta.Models.Base
 {
     /// <summary>
     /// Interface for entities that require audit tracking

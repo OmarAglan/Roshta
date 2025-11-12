@@ -2,7 +2,7 @@ using Roshta.Models.Entities;
 using Rosheta.ViewModels;
 using System.Threading.Tasks;
 
-namespace Roshta.Repositories.Interfaces;
+namespace Rosheta.Repositories.Interfaces;
 
 public interface IDoctorRepository
 {

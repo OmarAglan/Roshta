@@ -4,7 +4,7 @@ using Roshta.Data;
 using Roshta.Models.Entities;
 using Roshta.Repositories.Interfaces;
 
-namespace Roshta.Repositories;
+namespace Rosheta.Repositories;
 
 public class DoctorRepository : IDoctorRepository
 {

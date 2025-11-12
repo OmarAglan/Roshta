@@ -3,7 +3,7 @@ using Roshta.Models.Entities;
 using Roshta.Models.Base;
 using System.Reflection.Emit;
 
-namespace Roshta.Data;
+namespace Rosheta.Data;
 
 public class ApplicationDbContext : DbContext
 {

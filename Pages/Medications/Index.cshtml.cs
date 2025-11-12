@@ -8,7 +8,7 @@ using System; // Added for Math.Ceiling
 using System.Threading.Tasks;
 using System.Linq;
 
-namespace Roshta.Pages_Medications
+namespace Rosheta.Pages_Medications
 {
     public class IndexModel : PageModel
     {

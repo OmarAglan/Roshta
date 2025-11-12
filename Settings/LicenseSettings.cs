@@ -1,4 +1,4 @@
-namespace Roshta.Settings;
+namespace Rosheta.Settings;
 
 public class LicenseSettings
 {

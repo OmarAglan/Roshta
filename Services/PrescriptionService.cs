@@ -4,7 +4,7 @@ using Roshta.Services.Interfaces;
 using Roshta.ViewModels;
 using Microsoft.Extensions.Logging;
 
-namespace Roshta.Services;
+namespace Rosheta.Services;
 
 public class PrescriptionService : IPrescriptionService
 {

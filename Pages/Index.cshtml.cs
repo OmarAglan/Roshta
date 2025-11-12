@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Roshta.Services.Interfaces; // Add this
 using System.Threading.Tasks; // Add this
 
-namespace Roshta.Pages;
+namespace Rosheta.Pages;
 
 public class IndexModel : PageModel
 {

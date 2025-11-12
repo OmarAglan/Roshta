@@ -11,7 +11,7 @@ using System.Linq;
 using System;
 using Rosheta.ViewModels;
 
-namespace Roshta.Pages.DoctorProfile;
+namespace Rosheta.Pages.DoctorProfile;
 
 public class EditModel : PageModel, IValidatableObject
 {

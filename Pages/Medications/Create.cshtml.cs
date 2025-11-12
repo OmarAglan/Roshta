@@ -5,7 +5,7 @@ using Roshta.Services.Interfaces;
 using System.Threading.Tasks;
 using System; // Added for StringComparison
 
-namespace Roshta.Pages_Medications
+namespace Rosheta.Pages_Medications
 {
     public class CreateModel : PageModel
     {

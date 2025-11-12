@@ -10,7 +10,7 @@ using Roshta.Data;
 using Roshta.Models.Entities;
 using Roshta.Services.Interfaces;
 
-namespace Roshta.Pages_Medications
+namespace Rosheta.Pages_Medications
 {
     public class EditModel : PageModel
     {

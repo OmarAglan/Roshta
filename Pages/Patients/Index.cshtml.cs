@@ -11,7 +11,7 @@ using Roshta.Services.Interfaces;
 using Roshta.ViewModels;
 using Microsoft.AspNetCore.Mvc.Rendering; // Keep if needed elsewhere, otherwise remove
 
-namespace Roshta.Pages_Patients
+namespace Rosheta.Pages_Patients
 {
     public class IndexModel : PageModel
     {

@@ -2,7 +2,7 @@ using Roshta.Models.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Roshta.Repositories.Interfaces;
+namespace Rosheta.Repositories.Interfaces;
 
 public interface IPatientRepository
 {

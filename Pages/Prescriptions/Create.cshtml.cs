@@ -10,7 +10,7 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using System;
 
-namespace Roshta.Pages.Prescriptions
+namespace Rosheta.Pages.Prescriptions
 {
     public class CreateModel : PageModel
     {

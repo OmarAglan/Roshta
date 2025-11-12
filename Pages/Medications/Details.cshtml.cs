@@ -4,7 +4,7 @@ using Roshta.Models.Entities;
 using Roshta.Services.Interfaces;
 using System.Threading.Tasks;
 
-namespace Roshta.Pages_Medications
+namespace Rosheta.Pages_Medications
 {
     public class DetailsModel : PageModel
     {

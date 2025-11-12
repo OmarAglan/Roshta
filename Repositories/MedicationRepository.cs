@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Roshta.Repositories;
+namespace Rosheta.Repositories;
 
 public class MedicationRepository : IMedicationRepository
 {

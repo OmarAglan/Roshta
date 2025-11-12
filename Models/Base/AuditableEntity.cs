@@ -1,4 +1,4 @@
-namespace Roshta.Models.Base
+namespace Rosheta.Models.Base
 {
     /// <summary>
     /// Base entity with primary key and audit fields

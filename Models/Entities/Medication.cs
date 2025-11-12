@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Roshta.Models.Base;
 
-namespace Roshta.Models.Entities;
+namespace Rosheta.Models.Entities;
 
 public class Medication : AuditableEntity
 {

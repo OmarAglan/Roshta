@@ -5,7 +5,7 @@ using Roshta.ViewModels;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace Roshta.Services;
+namespace Rosheta.Services;
 
 public class SettingsService : ISettingsService
 {

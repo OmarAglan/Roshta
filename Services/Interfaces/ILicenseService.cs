@@ -1,4 +1,4 @@
-namespace Roshta.Services.Interfaces;
+namespace Rosheta.Services.Interfaces;
 
 public interface ILicenseService
 {

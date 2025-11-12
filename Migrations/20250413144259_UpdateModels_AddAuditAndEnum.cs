@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Roshta.Migrations
+namespace Rosheta.Migrations
 {
     /// <inheritdoc />
     public partial class UpdateModels_AddAuditAndEnum : Migration

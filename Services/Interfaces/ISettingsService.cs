@@ -1,7 +1,7 @@
 using Roshta.ViewModels;
 using System.Threading.Tasks;
 
-namespace Roshta.Services.Interfaces;
+namespace Rosheta.Services.Interfaces;
 
 public interface ISettingsService
 {

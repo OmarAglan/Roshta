@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System; // For DateTime
 using Roshta.Models.Base;
 
-namespace Roshta.Models.Entities;
+namespace Rosheta.Models.Entities;
 
 public class Patient : AuditableEntity, IValidatableObject // Implement interface
 {

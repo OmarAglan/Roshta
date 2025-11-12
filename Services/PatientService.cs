@@ -2,7 +2,7 @@ using Roshta.Models.Entities;
 using Roshta.Repositories.Interfaces;
 using Roshta.Services.Interfaces;
 
-namespace Roshta.Services;
+namespace Rosheta.Services;
 
 public class PatientService : IPatientService
 {

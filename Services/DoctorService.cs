@@ -4,7 +4,7 @@ using Roshta.Repositories.Interfaces;
 using Roshta.Services.Interfaces;
 using System.Threading.Tasks;
 
-namespace Roshta.Services;
+namespace Rosheta.Services;
 
 public class DoctorService : IDoctorService
 {

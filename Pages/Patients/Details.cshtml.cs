@@ -9,7 +9,7 @@ using Roshta.Data;
 using Roshta.Models.Entities;
 using Roshta.Services.Interfaces;
 
-namespace Roshta.Pages_Patients
+namespace Rosheta.Pages_Patients
 {
     public class DetailsModel : PageModel
     {

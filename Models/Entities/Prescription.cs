@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Roshta.Models.Base;
 
-namespace Roshta.Models.Entities;
+namespace Rosheta.Models.Entities;
 
 public class Prescription : AuditableEntity
 {
