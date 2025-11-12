@@ -133,7 +133,7 @@ if (entry.Entity is Patient || entry.Entity is Doctor || entry.Entity is Medicat
 
 **Issue 1:** Tight Coupling in [`DoctorRepository.cs`](Repositories/DoctorRepository.cs:5)
 ```csharp
-using static Roshta.Pages.DoctorProfile.EditModel;
+using static Rosheta.Pages.DoctorProfile.EditModel;
 // ❌ Repository depends on PageModel type - SEVERE architectural violation
 ```
 
@@ -450,7 +450,7 @@ ViewModels/
 **Effort:** Low
 
 **Actions:**
-- [ ] Remove `using static Roshta.Pages.DoctorProfile.EditModel` from [`DoctorRepository.cs`](Repositories/DoctorRepository.cs:5)
+- [ ] Remove `using static Rosheta.Pages.DoctorProfile.EditModel` from [`DoctorRepository.cs`](Repositories/DoctorRepository.cs:5)
 - [ ] Create proper DTO for doctor profile updates
 - [ ] Update service and repository interfaces
 

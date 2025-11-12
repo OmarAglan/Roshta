@@ -251,7 +251,7 @@ Remove the architectural violation where [`DoctorRepository.cs`](Repositories/Do
 **Current Issue:**
 ```csharp
 // Line 5 in DoctorRepository.cs
-using static Roshta.Pages.DoctorProfile.EditModel;
+using static Rosheta.Pages.DoctorProfile.EditModel;
 
 // Line 56 - Method signature violates separation of concerns
 public async Task<bool> UpdateDoctorProfileAsync(int doctorId, DoctorProfileInputModel profileInput)
@@ -271,7 +271,7 @@ public async Task<bool> UpdateDoctorProfileAsync(int doctorId, DoctorProfileInpu
 
 1. **Create DTO** (`ViewModels/DoctorProfileUpdateDto.cs`):
 ```csharp
-namespace Roshta.ViewModels;
+namespace Rosheta.ViewModels;
 
 public class DoctorProfileUpdateDto
 {
@@ -289,8 +289,8 @@ Task<bool> UpdateDoctorProfileAsync(int doctorId, DoctorProfileUpdateDto profile
 ```
 
 3. **Update Repository** (DoctorRepository.cs):
-   - Remove line 5: `using static Roshta.Pages.DoctorProfile.EditModel;`
-   - Add: `using Roshta.ViewModels;`
+   - Remove line 5: `using static Rosheta.Pages.DoctorProfile.EditModel;`
+   - Add: `using Rosheta.ViewModels;`
    - Update method signature on line 56
    - Update parameter usage in method body (lines 66-70)
 
@@ -366,7 +366,7 @@ if (entry.Entity is Patient || entry.Entity is Doctor || entry.Entity is Medicat
 
 ```csharp
 // Models/Base/IEntity.cs
-namespace Roshta.Models.Base;
+namespace Rosheta.Models.Base;
 
 public interface IEntity
 {
@@ -374,7 +374,7 @@ public interface IEntity
 }
 
 // Models/Base/BaseEntity.cs
-namespace Roshta.Models.Base;
+namespace Rosheta.Models.Base;
 
 public abstract class BaseEntity : IEntity
 {
@@ -382,7 +382,7 @@ public abstract class BaseEntity : IEntity
 }
 
 // Models/Base/IAuditable.cs
-namespace Roshta.Models.Base;
+namespace Rosheta.Models.Base;
 
 public interface IAuditable
 {
@@ -391,7 +391,7 @@ public interface IAuditable
 }
 
 // Models/Base/AuditableEntity.cs
-namespace Roshta.Models.Base;
+namespace Rosheta.Models.Base;
 
 public abstract class AuditableEntity : BaseEntity, IAuditable
 {
@@ -512,7 +512,7 @@ File.ReadAllText(_doctorIdFlagPath);
 
 ```csharp
 // Infrastructure/Storage/IFileStorageProvider.cs
-namespace Roshta.Infrastructure.Storage;
+namespace Rosheta.Infrastructure.Storage;
 
 public interface IFileStorageProvider
 {
@@ -525,7 +525,7 @@ public interface IFileStorageProvider
 }
 
 // Infrastructure/Storage/LocalFileStorageProvider.cs
-namespace Roshta.Infrastructure.Storage;
+namespace Rosheta.Infrastructure.Storage;
 
 public class LocalFileStorageProvider : IFileStorageProvider
 {
@@ -678,7 +678,7 @@ Implement global exception handling middleware and create custom exception types
 
 ```csharp
 // Exceptions/DomainException.cs
-namespace Roshta.Exceptions;
+namespace Rosheta.Exceptions;
 
 public abstract class DomainException : Exception
 {
@@ -701,7 +701,7 @@ public abstract class DomainException : Exception
 }
 
 // Exceptions/NotFoundException.cs
-namespace Roshta.Exceptions;
+namespace Rosheta.Exceptions;
 
 public class NotFoundException : DomainException
 {
@@ -713,7 +713,7 @@ public class NotFoundException : DomainException
 }
 
 // Exceptions/ValidationException.cs
-namespace Roshta.Exceptions;
+namespace Rosheta.Exceptions;
 
 public class ValidationException : DomainException
 {
@@ -728,7 +728,7 @@ public class ValidationException : DomainException
 }
 
 // Exceptions/LicenseException.cs
-namespace Roshta.Exceptions;
+namespace Rosheta.Exceptions;
 
 public class LicenseException : DomainException
 {
@@ -745,10 +745,10 @@ public class LicenseException : DomainException
 ```csharp
 // Middleware/GlobalExceptionMiddleware.cs
 using Microsoft.AspNetCore.Diagnostics;
-using Roshta.Exceptions;
+using Rosheta.Exceptions;
 using System.Text.Json;
 
-namespace Roshta.Middleware;
+namespace Rosheta.Middleware;
 
 public class GlobalExceptionMiddleware
 {
@@ -953,9 +953,9 @@ Create generic repository base classes to eliminate code duplication across repo
 
 ```csharp
 // Repositories/Interfaces/IReadRepository.cs
-using Roshta.Models.Base;
+using Rosheta.Models.Base;
 
-namespace Roshta.Repositories.Interfaces;
+namespace Rosheta.Repositories.Interfaces;
 
 public interface IReadRepository<T> where T : BaseEntity
 {
@@ -971,7 +971,7 @@ public interface IReadRepository<T> where T : BaseEntity
 }
 
 // Repositories/Interfaces/IRepository.cs
-namespace Roshta.Repositories.Interfaces;
+namespace Rosheta.Repositories.Interfaces;
 
 public interface IRepository<T> : IReadRepository<T> where T : BaseEntity
 {
@@ -991,7 +991,7 @@ public interface IRepository<T> : IReadRepository<T> where T : BaseEntity
 // Specifications/ISpecification.cs
 using System.Linq.Expressions;
 
-namespace Roshta.Specifications;
+namespace Rosheta.Specifications;
 
 public interface ISpecification<T>
 {
@@ -1008,7 +1008,7 @@ public interface ISpecification<T>
 // Specifications/BaseSpecification.cs
 using System.Linq.Expressions;
 
-namespace Roshta.Specifications;
+namespace Rosheta.Specifications;
 
 public abstract class BaseSpecification<T> : ISpecification<T>
 {
@@ -1062,12 +1062,12 @@ public abstract class BaseSpecification<T> : ISpecification<T>
 ```csharp
 // Repositories/Base/RepositoryBase.cs
 using Microsoft.EntityFrameworkCore;
-using Roshta.Data;
-using Roshta.Models.Base;
-using Roshta.Repositories.Interfaces;
-using Roshta.Specifications;
+using Rosheta.Data;
+using Rosheta.Models.Base;
+using Rosheta.Repositories.Interfaces;
+using Rosheta.Specifications;
 
-namespace Roshta.Repositories.Base;
+namespace Rosheta.Repositories.Base;
 
 public class RepositoryBase<T> : IRepository<T> where T : BaseEntity
 {
@@ -1154,9 +1154,9 @@ public class RepositoryBase<T> : IRepository<T> where T : BaseEntity
 
 // Specifications/SpecificationEvaluator.cs
 using Microsoft.EntityFrameworkCore;
-using Roshta.Models.Base;
+using Rosheta.Models.Base;
 
-namespace Roshta.Specifications;
+namespace Rosheta.Specifications;
 
 public class SpecificationEvaluator<T> where T : BaseEntity
 {
@@ -1221,9 +1221,9 @@ public class PatientRepository : RepositoryBase<Patient>, IPatientRepository
 
 ```csharp
 // Specifications/PatientSearchSpecification.cs
-using Roshta.Models;
+using Rosheta.Models;
 
-namespace Roshta.Specifications;
+namespace Rosheta.Specifications;
 
 public class PatientSearchSpecification : BaseSpecification<Patient>
 {
@@ -1321,9 +1321,9 @@ Implement Unit of Work pattern to manage transactions across multiple repositori
 
 ```csharp
 // Data/Interfaces/IUnitOfWork.cs
-using Roshta.Repositories.Interfaces;
+using Rosheta.Repositories.Interfaces;
 
-namespace Roshta.Data.Interfaces;
+namespace Rosheta.Data.Interfaces;
 
 public interface IUnitOfWork : IDisposable
 {
@@ -1353,13 +1353,13 @@ public interface IUnitOfWork : IDisposable
 // Data/UnitOfWork.cs
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
-using Roshta.Data.Interfaces;
-using Roshta.Models.Base;
-using Roshta.Repositories;
-using Roshta.Repositories.Base;
-using Roshta.Repositories.Interfaces;
+using Rosheta.Data.Interfaces;
+using Rosheta.Models.Base;
+using Rosheta.Repositories;
+using Rosheta.Repositories.Base;
+using Rosheta.Repositories.Interfaces;
 
-namespace Roshta.Data;
+namespace Rosheta.Data;
 
 public class UnitOfWork : IUnitOfWork
 {
@@ -1621,9 +1621,9 @@ Implement FluentValidation for comprehensive, reusable, and testable validation 
 ```csharp
 // Validators/PatientValidator.cs
 using FluentValidation;
-using Roshta.Models;
+using Rosheta.Models;
 
-namespace Roshta.Validators;
+namespace Rosheta.Validators;
 
 public class PatientValidator : AbstractValidator<Patient>
 {
@@ -1666,9 +1666,9 @@ public class PatientValidator : AbstractValidator<Patient>
 
 // Validators/PrescriptionCreateModelValidator.cs
 using FluentValidation;
-using Roshta.ViewModels;
+using Rosheta.ViewModels;
 
-namespace Roshta.Validators;
+namespace Rosheta.Validators;
 
 public class PrescriptionCreateModelValidator : AbstractValidator<PrescriptionCreateModel>
 {
@@ -1706,9 +1706,9 @@ public class PrescriptionCreateModelValidator : AbstractValidator<PrescriptionCr
 
 // Validators/DoctorValidator.cs
 using FluentValidation;
-using Roshta.Models;
+using Rosheta.Models;
 
-namespace Roshta.Validators;
+namespace Rosheta.Validators;
 
 public class DoctorValidator : AbstractValidator<Doctor>
 {
@@ -1816,7 +1816,7 @@ public class Patient : AuditableEntity // Remove: , IValidatableObject
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace Roshta.Extensions;
+namespace Rosheta.Extensions;
 
 public static class ValidationExtensions
 {
@@ -1919,7 +1919,7 @@ Implement Result pattern to replace exception-based error handling in services w
 
 ```csharp
 // Common/Results/ErrorType.cs
-namespace Roshta.Common.Results;
+namespace Rosheta.Common.Results;
 
 public enum ErrorType
 {
@@ -1933,7 +1933,7 @@ public enum ErrorType
 }
 
 // Common/Results/Error.cs
-namespace Roshta.Common.Results;
+namespace Rosheta.Common.Results;
 
 public class Error
 {
@@ -1989,7 +1989,7 @@ public class Error
 }
 
 // Common/Results/Result.cs
-namespace Roshta.Common.Results;
+namespace Rosheta.Common.Results;
 
 public class Result
 {
@@ -2018,7 +2018,7 @@ public class Result
 }
 
 // Common/Results/Result{T}.cs
-namespace Roshta.Common.Results;
+namespace Rosheta.Common.Results;
 
 public class Result<T> : Result
 {
@@ -2217,9 +2217,9 @@ public class CreateModel : PageModel
 ```csharp
 // Extensions/ResultExtensions.cs
 using Microsoft.AspNetCore.Mvc;
-using Roshta.Common.Results;
+using Rosheta.Common.Results;
 
-namespace Roshta.Extensions;
+namespace Rosheta.Extensions;
 
 public static class ResultExtensions
 {
@@ -2406,7 +2406,7 @@ Move these folders/files:
 - `Models/Base/` → `Rosheta.Core/Models/Base/`
 - `Exceptions/` → `Rosheta.Core/Exceptions/`
 
-Update namespaces from `Roshta.Models` to `Rosheta.Core.Models`
+Update namespaces from `Rosheta.Models` to `Rosheta.Core.Models`
 
 3. **Move Application Logic to Rosheta.Application:**
 
@@ -2417,7 +2417,7 @@ Move these folders/files:
 - `Validators/` → `Rosheta.Application/Validators/`
 - `Common/Results/` → `Rosheta.Application/Common/Results/`
 
-Update namespaces from `Roshta.Services` to `Rosheta.Application.Services`
+Update namespaces from `Rosheta.Services` to `Rosheta.Application.Services`
 
 Add NuGet packages to Rosheta.Application:
 ```xml
@@ -2436,7 +2436,7 @@ Move these folders/files:
 - `Infrastructure/Storage/` → `Rosheta.Infrastructure/Storage/`
 - `Specifications/` → `Rosheta.Infrastructure/Specifications/`
 
-Update namespaces from `Roshta.Data` to `Rosheta.Infrastructure.Data`
+Update namespaces from `Rosheta.Data` to `Rosheta.Infrastructure.Data`
 
 Add NuGet packages to Rosheta.Infrastructure:
 ```xml
@@ -2449,11 +2449,11 @@ Add NuGet packages to Rosheta.Infrastructure:
 
 **Week 2: Update Web Project and Test**
 
-5. **Update Rosheta.Web (formerly Roshta.csproj):**
+5. **Update Rosheta.Web (formerly Rosheta.csproj):**
 
 Rename project and update references:
 ```bash
-# In Roshta.csproj, add project references
+# In Rosheta.csproj, add project references
 dotnet add reference ../Core/Rosheta.Core/Rosheta.Core.csproj
 dotnet add reference ../Application/Rosheta.Application/Rosheta.Application.csproj
 dotnet add reference ../Infrastructure/Rosheta.Infrastructure/Rosheta.Infrastructure.csproj
@@ -2463,9 +2463,9 @@ dotnet add reference ../Contracts/Rosheta.Contracts/Rosheta.Contracts.csproj
 Update all using statements in Pages:
 ```csharp
 // Old
-using Roshta.Models;
-using Roshta.Services;
-using Roshta.Data;
+using Rosheta.Models;
+using Rosheta.Services;
+using Rosheta.Data;
 
 // New
 using Rosheta.Core.Models;

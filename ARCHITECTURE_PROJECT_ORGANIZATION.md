@@ -6,7 +6,7 @@ This document outlines a comprehensive reorganization of the Rosheta project str
 
 ### Key Issues Identified
 
-1. **Namespace Inconsistency**: Mixed use of `Roshta` and `Rosheta` namespaces
+1. **Namespace Inconsistency**: Mixed use of `Rosheta` and `Rosheta` namespaces
 2. **Layer Violations**: Razor Pages directly reference repositories instead of only services
 3. **Mixed Concerns**: ViewModels folder contains DTOs, search models, and validation models
 4. **Missing Organization**: No clear place for validators, mappers, constants, or enums
@@ -172,19 +172,19 @@ Rosheta/
 **Why**: Inconsistent namespaces cause confusion and compilation issues.
 
 **Actions**:
-1. Standardize all namespaces to `Rosheta` (not `Roshta`)
+1. Standardize all namespaces to `Rosheta` (not `Rosheta`)
 2. Update all `using` statements
 3. Update project file if needed
 
 **Files to Update** (All files):
-- All `.cs` files currently using `Roshta` namespace
-- Update `Roshta.csproj` to `Rosheta.csproj` if needed
+- All `.cs` files currently using `Rosheta` namespace
+- Update `Rosheta.csproj` to `Rosheta.csproj` if needed
 
 **Script to Help**:
 ```powershell
-# Find all files with Roshta namespace
-Get-ChildItem -Recurse -Filter "*.cs" | Select-String "namespace Roshta" -List
-Get-ChildItem -Recurse -Filter "*.cs" | Select-String "using Roshta" -List
+# Find all files with Rosheta namespace
+Get-ChildItem -Recurse -Filter "*.cs" | Select-String "namespace Rosheta" -List
+Get-ChildItem -Recurse -Filter "*.cs" | Select-String "using Rosheta" -List
 ```
 
 ### Phase 2: Create Core Layer Structure
@@ -316,7 +316,7 @@ using Rosheta.Presentation.Filters;
    ```
 
 2. **Fix Namespace Inconsistencies First** (15 minutes)
-   - Find/Replace all `Roshta` with `Rosheta`
+   - Find/Replace all `Rosheta` with `Rosheta`
    - Test build
 
 3. **Create All New Folders** (5 minutes)
@@ -476,7 +476,7 @@ src/
 - [ ] Backup database
 
 ### During Migration
-- [ ] Fix namespace inconsistencies (Roshta → Rosheta)
+- [ ] Fix namespace inconsistencies (Rosheta → Rosheta)
 - [ ] Create new folder structure
 - [ ] Move Domain layer files
 - [ ] Move Application layer files
