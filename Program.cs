@@ -7,7 +7,7 @@ using Rosheta.Core.Application.Contracts.Persistence;
 using Rosheta.Core.Application.Services;
 using Rosheta.Core.Application.Contracts.Services;
 using Rosheta.Settings;
-using Rosheta.Filters;
+using Rosheta.Presentation.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,10 +47,14 @@ builder.Services.AddScoped<ISettingsService, SettingsService>();
 
 // Configure Razor Pages and add the global filter
 builder.Services.AddRazorPages()
-.AddMvcOptions(options =>
-{
-    options.Filters.Add<ActivationCheckPageFilter>();
-});
+    .AddRazorPagesOptions(options =>
+    {
+        options.RootDirectory = "/Presentation/Pages";
+    })
+    .AddMvcOptions(options =>
+    {
+        options.Filters.Add<ActivationCheckPageFilter>();
+    });
 
 var app = builder.Build();
 
@@ -63,7 +67,12 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
+app.UseStaticFiles(new Microsoft.AspNetCore.Builder.StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
+        System.IO.Path.Combine(builder.Environment.ContentRootPath, "Presentation/wwwroot")),
+    RequestPath = ""
+});
 
 app.UseRouting();
 
