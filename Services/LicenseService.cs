@@ -1,13 +1,14 @@
 using Microsoft.Extensions.Options; // Required for IOptions
+using Rosheta.Infrastructure.Storage.Interfaces;
 using Roshta.Services.Interfaces;
 using Roshta.Settings;
-using System.IO; // Required for Path, File
 
 namespace Roshta.Services;
 
 public class LicenseService : ILicenseService
 {
     private readonly LicenseSettings _licenseSettings;
+    private readonly IFileStorageProvider _fileStorage;
     private readonly string _activationFlagPath; // Path to the activation marker file
     private readonly string _doctorIdFlagPath;   // Path to store the configured doctor ID
 
@@ -15,11 +16,14 @@ public class LicenseService : ILicenseService
     private int? _cachedDoctorId = null;
     private bool _doctorIdChecked = false;
 
-    public LicenseService(IOptions<LicenseSettings> licenseSettingsOptions)
+    public LicenseService(IOptions<LicenseSettings> licenseSettingsOptions, IFileStorageProvider fileStorage)
     {
         _licenseSettings = licenseSettingsOptions.Value;
-        _activationFlagPath = Path.Combine(AppContext.BaseDirectory, ".activated");
-        _doctorIdFlagPath = Path.Combine(AppContext.BaseDirectory, ".doctorid");
+        _fileStorage = fileStorage;
+        
+        var baseDirectory = _fileStorage.CombinePath(_fileStorage.GetApplicationDataPath(), "Rosheta");
+        _activationFlagPath = _fileStorage.CombinePath(baseDirectory, ".activated");
+        _doctorIdFlagPath = _fileStorage.CombinePath(baseDirectory, ".doctorid");
     }
 
     public bool ValidateLicense(string enteredRegistrationNumber, string enteredSerialNumber)
@@ -36,16 +40,17 @@ public class LicenseService : ILicenseService
     public bool IsActivated()
     {
         // Check if the activation marker file exists.
-        return File.Exists(_activationFlagPath);
+        return _fileStorage.FileExists(_activationFlagPath);
     }
 
-    public void MarkAsActivated()
+    public async Task MarkAsActivatedAsync()
     {
         try
         {
             // Create the empty marker file to indicate activation.
             // The content doesn't matter, only its existence.
-            File.Create(_activationFlagPath).Dispose(); // Dispose releases the file handle immediately
+            _fileStorage.EnsureDirectoryExists(_activationFlagPath);
+            await _fileStorage.WriteAllTextAsync(_activationFlagPath, string.Empty);
         }
         catch (Exception)
         {
@@ -55,20 +60,21 @@ public class LicenseService : ILicenseService
         }
     }
 
-    // --- New Methods --- 
+    // --- New Methods ---
 
-    public bool IsProfileSetup()
+    public async Task<bool> IsProfileSetupAsync()
     {
         // Profile is setup if the Doctor ID file exists and contains a valid integer
-        return GetCurrentDoctorId() != null;
+        return await GetCurrentDoctorIdAsync() != null;
     }
 
-    public void MarkProfileAsSetup(int doctorId)
+    public async Task MarkProfileAsSetupAsync(int doctorId)
     {
         try
         {
             // Store the Doctor ID in the flag file.
-            File.WriteAllText(_doctorIdFlagPath, doctorId.ToString());
+            _fileStorage.EnsureDirectoryExists(_doctorIdFlagPath);
+            await _fileStorage.WriteAllTextAsync(_doctorIdFlagPath, doctorId.ToString());
             // Reset cache
             _cachedDoctorId = doctorId;
             _doctorIdChecked = true;
@@ -80,7 +86,7 @@ public class LicenseService : ILicenseService
         }
     }
 
-    public int? GetCurrentDoctorId()
+    public async Task<int?> GetCurrentDoctorIdAsync()
     {
         // Return cached value if already checked
         if (_doctorIdChecked)
@@ -89,11 +95,11 @@ public class LicenseService : ILicenseService
         }
 
         _doctorIdChecked = true; // Mark as checked even if file doesn't exist or is invalid
-        if (File.Exists(_doctorIdFlagPath))
+        if (_fileStorage.FileExists(_doctorIdFlagPath))
         {
             try
             {
-                string content = File.ReadAllText(_doctorIdFlagPath);
+                string content = await _fileStorage.ReadAllTextAsync(_doctorIdFlagPath);
                 if (int.TryParse(content, out int id))
                 {
                     _cachedDoctorId = id;
