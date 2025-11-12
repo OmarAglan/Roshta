@@ -3,7 +3,7 @@ using Rosheta.Core.Domain.Entities;
 using Rosheta.Core.Domain.Base;
 using System.Reflection.Emit;
 
-namespace Rosheta.Data;
+namespace Rosheta.Infrastructure.Data;
 
 public class ApplicationDbContext : DbContext
 {

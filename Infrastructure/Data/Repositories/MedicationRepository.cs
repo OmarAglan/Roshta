@@ -1,12 +1,12 @@
 using Microsoft.EntityFrameworkCore;
-using Rosheta.Data;
+using Rosheta.Infrastructure.Data;
 using Rosheta.Core.Domain.Entities;
 using Rosheta.Core.Application.Contracts.Persistence;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Rosheta.Repositories;
+namespace Rosheta.Infrastructure.Data.Repositories;
 
 public class MedicationRepository : IMedicationRepository
 {
