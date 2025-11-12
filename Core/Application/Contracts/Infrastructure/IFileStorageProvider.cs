@@ -1,4 +1,4 @@
-namespace Rosheta.Infrastructure.Storage.Interfaces
+namespace Rosheta.Core.Application.Contracts.Infrastructure
 {
     /// <summary>
     /// Abstraction for file storage operations to enable platform-agnostic file access
