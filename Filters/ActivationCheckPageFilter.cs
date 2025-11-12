@@ -42,22 +42,22 @@ public class ActivationCheckPageFilter : IAsyncPageFilter
             {
                  _logger.LogInformation("Already activated. Redirecting away from Activate page.");
                  // Check if profile setup is needed before redirecting
-                 if(!_licenseService.IsProfileSetup())
+                 if(!await _licenseService.IsProfileSetupAsync())
                  {
                     _logger.LogInformation("Profile not set up. Redirecting to Setup page.");
                     context.Result = new RedirectToPageResult(setupPageRoute); // Use correct route
                     return;
                  }
-                 else 
+                 else
                  {
                     _logger.LogInformation("Profile set up. Redirecting to Index page.");
-                    context.Result = new RedirectToPageResult("/Index"); 
+                    context.Result = new RedirectToPageResult("/Index");
                     return;
                  }
             }
             // If not activated, allow access to the activation page
             _logger.LogDebug("Not activated. Allowing access to Activate page.");
-            await next(); 
+            await next();
             return;
         }
 
@@ -75,7 +75,7 @@ public class ActivationCheckPageFilter : IAsyncPageFilter
         if (pagePath.Equals(setupPagePhysicalPath, StringComparison.OrdinalIgnoreCase))
         {
             _logger.LogDebug("Accessing Setup page directly.");
-             if (_licenseService.IsProfileSetup())
+             if (await _licenseService.IsProfileSetupAsync())
             {
                 _logger.LogInformation("Profile already set up. Redirecting from Setup page to Index.");
                 context.Result = new RedirectToPageResult("/Index"); // Or main page
@@ -87,7 +87,7 @@ public class ActivationCheckPageFilter : IAsyncPageFilter
         }
         
         // If activated BUT profile not set up, redirect other pages to setup page
-        if (!_licenseService.IsProfileSetup())
+        if (!await _licenseService.IsProfileSetupAsync())
         {
             _logger.LogInformation("Profile not set up. Redirecting to {SetupPage} from {PagePath}.", setupPageRoute, pagePath);
              context.Result = new RedirectToPageResult(setupPageRoute); // Use correct route
