@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Rosheta.Core.Domain.Entities;
 using Rosheta.Core.Application.Contracts.Services;
 
-namespace Rosheta.Pages.Prescriptions;
+namespace Rosheta.Presentation.Pages.Prescriptions;
 
 public class DetailsModel : PageModel
 {

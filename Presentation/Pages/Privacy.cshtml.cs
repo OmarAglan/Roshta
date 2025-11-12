@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Rosheta.Pages;
+namespace Rosheta.Presentation.Pages;
 
 public class PrivacyModel : PageModel
 {

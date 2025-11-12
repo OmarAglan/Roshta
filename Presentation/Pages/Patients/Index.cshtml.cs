@@ -13,7 +13,7 @@ using Rosheta.Core.Application.DTOs.Doctor;
 using Rosheta.Core.Application.Models;
 using Microsoft.AspNetCore.Mvc.Rendering; // Keep if needed elsewhere, otherwise remove
 
-namespace Rosheta.Pages_Patients
+namespace Rosheta.Presentation.Pages_Patients
 {
     public class IndexModel : PageModel
     {

@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 
-namespace Rosheta.Pages.DoctorProfile;
+namespace Rosheta.Presentation.Pages.DoctorProfile;
 
 public class SetupModel : PageModel, IValidatableObject
 {

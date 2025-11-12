@@ -11,7 +11,7 @@ using System.Collections.Generic; // Added for List<>
 using System.Linq; // Added for ToList()
 using System.Threading.Tasks; // Added for Task
 
-namespace Rosheta.Pages.Prescriptions;
+namespace Rosheta.Presentation.Pages.Prescriptions;
 
 public class IndexModel : PageModel
 {
