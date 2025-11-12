@@ -5,7 +5,7 @@ using Rosheta.Core.Application.Contracts.Services;
 using System.Threading.Tasks;
 using System;
 
-namespace Rosheta.Filters;
+namespace Rosheta.Presentation.Filters;
 
 public class ActivationCheckPageFilter : IAsyncPageFilter
 {
