@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Rosheta.Models.Base;
+using Rosheta.Core.Domain.Base;
 
-namespace Rosheta.Models.Entities;
+namespace Rosheta.Core.Domain.Entities;
 
 // Join entity for the many-to-many relationship between Prescription and Medication
 public class PrescriptionItem : AuditableEntity

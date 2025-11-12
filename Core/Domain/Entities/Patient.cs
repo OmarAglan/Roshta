@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
 using System; // For DateTime
-using Rosheta.Models.Base;
+using Rosheta.Core.Domain.Base;
 
-namespace Rosheta.Models.Entities;
+namespace Rosheta.Core.Domain.Entities;
 
 public class Patient : AuditableEntity, IValidatableObject // Implement interface
 {

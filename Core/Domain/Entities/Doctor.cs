@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
-using Rosheta.Models.Base;
+using Rosheta.Core.Domain.Base;
 
-namespace Rosheta.Models.Entities;
+namespace Rosheta.Core.Domain.Entities;
 
 public class Doctor : AuditableEntity
 {
