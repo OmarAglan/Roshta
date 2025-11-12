@@ -1,7 +1,7 @@
 using Rosheta.ViewModels;
-using Roshta.Models.Entities;
-using Roshta.Repositories.Interfaces;
-using Roshta.Services.Interfaces;
+using Rosheta.Models.Entities;
+using Rosheta.Repositories.Interfaces;
+using Rosheta.Services.Interfaces;
 using System.Threading.Tasks;
 
 namespace Rosheta.Services;

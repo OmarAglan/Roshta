@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Roshta.Models.Entities;
-using Roshta.Services.Interfaces;
+using Rosheta.Models.Entities;
+using Rosheta.Services.Interfaces;
 
 namespace Rosheta.Pages.Prescriptions;
 

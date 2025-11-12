@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Options; // Required for IOptions
 using Rosheta.Infrastructure.Storage.Interfaces;
-using Roshta.Services.Interfaces;
-using Roshta.Settings;
+using Rosheta.Services.Interfaces;
+using Rosheta.Settings;
 
 namespace Rosheta.Services;
 

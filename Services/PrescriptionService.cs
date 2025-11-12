@@ -1,7 +1,7 @@
-using Roshta.Models.Entities;
-using Roshta.Repositories.Interfaces;
-using Roshta.Services.Interfaces;
-using Roshta.ViewModels;
+using Rosheta.Models.Entities;
+using Rosheta.Repositories.Interfaces;
+using Rosheta.Services.Interfaces;
+using Rosheta.ViewModels;
 using Microsoft.Extensions.Logging;
 
 namespace Rosheta.Services;

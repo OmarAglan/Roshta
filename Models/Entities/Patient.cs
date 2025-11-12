@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
 using System; // For DateTime
-using Roshta.Models.Base;
+using Rosheta.Models.Base;
 
 namespace Rosheta.Models.Entities;
 

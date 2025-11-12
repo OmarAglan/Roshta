@@ -1,13 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Rosheta.Infrastructure.Storage;
 using Rosheta.Infrastructure.Storage.Interfaces;
-using Roshta.Data;
-using Roshta.Repositories;
-using Roshta.Repositories.Interfaces;
-using Roshta.Services;
-using Roshta.Services.Interfaces;
-using Roshta.Settings;
-using Roshta.Filters;
+using Rosheta.Data;
+using Rosheta.Repositories;
+using Rosheta.Repositories.Interfaces;
+using Rosheta.Services;
+using Rosheta.Services.Interfaces;
+using Rosheta.Settings;
+using Rosheta.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 

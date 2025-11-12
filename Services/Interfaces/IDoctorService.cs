@@ -1,5 +1,5 @@
 using Rosheta.ViewModels;
-using Roshta.Models.Entities;
+using Rosheta.Models.Entities;
 using System.Threading.Tasks;
 
 namespace Rosheta.Services.Interfaces;

@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using Roshta.Data;
-using Roshta.Models.Entities;
-using Roshta.Services.Interfaces;
+using Rosheta.Data;
+using Rosheta.Models.Entities;
+using Rosheta.Services.Interfaces;
 
 namespace Rosheta.Pages_Patients
 {

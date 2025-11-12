@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
-using Roshta.Models.Entities;
-using Roshta.Services.Interfaces;
-using Roshta.ViewModels;
+using Rosheta.Models.Entities;
+using Rosheta.Services.Interfaces;
+using Rosheta.ViewModels;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using System.Collections.Generic;

@@ -1,4 +1,4 @@
-using Roshta.Models.Entities;
+using Rosheta.Models.Entities;
 
 namespace Rosheta.ViewModels;
 

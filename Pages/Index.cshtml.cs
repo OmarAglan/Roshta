@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Roshta.Services.Interfaces; // Add this
+using Rosheta.Services.Interfaces; // Add this
 using System.Threading.Tasks; // Add this
 
 namespace Rosheta.Pages;

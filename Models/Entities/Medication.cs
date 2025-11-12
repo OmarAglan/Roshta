@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using Roshta.Models.Base;
+using Rosheta.Models.Base;
 
 namespace Rosheta.Models.Entities;
 

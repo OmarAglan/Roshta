@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Roshta.Services.Interfaces;
+using Rosheta.Services.Interfaces;
 using System.Threading.Tasks;
 using System;
 

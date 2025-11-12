@@ -1,6 +1,6 @@
-using Roshta.Models.Entities;
-using Roshta.Repositories.Interfaces;
-using Roshta.Services.Interfaces;
+using Rosheta.Models.Entities;
+using Rosheta.Repositories.Interfaces;
+using Rosheta.Services.Interfaces;
 
 namespace Rosheta.Services;
 

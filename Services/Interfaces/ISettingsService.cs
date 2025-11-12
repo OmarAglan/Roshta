@@ -1,4 +1,4 @@
-using Roshta.ViewModels;
+using Rosheta.ViewModels;
 using System.Threading.Tasks;
 
 namespace Rosheta.Services.Interfaces;

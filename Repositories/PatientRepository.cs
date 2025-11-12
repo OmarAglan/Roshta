@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using Roshta.Data;
-using Roshta.Models.Entities;
-using Roshta.Repositories.Interfaces;
+using Rosheta.Data;
+using Rosheta.Models.Entities;
+using Rosheta.Repositories.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
