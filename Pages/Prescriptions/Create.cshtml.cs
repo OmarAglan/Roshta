@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering; // For SelectList
-using Rosheta.Models.Entities;
-using Rosheta.Repositories.Interfaces;
-using Rosheta.Services.Interfaces;
-using Rosheta.ViewModels;
+using Rosheta.Core.Domain.Entities;
+using Rosheta.Core.Application.Contracts.Persistence;
+using Rosheta.Core.Application.Contracts.Services;
+using Rosheta.Core.Application.DTOs;
 using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.Extensions.Logging;

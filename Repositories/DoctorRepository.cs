@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using Rosheta.ViewModels;
+using Rosheta.Core.Application.DTOs;
 using Rosheta.Data;
-using Rosheta.Models.Entities;
-using Rosheta.Repositories.Interfaces;
+using Rosheta.Core.Domain.Entities;
+using Rosheta.Core.Application.Contracts.Persistence;
 
 namespace Rosheta.Repositories;
 

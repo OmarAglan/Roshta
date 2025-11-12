@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using Rosheta.Models.Entities;
-using Rosheta.Models.Base;
+using Rosheta.Core.Domain.Entities;
+using Rosheta.Core.Domain.Base;
 using System.Reflection.Emit;
 
 namespace Rosheta.Data;

@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Rosheta.Data;
-using Rosheta.Models.Entities;
-using Rosheta.Services.Interfaces;
-using Rosheta.ViewModels;
+using Rosheta.Core.Domain.Entities;
+using Rosheta.Core.Application.Contracts.Services;
+using Rosheta.Core.Application.DTOs;
 using Microsoft.AspNetCore.Mvc.Rendering; // Keep if needed elsewhere, otherwise remove
 
 namespace Rosheta.Pages_Patients

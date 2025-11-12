@@ -1,15 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
-using Rosheta.Models.Entities;
-using Rosheta.Services.Interfaces;
-using Rosheta.ViewModels;
+using Rosheta.Core.Domain.Entities;
+using Rosheta.Core.Application.Contracts.Services;
+using Rosheta.Core.Application.DTOs;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using Rosheta.ViewModels;
+using Rosheta.Core.Application.DTOs;
 
 namespace Rosheta.Pages.DoctorProfile;
 

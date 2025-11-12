@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Rosheta.Models.Entities;
-using Rosheta.Services.Interfaces;
-using Rosheta.ViewModels;
+using Rosheta.Core.Domain.Entities;
+using Rosheta.Core.Application.Contracts.Services;
+using Rosheta.Core.Application.DTOs;
 using System.Collections.Generic;
 using System; // Added for Math.Ceiling
 using System.Threading.Tasks;

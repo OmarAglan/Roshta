@@ -1,4 +1,4 @@
-using Rosheta.Infrastructure.Storage.Interfaces;
+using Rosheta.Core.Application.Contracts.Infrastructure;
 
 namespace Rosheta.Infrastructure.Storage
 {

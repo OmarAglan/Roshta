@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Rosheta.Models.Entities;
-using Rosheta.Services.Interfaces;
+using Rosheta.Core.Domain.Entities;
+using Rosheta.Core.Application.Contracts.Services;
 using System.Threading.Tasks;
 
 namespace Rosheta.Pages_Medications
