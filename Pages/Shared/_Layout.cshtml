@@ -133,9 +133,9 @@
                         </div>
 
                         <!-- User Menu -->
-                        @if (LicenseService.IsActivated() && LicenseService.IsProfileSetup())
+                        @if (LicenseService.IsActivated() && await LicenseService.IsProfileSetupAsync())
                         {
-                            var currentDoctorId = LicenseService.GetCurrentDoctorId();
+                            var currentDoctorId = await LicenseService.GetCurrentDoctorIdAsync();
                             var doctor = currentDoctorId.HasValue ? await DoctorService.GetDoctorProfileAsync(currentDoctorId.Value) : null;
                             
                             <div class="nav-item dropdown">
