@@ -1,11 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using Rosheta.Infrastructure.Storage;
-using Rosheta.Infrastructure.Storage.Interfaces;
+using Rosheta.Core.Application.Contracts.Infrastructure;
 using Rosheta.Data;
 using Rosheta.Repositories;
-using Rosheta.Repositories.Interfaces;
-using Rosheta.Services;
-using Rosheta.Services.Interfaces;
+using Rosheta.Core.Application.Contracts.Persistence;
+using Rosheta.Core.Application.Services;
+using Rosheta.Core.Application.Contracts.Services;
 using Rosheta.Settings;
 using Rosheta.Filters;
 
