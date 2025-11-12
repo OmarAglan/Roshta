@@ -1,8 +1,8 @@
-using Rosheta.Models.Entities;
-using Rosheta.ViewModels;
+using Rosheta.Core.Domain.Entities;
+using Rosheta.Core.Application.DTOs;
 using System.Threading.Tasks;
 
-namespace Rosheta.Repositories.Interfaces;
+namespace Rosheta.Core.Application.Contracts.Persistence;
 
 public interface IDoctorRepository
 {

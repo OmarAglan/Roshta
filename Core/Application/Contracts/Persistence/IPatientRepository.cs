@@ -1,8 +1,8 @@
-using Rosheta.Models.Entities;
+using Rosheta.Core.Domain.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Rosheta.Repositories.Interfaces;
+namespace Rosheta.Core.Application.Contracts.Persistence;
 
 public interface IPatientRepository
 {
