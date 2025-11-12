@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Rosheta.Infrastructure.Storage;
 using Rosheta.Core.Application.Contracts.Infrastructure;
-using Rosheta.Data;
-using Rosheta.Repositories;
+using Rosheta.Infrastructure.Data;
+using Rosheta.Infrastructure.Data.Repositories;
 using Rosheta.Core.Application.Contracts.Persistence;
 using Rosheta.Core.Application.Services;
 using Rosheta.Core.Application.Contracts.Services;
