@@ -12,7 +12,7 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using System;
 
-namespace Rosheta.Presentation.Pages.Prescriptions
+namespace Rosheta.Pages.Prescriptions
 {
     public class CreateModel : PageModel
     {

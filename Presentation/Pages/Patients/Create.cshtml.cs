@@ -9,7 +9,7 @@ using Rosheta.Infrastructure.Data;
 using Rosheta.Core.Domain.Entities;
 using Rosheta.Core.Application.Contracts.Services;
 
-namespace Rosheta.Presentation.Pages_Patients
+namespace Rosheta.Pages.Patients
 {
     public class CreateModel : PageModel
     {
