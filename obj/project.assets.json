@@ -6567,9 +6567,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\My Dev Life\\Full Stack Dev\\DotNet\\Rosheta\\Roshta.csproj",
-      "projectName": "Roshta",
-      "projectPath": "D:\\My Dev Life\\Full Stack Dev\\DotNet\\Rosheta\\Roshta.csproj",
+      "projectUniqueName": "D:\\My Dev Life\\Full Stack Dev\\DotNet\\Rosheta\\Rosheta.csproj",
+      "projectName": "Rosheta",
+      "projectPath": "D:\\My Dev Life\\Full Stack Dev\\DotNet\\Rosheta\\Rosheta.csproj",
       "packagesPath": "C:\\Users\\Omar\\.nuget\\packages\\",
       "outputPath": "D:\\My Dev Life\\Full Stack Dev\\DotNet\\Rosheta\\obj\\",
       "projectStyle": "PackageReference",
