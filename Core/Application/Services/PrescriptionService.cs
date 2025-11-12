@@ -5,6 +5,7 @@ using Rosheta.Core.Application.DTOs;
 using Rosheta.Core.Application.DTOs.Doctor;
 using Rosheta.Core.Application.Models;
 using Microsoft.Extensions.Logging;
+using Rosheta.Core.Domain.Enums;
 
 namespace Rosheta.Core.Application.Services;
 
@@ -63,6 +64,7 @@ public class PrescriptionService : IPrescriptionService
         }
 
         // Save using the repository
+
         return await _prescriptionRepository.AddAsync(prescription); // Use renamed method
     }
 

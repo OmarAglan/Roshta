@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Rosheta.Core.Domain.Base;
+using Rosheta.Core.Domain.Enums;
 
 namespace Rosheta.Core.Domain.Entities;
 
