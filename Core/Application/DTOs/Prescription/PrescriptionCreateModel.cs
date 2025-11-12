@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
 using System;
 
-namespace Rosheta.ViewModels;
+namespace Rosheta.Core.Application.DTOs;
 
 public class PrescriptionCreateModel : IValidatableObject
 {

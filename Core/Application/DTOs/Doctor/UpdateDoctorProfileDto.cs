@@ -1,4 +1,4 @@
-namespace Rosheta.ViewModels
+namespace Rosheta.Core.Application.DTOs.Doctor
 {
     public class UpdateDoctorProfileDto
     {
