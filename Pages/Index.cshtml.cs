@@ -44,7 +44,7 @@ public class IndexModel : PageModel
         PrescriptionCount = await _prescriptionService.GetPrescriptionsCountAsync();
 
         // Check license status for Edit Profile button
-        ShowEditProfileButton = _licenseService.IsActivated() && _licenseService.IsProfileSetup();
+        ShowEditProfileButton = _licenseService.IsActivated() && await _licenseService.IsProfileSetupAsync();
 
         _logger.LogInformation("Dashboard loaded: Patients={PatientCount}, Medications={MedicationCount}, Prescriptions={PrescriptionCount}, ShowEditProfile={ShowEditProfile}",
             PatientCount, MedicationCount, PrescriptionCount, ShowEditProfileButton);

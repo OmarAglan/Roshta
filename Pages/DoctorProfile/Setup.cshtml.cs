@@ -59,7 +59,7 @@ public class SetupModel : PageModel, IValidatableObject
             _logger.LogWarning("Attempted to access profile setup without activation.");
             return RedirectToPage("/Activate");
         }
-        if (_licenseService.IsProfileSetup())
+        if (await _licenseService.IsProfileSetupAsync())
         {
             _logger.LogInformation("Profile already set up. Redirecting from Setup page.");
             // Maybe redirect to an Edit page or dashboard later
@@ -87,7 +87,7 @@ public class SetupModel : PageModel, IValidatableObject
         {
             return RedirectToPage("/Activate");
         }
-        if (_licenseService.IsProfileSetup())
+        if (await _licenseService.IsProfileSetupAsync())
         {
             return RedirectToPage("/Index");
         }
@@ -115,7 +115,7 @@ public class SetupModel : PageModel, IValidatableObject
             var savedDoctor = await _doctorService.SaveDoctorProfileAsync(doctorToSave);
 
             // Mark profile as setup with the saved doctor's ID
-            _licenseService.MarkProfileAsSetup(savedDoctor.Id);
+            await _licenseService.MarkProfileAsSetupAsync(savedDoctor.Id);
 
             _logger.LogInformation("Doctor profile setup completed for Doctor ID: {DoctorId}", savedDoctor.Id);
             TempData["SuccessMessage"] = "Doctor profile saved successfully!";

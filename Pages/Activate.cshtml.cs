@@ -35,19 +35,19 @@ public class ActivateModel : PageModel
         // If already activated, redirect away from the activation page
         if (_licenseService.IsActivated())
         {
-             _logger.LogInformation("Application already activated. Redirecting from Activate page.");
+            _logger.LogInformation("Application already activated. Redirecting from Activate page.");
             // Redirect to the main page or dashboard (e.g., home page for now)
-            return RedirectToPage("/Index"); 
+            return RedirectToPage("/Index");
         }
         return Page();
     }
 
-    public IActionResult OnPost()
+    public async Task<IActionResult> OnPost()
     {
         if (_licenseService.IsActivated())
         {
-             _logger.LogInformation("Application already activated. Redirecting from Activate page post.");
-             return RedirectToPage("/Index");
+            _logger.LogInformation("Application already activated. Redirecting from Activate page post.");
+            return RedirectToPage("/Index");
         }
 
         if (!ModelState.IsValid)
@@ -60,10 +60,10 @@ public class ActivateModel : PageModel
         if (isValid)
         {
             _logger.LogInformation("License validation successful. Marking as activated.");
-            _licenseService.MarkAsActivated();
+            await _licenseService.MarkAsActivatedAsync();
             TempData["SuccessMessage"] = "Application activated successfully! Please complete your profile.";
             // Redirect to the profile setup page now
-            return RedirectToPage("/DoctorProfile/Setup"); 
+            return RedirectToPage("/DoctorProfile/Setup");
         }
         else
         {
@@ -72,4 +72,4 @@ public class ActivateModel : PageModel
             return Page();
         }
     }
-} 
+}

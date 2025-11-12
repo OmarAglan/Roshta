@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Rosheta.Infrastructure.Storage;
+using Rosheta.Infrastructure.Storage.Interfaces;
 using Roshta.Data;
 using Roshta.Repositories;
 using Roshta.Repositories.Interfaces;
@@ -22,6 +24,10 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(connectionString));
 // -----------------------------------
+
+// --- Register Infrastructure Services ---
+builder.Services.AddSingleton<IFileStorageProvider, LocalFileStorageProvider>();
+// -----------------------------------------
 
 // --- Register Repositories --------
 builder.Services.AddScoped<IMedicationRepository, MedicationRepository>();

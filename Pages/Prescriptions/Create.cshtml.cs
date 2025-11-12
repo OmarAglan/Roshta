@@ -124,8 +124,8 @@ namespace Roshta.Pages.Prescriptions
                 return Page();
             }
 
-            // --- Get Doctor ID from License Service --- 
-            int? currentDoctorId = _licenseService.GetCurrentDoctorId();
+            // --- Get Doctor ID from License Service ---
+            int? currentDoctorId = await _licenseService.GetCurrentDoctorIdAsync();
             if (currentDoctorId == null)
             {
                 _logger.LogError("Could not retrieve Doctor ID for prescription creation. Profile might not be set up.");

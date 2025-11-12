@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Rosheta.Infrastructure.Storage.Interfaces;
 using Roshta.Services.Interfaces;
 using Roshta.ViewModels;
 using System.Text.Json;
@@ -9,18 +10,18 @@ namespace Roshta.Services;
 public class SettingsService : ISettingsService
 {
     private readonly ILogger<SettingsService> _logger;
+    private readonly IFileStorageProvider _fileStorage;
     private readonly string _settingsDirectory;
 
-    public SettingsService(ILogger<SettingsService> logger)
+    public SettingsService(ILogger<SettingsService> logger, IFileStorageProvider fileStorage)
     {
         _logger = logger;
-        _settingsDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Rosheta", "Settings");
+        _fileStorage = fileStorage;
+        _settingsDirectory = _fileStorage.CombinePath(_fileStorage.GetApplicationDataPath(), "Rosheta", "Settings");
         
         // Ensure settings directory exists
-        if (!Directory.Exists(_settingsDirectory))
-        {
-            Directory.CreateDirectory(_settingsDirectory);
-        }
+        var testFilePath = _fileStorage.CombinePath(_settingsDirectory, "test.tmp");
+        _fileStorage.EnsureDirectoryExists(testFilePath);
     }
 
     public async Task<UserSettingsModel> GetUserSettingsAsync(int doctorId)
@@ -29,13 +30,13 @@ public class SettingsService : ISettingsService
         {
             var settingsFilePath = GetSettingsFilePath(doctorId);
             
-            if (!File.Exists(settingsFilePath))
+            if (!_fileStorage.FileExists(settingsFilePath))
             {
                 _logger.LogInformation("Settings file not found for doctor {DoctorId}, returning default settings", doctorId);
                 return GetDefaultSettings();
             }
 
-            var json = await File.ReadAllTextAsync(settingsFilePath);
+            var json = await _fileStorage.ReadAllTextAsync(settingsFilePath);
             var settings = JsonSerializer.Deserialize<UserSettingsModel>(json);
             
             if (settings == null)
@@ -64,7 +65,8 @@ public class SettingsService : ISettingsService
                 WriteIndented = true
             });
 
-            await File.WriteAllTextAsync(settingsFilePath, json);
+            _fileStorage.EnsureDirectoryExists(settingsFilePath);
+            await _fileStorage.WriteAllTextAsync(settingsFilePath, json);
             _logger.LogInformation("Successfully saved settings for doctor {DoctorId}", doctorId);
             return true;
         }
@@ -82,6 +84,6 @@ public class SettingsService : ISettingsService
 
     private string GetSettingsFilePath(int doctorId)
     {
-        return Path.Combine(_settingsDirectory, $"doctor_{doctorId}_settings.json");
+        return _fileStorage.CombinePath(_settingsDirectory, $"doctor_{doctorId}_settings.json");
     }
 }

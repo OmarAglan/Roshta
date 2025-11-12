@@ -62,14 +62,14 @@ public class EditModel : PageModel, IValidatableObject
     public async Task<IActionResult> OnGetAsync()
     {
         // Activation/Setup check should be handled by the filter, but defensive checks are good.
-        if (!_licenseService.IsActivated() || !_licenseService.IsProfileSetup())
+        if (!_licenseService.IsActivated() || !await _licenseService.IsProfileSetupAsync())
         {
             _logger.LogWarning("Attempted to access profile edit page without proper activation or setup.");
             // Redirect to appropriate page (Setup if not set up, Activate if not activated)
             return RedirectToPage(!_licenseService.IsActivated() ? "/Activate" : "/DoctorProfile/Setup");
         }
 
-        int? currentDoctorId = _licenseService.GetCurrentDoctorId();
+        int? currentDoctorId = await _licenseService.GetCurrentDoctorIdAsync();
         if (currentDoctorId == null)
         {
             _logger.LogError("Could not retrieve Doctor ID for editing. User might not be properly associated with a profile.");
@@ -103,12 +103,12 @@ public class EditModel : PageModel, IValidatableObject
     public async Task<IActionResult> OnPostAsync()
     {
         // Re-check activation/setup status on post
-        if (!_licenseService.IsActivated() || !_licenseService.IsProfileSetup())
+        if (!_licenseService.IsActivated() || !await _licenseService.IsProfileSetupAsync())
         {
             return RedirectToPage(!_licenseService.IsActivated() ? "/Activate" : "/DoctorProfile/Setup");
         }
 
-        int? currentDoctorId = _licenseService.GetCurrentDoctorId();
+        int? currentDoctorId = await _licenseService.GetCurrentDoctorIdAsync();
         if (currentDoctorId == null)
         {
             _logger.LogError("Could not retrieve Doctor ID for profile update POST.");
@@ -162,12 +162,12 @@ public class EditModel : PageModel, IValidatableObject
     public async Task<IActionResult> OnPostSaveSettingsAsync()
     {
         // Re-check activation/setup status on post
-        if (!_licenseService.IsActivated() || !_licenseService.IsProfileSetup())
+        if (!_licenseService.IsActivated() || !await _licenseService.IsProfileSetupAsync())
         {
             return RedirectToPage(!_licenseService.IsActivated() ? "/Activate" : "/DoctorProfile/Setup");
         }
 
-        int? currentDoctorId = _licenseService.GetCurrentDoctorId();
+        int? currentDoctorId = await _licenseService.GetCurrentDoctorIdAsync();
         if (currentDoctorId == null)
         {
             _logger.LogError("Could not retrieve Doctor ID for settings update POST.");
