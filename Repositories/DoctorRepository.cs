@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Rosheta.Core.Application.DTOs;
+using Rosheta.Core.Application.DTOs.Doctor;
 using Rosheta.Data;
 using Rosheta.Core.Domain.Entities;
 using Rosheta.Core.Application.Contracts.Persistence;
