@@ -5,6 +5,8 @@ using Rosheta.Core.Domain.Entities;
 using Rosheta.Core.Application.Contracts.Persistence;
 using Rosheta.Core.Application.Contracts.Services;
 using Rosheta.Core.Application.DTOs;
+using Rosheta.Core.Application.DTOs.Doctor;
+using Rosheta.Core.Application.Models;
 using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.Extensions.Logging;
