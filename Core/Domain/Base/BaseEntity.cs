@@ -1,4 +1,4 @@
-namespace Rosheta.Models.Base
+namespace Rosheta.Core.Domain.Base
 {
     /// <summary>
     /// Base entity with primary key

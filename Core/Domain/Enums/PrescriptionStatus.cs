@@ -1,4 +1,4 @@
-namespace Rosheta.Models.Entities;
+namespace Rosheta.Core.Domain.Enums;
 
 public enum PrescriptionStatus
 {
