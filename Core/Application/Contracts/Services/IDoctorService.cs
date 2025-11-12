@@ -1,8 +1,8 @@
-using Rosheta.ViewModels;
-using Rosheta.Models.Entities;
+using Rosheta.Core.Application.DTOs;
+using Rosheta.Core.Domain.Entities;
 using System.Threading.Tasks;
 
-namespace Rosheta.Services.Interfaces;
+namespace Rosheta.Core.Application.Contracts.Services;
 
 public interface IDoctorService
 {

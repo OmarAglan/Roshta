@@ -1,4 +1,4 @@
-namespace Rosheta.Services.Interfaces;
+namespace Rosheta.Core.Application.Contracts.Services;
 
 public interface ILicenseService
 {

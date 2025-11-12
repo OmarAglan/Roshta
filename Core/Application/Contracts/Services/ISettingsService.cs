@@ -1,7 +1,7 @@
-using Rosheta.ViewModels;
+using Rosheta.Core.Application.DTOs;
 using System.Threading.Tasks;
 
-namespace Rosheta.Services.Interfaces;
+namespace Rosheta.Core.Application.Contracts.Services;
 
 public interface ISettingsService
 {
