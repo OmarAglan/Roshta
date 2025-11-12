@@ -5,7 +5,7 @@ using Rosheta.Core.Application.Contracts.Services;
 using System.Threading.Tasks;
 using System;
 
-namespace Rosheta.Presentation.Filters;
+namespace Rosheta.Filters;
 
 public class ActivationCheckPageFilter : IAsyncPageFilter
 {
@@ -40,20 +40,20 @@ public class ActivationCheckPageFilter : IAsyncPageFilter
             // If already activated, redirect away from activation page itself
             if (_licenseService.IsActivated())
             {
-                 _logger.LogInformation("Already activated. Redirecting away from Activate page.");
-                 // Check if profile setup is needed before redirecting
-                 if(!await _licenseService.IsProfileSetupAsync())
-                 {
+                _logger.LogInformation("Already activated. Redirecting away from Activate page.");
+                // Check if profile setup is needed before redirecting
+                if (!await _licenseService.IsProfileSetupAsync())
+                {
                     _logger.LogInformation("Profile not set up. Redirecting to Setup page.");
                     context.Result = new RedirectToPageResult(setupPageRoute); // Use correct route
                     return;
-                 }
-                 else
-                 {
+                }
+                else
+                {
                     _logger.LogInformation("Profile set up. Redirecting to Index page.");
                     context.Result = new RedirectToPageResult("/Index");
                     return;
-                 }
+                }
             }
             // If not activated, allow access to the activation page
             _logger.LogDebug("Not activated. Allowing access to Activate page.");
@@ -66,7 +66,7 @@ public class ActivationCheckPageFilter : IAsyncPageFilter
         {
             _logger.LogInformation("Application not activated. Redirecting to {ActivatePage} from {PagePath}.", activatePageRoute, pagePath);
             context.Result = new RedirectToPageResult(activatePageRoute); // Use correct route
-            return; 
+            return;
         }
 
         // --- Activated: Now Check Profile Setup ---
@@ -75,7 +75,7 @@ public class ActivationCheckPageFilter : IAsyncPageFilter
         if (pagePath.Equals(setupPagePhysicalPath, StringComparison.OrdinalIgnoreCase))
         {
             _logger.LogDebug("Accessing Setup page directly.");
-             if (await _licenseService.IsProfileSetupAsync())
+            if (await _licenseService.IsProfileSetupAsync())
             {
                 _logger.LogInformation("Profile already set up. Redirecting from Setup page to Index.");
                 context.Result = new RedirectToPageResult("/Index"); // Or main page
@@ -85,12 +85,12 @@ public class ActivationCheckPageFilter : IAsyncPageFilter
             await next();
             return;
         }
-        
+
         // If activated BUT profile not set up, redirect other pages to setup page
         if (!await _licenseService.IsProfileSetupAsync())
         {
             _logger.LogInformation("Profile not set up. Redirecting to {SetupPage} from {PagePath}.", setupPageRoute, pagePath);
-             context.Result = new RedirectToPageResult(setupPageRoute); // Use correct route
+            context.Result = new RedirectToPageResult(setupPageRoute); // Use correct route
             return;
         }
 
@@ -98,4 +98,4 @@ public class ActivationCheckPageFilter : IAsyncPageFilter
         _logger.LogDebug("Activated and profile set up. Proceeding with request for {PagePath}.", pagePath);
         await next();
     }
-} 
+}
