@@ -4,7 +4,7 @@ using Rosheta.Core.Domain.Entities;
 using Rosheta.Core.Application.Contracts.Services;
 using System.Threading.Tasks;
 
-namespace Rosheta.Presentation.Pages_Medications
+namespace Rosheta.Pages.Medications
 {
     public class DeleteModel : PageModel
     {

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Rosheta.Core.Application.Contracts.Services;
 using System.ComponentModel.DataAnnotations;
 
-namespace Rosheta.Presentation.Pages;
+namespace Rosheta.Pages;
 
 public class ActivateModel : PageModel
 {

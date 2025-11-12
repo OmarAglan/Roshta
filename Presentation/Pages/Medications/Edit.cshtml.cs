@@ -10,7 +10,7 @@ using Rosheta.Infrastructure.Data;
 using Rosheta.Core.Domain.Entities;
 using Rosheta.Core.Application.Contracts.Services;
 
-namespace Rosheta.Presentation.Pages_Medications
+namespace Rosheta.Pages.Medications
 {
     public class EditModel : PageModel
     {

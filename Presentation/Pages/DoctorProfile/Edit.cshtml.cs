@@ -15,7 +15,7 @@ using Rosheta.Core.Application.DTOs;
 using Rosheta.Core.Application.DTOs.Doctor;
 using Rosheta.Core.Application.Models;
 
-namespace Rosheta.Presentation.Pages.DoctorProfile;
+namespace Rosheta.Pages.DoctorProfile;
 
 public class EditModel : PageModel, IValidatableObject
 {

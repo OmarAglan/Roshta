@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Rosheta.Core.Application.Contracts.Services; // Add this
 using System.Threading.Tasks; // Add this
 
-namespace Rosheta.Presentation.Pages;
+namespace Rosheta.Pages;
 
 public class IndexModel : PageModel
 {
