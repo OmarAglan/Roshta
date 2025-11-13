@@ -8,6 +8,7 @@ using Rosheta.Core.Application.Services;
 using Rosheta.Core.Application.Contracts.Services;
 using Rosheta.Configuration.Settings;
 using Rosheta.Filters;
+using Rosheta.Presentation.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -59,12 +60,25 @@ builder.Services.AddRazorPages()
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+// Development vs Production error handling
+if (app.Environment.IsDevelopment())
 {
+    app.UseDeveloperExceptionPage();
+}
+else
+{
+    // Use custom global exception handler
+    app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
+    
+    // Use default error page as fallback
     app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    
+    // HSTS
     app.UseHsts();
 }
+
+// Status code pages for common HTTP errors
+app.UseStatusCodePagesWithReExecute("/Error", "?statusCode={0}");
 
 app.UseHttpsRedirection();
 app.UseStaticFiles(new Microsoft.AspNetCore.Builder.StaticFileOptions
