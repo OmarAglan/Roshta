@@ -1,6 +1,7 @@
 using Rosheta.Core.Domain.Entities;
 using Rosheta.Core.Application.Contracts.Persistence;
 using Rosheta.Core.Application.Contracts.Services;
+using Rosheta.Core.Application.Common.Exceptions;
 
 namespace Rosheta.Core.Application.Services;
 
@@ -15,70 +16,197 @@ public class PatientService : IPatientService
 
     public async Task<IEnumerable<Patient>> GetAllPatientsAsync()
     {
-        // Business logic like filtering only active patients could go here later
-        return await _patientRepository.GetAllAsync();
+        try
+        {
+            return await _patientRepository.GetAllAsync();
+        }
+        catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
+        {
+            throw new InfrastructureException("Failed to retrieve patients.", ex);
+        }
     }
 
     public async Task<IEnumerable<Patient>> SearchPatientsAsync(string searchTerm)
     {
-        return await _patientRepository.SearchAsync(searchTerm);
+        try
+        {
+            return await _patientRepository.SearchAsync(searchTerm);
+        }
+        catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
+        {
+            throw new InfrastructureException("Failed to search patients.", ex);
+        }
     }
 
     public async Task<Patient?> GetPatientByIdAsync(int id)
     {
-        return await _patientRepository.GetByIdAsync(id);
+        try
+        {
+            var patient = await _patientRepository.GetByIdAsync(id);
+
+            if (patient == null)
+            {
+                throw new NotFoundException(nameof(Patient), id);
+            }
+
+            return patient;
+        }
+        catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
+        {
+            throw new InfrastructureException("Failed to retrieve patient.", ex);
+        }
     }
 
     public async Task<Patient> AddPatientAsync(Patient patient)
     {
-        // Add any service-level validation or logic here
-        return await _patientRepository.AddAsync(patient);
+        // Validation
+        if (string.IsNullOrWhiteSpace(patient.Name))
+        {
+            throw new ValidationException("Patient name is required.");
+        }
+
+        if (string.IsNullOrWhiteSpace(patient.ContactInfo))
+        {
+            throw new ValidationException("Patient contact information is required.");
+        }
+
+        // Check uniqueness
+        if (!await _patientRepository.IsNameUniqueAsync(patient.Name))
+        {
+            throw new BusinessRuleException($"A patient with the name '{patient.Name}' already exists.");
+        }
+
+        if (!await _patientRepository.IsContactInfoUniqueAsync(patient.ContactInfo))
+        {
+            throw new BusinessRuleException($"A patient with the contact info '{patient.ContactInfo}' already exists.");
+        }
+
+        try
+        {
+            return await _patientRepository.AddAsync(patient);
+        }
+        catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
+        {
+            throw new InfrastructureException("Failed to add patient.", ex);
+        }
     }
 
     public async Task<Patient?> UpdatePatientAsync(Patient patient)
     {
-        // Add any service-level validation or logic here
-        var updated = await _patientRepository.UpdateAsync(patient);
-        return updated ? patient : null;
+        // Validation
+        if (string.IsNullOrWhiteSpace(patient.Name))
+        {
+            throw new ValidationException("Patient name is required.");
+        }
+
+        if (string.IsNullOrWhiteSpace(patient.ContactInfo))
+        {
+            throw new ValidationException("Patient contact information is required.");
+        }
+
+        // Check if patient exists
+        if (!await _patientRepository.ExistsAsync(patient.Id))
+        {
+            throw new NotFoundException(nameof(Patient), patient.Id);
+        }
+
+        // Check uniqueness
+        if (!await _patientRepository.IsNameUniqueAsync(patient.Name, patient.Id))
+        {
+            throw new BusinessRuleException($"A patient with the name '{patient.Name}' already exists.");
+        }
+
+        if (!await _patientRepository.IsContactInfoUniqueAsync(patient.ContactInfo, patient.Id))
+        {
+            throw new BusinessRuleException($"A patient with the contact info '{patient.ContactInfo}' already exists.");
+        }
+
+        try
+        {
+            var updated = await _patientRepository.UpdateAsync(patient);
+            return updated ? patient : null;
+        }
+        catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
+        {
+            throw new InfrastructureException("Failed to update patient.", ex);
+        }
     }
 
     public async Task<bool> DeletePatientAsync(int id)
     {
-        // Add any service-level validation or logic here
-        return await _patientRepository.DeleteAsync(id);
+        // Check if patient exists
+        if (!await _patientRepository.ExistsAsync(id))
+        {
+            throw new NotFoundException(nameof(Patient), id);
+        }
+
+        try
+        {
+            return await _patientRepository.DeleteAsync(id);
+        }
+        catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
+        {
+            throw new InfrastructureException("Failed to delete patient.", ex);
+        }
     }
 
     public async Task<bool> PatientExistsAsync(int id)
     {
-        return await _patientRepository.ExistsAsync(id);
+        try
+        {
+            return await _patientRepository.ExistsAsync(id);
+        }
+        catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
+        {
+            throw new InfrastructureException("Failed to check patient existence.", ex);
+        }
     }
 
-    // Implementation for the new interface method
     public async Task<bool> IsContactInfoUniqueAsync(string contactInfo, int? currentId = null)
     {
-        // Could add validation here to check format before hitting repo?
-        return await _patientRepository.IsContactInfoUniqueAsync(contactInfo, currentId);
+        try
+        {
+            return await _patientRepository.IsContactInfoUniqueAsync(contactInfo, currentId);
+        }
+        catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
+        {
+            throw new InfrastructureException("Failed to validate contact info uniqueness.", ex);
+        }
     }
 
-    // Implementation for Name uniqueness
     public async Task<bool> IsNameUniqueAsync(string name, int? currentId = null)
     {
-        return await _patientRepository.IsNameUniqueAsync(name, currentId);
+        try
+        {
+            return await _patientRepository.IsNameUniqueAsync(name, currentId);
+        }
+        catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
+        {
+            throw new InfrastructureException("Failed to validate name uniqueness.", ex);
+        }
     }
-
-    // --- Implementation for Pagination Methods ---
 
     public async Task<List<Patient>> GetPatientsPagedAsync(int pageNumber, int pageSize, string? searchTerm = null, string? sortOrder = null)
     {
-        // Add any service-level logic here if needed (e.g., default page size)
-        return await _patientRepository.GetPagedAsync(pageNumber, pageSize, searchTerm, sortOrder);
+        try
+        {
+            return await _patientRepository.GetPagedAsync(pageNumber, pageSize, searchTerm, sortOrder);
+        }
+        catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
+        {
+            throw new InfrastructureException("Failed to retrieve paged patients.", ex);
+        }
     }
 
     public async Task<int> GetPatientsCountAsync(string? searchTerm = null)
     {
-        // Add any service-level logic here if needed
-        return await _patientRepository.GetCountAsync(searchTerm);
+        try
+        {
+            return await _patientRepository.GetCountAsync(searchTerm);
+        }
+        catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
+        {
+            throw new InfrastructureException("Failed to count patients.", ex);
+        }
     }
-
-    // ---------------------------------------------
 }

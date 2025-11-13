@@ -1,6 +1,7 @@
-using Microsoft.Extensions.Options; // Required for IOptions
+using Microsoft.Extensions.Options;
 using Rosheta.Core.Application.Contracts.Infrastructure;
 using Rosheta.Core.Application.Contracts.Services;
+using Rosheta.Core.Application.Common.Exceptions;
 using Rosheta.Configuration.Settings;
 
 namespace Rosheta.Core.Application.Services;
@@ -20,7 +21,7 @@ public class LicenseService : ILicenseService
     {
         _licenseSettings = licenseSettingsOptions.Value;
         _fileStorage = fileStorage;
-        
+
         var baseDirectory = _fileStorage.CombinePath(_fileStorage.GetApplicationDataPath(), "Rosheta");
         _activationFlagPath = _fileStorage.CombinePath(baseDirectory, ".activated");
         _doctorIdFlagPath = _fileStorage.CombinePath(baseDirectory, ".doctorid");
@@ -31,7 +32,7 @@ public class LicenseService : ILicenseService
         // Simple string comparison (case-insensitive for robustness)
         bool isValid = string.Equals(enteredRegistrationNumber, _licenseSettings.ExpectedRegistrationNumber, StringComparison.OrdinalIgnoreCase) &&
                        string.Equals(enteredSerialNumber, _licenseSettings.ExpectedSerialNumber, StringComparison.OrdinalIgnoreCase);
-        
+
         // TODO: Implement more robust validation if needed (e.g., checking format, checksums, or calling an external server)
 
         return isValid;
@@ -48,15 +49,12 @@ public class LicenseService : ILicenseService
         try
         {
             // Create the empty marker file to indicate activation.
-            // The content doesn't matter, only its existence.
             _fileStorage.EnsureDirectoryExists(_activationFlagPath);
             await _fileStorage.WriteAllTextAsync(_activationFlagPath, string.Empty);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // TODO: Log the exception (ex)
-            // Handle potential file system errors (permissions, etc.)
-            // For now, activation might fail silently if the file can't be created.
+            throw new InfrastructureException("Failed to mark application as activated.", ex);
         }
     }
 
@@ -79,10 +77,9 @@ public class LicenseService : ILicenseService
             _cachedDoctorId = doctorId;
             _doctorIdChecked = true;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // TODO: Log the exception (ex)
-            // Handle potential file system errors
+            throw new InfrastructureException("Failed to mark profile as setup.", ex);
         }
     }
 
@@ -94,7 +91,8 @@ public class LicenseService : ILicenseService
             return _cachedDoctorId;
         }
 
-        _doctorIdChecked = true; // Mark as checked even if file doesn't exist or is invalid
+        _doctorIdChecked = true;
+
         if (_fileStorage.FileExists(_doctorIdFlagPath))
         {
             try
@@ -106,13 +104,13 @@ public class LicenseService : ILicenseService
                     return id;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                 // TODO: Log the exception (ex)
+                throw new InfrastructureException("Failed to retrieve current doctor ID.", ex);
             }
         }
-        
+
         _cachedDoctorId = null;
         return null;
     }
-} 
+}

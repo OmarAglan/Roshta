@@ -4,6 +4,7 @@ using Rosheta.Core.Application.Contracts.Services;
 using Rosheta.Core.Application.DTOs;
 using Rosheta.Core.Application.DTOs.Doctor;
 using Rosheta.Core.Application.Models;
+using Rosheta.Core.Application.Common.Exceptions;
 using Microsoft.Extensions.Logging;
 using Rosheta.Core.Domain.Enums;
 
@@ -57,44 +58,103 @@ public class PrescriptionService : IPrescriptionService
             }
         }
 
-        // Validate (basic example - add more robust validation)
+        // Validate
         if (!prescription.PrescriptionItems.Any())
         {
-            throw new ArgumentException("Prescription must have at least one item.");
+            throw new ValidationException("Prescription must have at least one medication item.");
         }
 
-        // Save using the repository
+        // Verify patient exists
+        if (!await _patientRepository.ExistsAsync(prescription.PatientId))
+        {
+            throw new NotFoundException(nameof(Patient), prescription.PatientId);
+        }
 
-        return await _prescriptionRepository.AddAsync(prescription); // Use renamed method
+        try
+        {
+            return await _prescriptionRepository.AddAsync(prescription);
+        }
+        catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
+        {
+            throw new InfrastructureException("Failed to create prescription.", ex);
+        }
     }
 
-    // Add implementation for GetAllPrescriptionsAsync
     public async Task<IEnumerable<Prescription>> GetAllPrescriptionsAsync()
     {
-        // Enhance later to include Patient/Doctor info if needed for display
-        return await _prescriptionRepository.GetAllAsync(); // Use renamed method
+        try
+        {
+            return await _prescriptionRepository.GetAllAsync();
+        }
+        catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
+        {
+            throw new InfrastructureException("Failed to retrieve prescriptions.", ex);
+        }
     }
 
     public async Task<IEnumerable<Prescription>> SearchPrescriptionsAsync(string searchTerm)
     {
-        // Implement search logic, potentially involving related entities
-        return await _prescriptionRepository.SearchAsync(searchTerm);
+        try
+        {
+            return await _prescriptionRepository.SearchAsync(searchTerm);
+        }
+        catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
+        {
+            throw new InfrastructureException("Failed to search prescriptions.", ex);
+        }
     }
 
-    // Add implementation for GetPrescriptionByIdAsync
     public async Task<Prescription?> GetPrescriptionByIdAsync(int id)
     {
-        // Enhance later to include related items/patient/doctor
-        return await _prescriptionRepository.GetByIdAsync(id); // Use renamed method
+        try
+        {
+            var prescription = await _prescriptionRepository.GetByIdAsync(id);
+
+            if (prescription == null)
+            {
+                throw new NotFoundException(nameof(Prescription), id);
+            }
+
+            return prescription;
+        }
+        catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
+        {
+            throw new InfrastructureException("Failed to retrieve prescription.", ex);
+        }
     }
 
     public async Task<bool> CancelPrescriptionAsync(int prescriptionId)
     {
-        // Could add business logic here, e.g., check user permissions,
-        // or prevent cancellation based on status or time.
-        // For now, directly call the repository.
         _logger.LogInformation("Attempting to cancel prescription ID {PrescriptionId}", prescriptionId);
-        return await _prescriptionRepository.CancelAsync(prescriptionId);
+
+        // Verify prescription exists and get its status
+        var prescription = await _prescriptionRepository.GetByIdAsync(prescriptionId);
+
+        if (prescription == null)
+        {
+            throw new NotFoundException(nameof(Prescription), prescriptionId);
+        }
+
+        // Business rule: can't cancel already cancelled prescriptions
+        if (prescription.Status == PrescriptionStatus.Cancelled)
+        {
+            throw new BusinessRuleException("Cannot cancel a prescription that is already cancelled.");
+        }
+
+        // Business rule: can't cancel completed prescriptions
+        if (prescription.Status == PrescriptionStatus.Completed)
+        {
+            throw new BusinessRuleException("Cannot cancel a prescription that has been completed.");
+        }
+
+        try
+        {
+            return await _prescriptionRepository.CancelAsync(prescriptionId);
+        }
+        catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
+        {
+            throw new InfrastructureException("Failed to cancel prescription.", ex);
+        }
     }
 
     // Add Update/Delete service methods later if needed
@@ -103,12 +163,26 @@ public class PrescriptionService : IPrescriptionService
 
     public async Task<List<Prescription>> GetPrescriptionsPagedAsync(int pageNumber, int pageSize, string? searchTerm = null, string? sortOrder = null)
     {
-        return await _prescriptionRepository.GetPagedAsync(pageNumber, pageSize, searchTerm, sortOrder);
+        try
+        {
+            return await _prescriptionRepository.GetPagedAsync(pageNumber, pageSize, searchTerm, sortOrder);
+        }
+        catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
+        {
+            throw new InfrastructureException("Failed to retrieve paged prescriptions.", ex);
+        }
     }
 
     public async Task<int> GetPrescriptionsCountAsync(string? searchTerm = null)
     {
-        return await _prescriptionRepository.GetCountAsync(searchTerm);
+        try
+        {
+            return await _prescriptionRepository.GetCountAsync(searchTerm);
+        }
+        catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
+        {
+            throw new InfrastructureException("Failed to count prescriptions.", ex);
+        }
     }
 
     // ---------------------------------------------
