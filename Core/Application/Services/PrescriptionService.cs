@@ -141,10 +141,10 @@ public class PrescriptionService : IPrescriptionService
             throw new BusinessRuleException("Cannot cancel a prescription that is already cancelled.");
         }
 
-        // Business rule: can't cancel completed prescriptions
-        if (prescription.Status == PrescriptionStatus.Completed)
+        // Business rule: can't cancel filled prescriptions
+        if (prescription.Status == PrescriptionStatus.Filled)
         {
-            throw new BusinessRuleException("Cannot cancel a prescription that has been completed.");
+            throw new BusinessRuleException("Cannot cancel a prescription that has been filled.");
         }
 
         try
