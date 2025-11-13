@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Options; // Required for IOptions
 using Rosheta.Core.Application.Contracts.Infrastructure;
 using Rosheta.Core.Application.Contracts.Services;
-using Rosheta.Settings;
+using Rosheta.Configuration.Settings;
 
 namespace Rosheta.Core.Application.Services;
 
