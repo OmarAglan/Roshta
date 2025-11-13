@@ -15,9 +15,9 @@
                     </h1>
                 </div>
                 <div class="card-body">
-                    @if (Model.StatusCode != 500)
+                    @if (Model.ErrorStatusCode != 500)
                     {
-                        <h4 class="text-danger">@Model.StatusCode</h4>
+                        <h4 class="text-danger">@Model.ErrorStatusCode</h4>
                     }
                     
                     <p class="lead">@Model.ErrorMessage</p>
@@ -42,7 +42,7 @@
                 </div>
             </div>
 
-            @if (Model.StatusCode == 404)
+            @if (Model.ErrorStatusCode == 404)
             {
                 <div class="mt-4 text-center">
                     <p class="text-muted">Common pages:</p>

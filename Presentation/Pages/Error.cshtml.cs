@@ -10,10 +10,10 @@ namespace Rosheta.Pages
     {
         public string? RequestId { get; set; }
         public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
-        
+
         public string ErrorTitle { get; set; } = "Error";
         public string ErrorMessage { get; set; } = "An error occurred while processing your request.";
-        public int StatusCode { get; set; } = 500;
+        public int ErrorStatusCode { get; set; } = 500;
 
         private readonly ILogger<ErrorModel> _logger;
 
@@ -25,19 +25,19 @@ namespace Rosheta.Pages
         public void OnGet(int? statusCode = null)
         {
             RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
-            
+
             // Get error details from middleware if available
             if (HttpContext.Items.TryGetValue("ErrorTitle", out var title))
             {
                 ErrorTitle = title?.ToString() ?? ErrorTitle;
             }
-            
+
             if (HttpContext.Items.TryGetValue("ErrorMessage", out var message))
             {
                 ErrorMessage = message?.ToString() ?? ErrorMessage;
             }
 
-            StatusCode = statusCode ?? StatusCode;
+            ErrorStatusCode = statusCode ?? ErrorStatusCode;
 
             // Set friendly messages based on status code
             if (statusCode.HasValue)
@@ -54,7 +54,7 @@ namespace Rosheta.Pages
                 };
             }
 
-            _logger.LogWarning("Error page displayed: {StatusCode} - {Title}", StatusCode, ErrorTitle);
+            _logger.LogWarning("Error page displayed: {StatusCode} - {Title}", ErrorStatusCode, ErrorTitle);
         }
     }
 }
