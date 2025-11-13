@@ -1,4 +1,4 @@
-namespace Rosheta.Settings;
+namespace Rosheta.Configuration.Settings;
 
 public class LicenseSettings
 {
@@ -6,4 +6,4 @@ public class LicenseSettings
 
     public string ExpectedRegistrationNumber { get; set; } = string.Empty;
     public string ExpectedSerialNumber { get; set; } = string.Empty;
-} 
+}

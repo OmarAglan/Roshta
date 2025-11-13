@@ -6,7 +6,7 @@ using Rosheta.Infrastructure.Data.Repositories;
 using Rosheta.Core.Application.Contracts.Persistence;
 using Rosheta.Core.Application.Services;
 using Rosheta.Core.Application.Contracts.Services;
-using Rosheta.Settings;
+using Rosheta.Configuration.Settings;
 using Rosheta.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
