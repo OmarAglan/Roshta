@@ -14,13 +14,14 @@ public class PatientService : IPatientService
         _patientRepository = patientRepository;
     }
 
+    // ... GetAllAsync and SearchAsync remain unchanged ... 
     public async Task<IEnumerable<Patient>> GetAllPatientsAsync()
     {
         try
         {
             return await _patientRepository.GetAllAsync();
         }
-        catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
+        catch (Exception ex)
         {
             throw new InfrastructureException("Failed to retrieve patients.", ex);
         }
@@ -32,7 +33,7 @@ public class PatientService : IPatientService
         {
             return await _patientRepository.SearchAsync(searchTerm);
         }
-        catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
+        catch (Exception ex)
         {
             throw new InfrastructureException("Failed to search patients.", ex);
         }
@@ -43,12 +44,10 @@ public class PatientService : IPatientService
         try
         {
             var patient = await _patientRepository.GetByIdAsync(id);
-
             if (patient == null)
             {
                 throw new NotFoundException(nameof(Patient), id);
             }
-
             return patient;
         }
         catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
@@ -60,26 +59,15 @@ public class PatientService : IPatientService
     public async Task<Patient> AddPatientAsync(Patient patient)
     {
         // Validation
-        if (string.IsNullOrWhiteSpace(patient.Name))
-        {
-            throw new ValidationException("Patient name is required.");
-        }
+        if (string.IsNullOrWhiteSpace(patient.Name)) throw new ValidationException("Patient name is required.");
+        if (string.IsNullOrWhiteSpace(patient.ContactInfo)) throw new ValidationException("Patient contact information is required.");
 
-        if (string.IsNullOrWhiteSpace(patient.ContactInfo))
-        {
-            throw new ValidationException("Patient contact information is required.");
-        }
-
-        // Check uniqueness
+        // Uniqueness
         if (!await _patientRepository.IsNameUniqueAsync(patient.Name))
-        {
             throw new BusinessRuleException($"A patient with the name '{patient.Name}' already exists.");
-        }
 
         if (!await _patientRepository.IsContactInfoUniqueAsync(patient.ContactInfo))
-        {
             throw new BusinessRuleException($"A patient with the contact info '{patient.ContactInfo}' already exists.");
-        }
 
         try
         {
@@ -94,37 +82,27 @@ public class PatientService : IPatientService
     public async Task<Patient?> UpdatePatientAsync(Patient patient)
     {
         // Validation
-        if (string.IsNullOrWhiteSpace(patient.Name))
-        {
-            throw new ValidationException("Patient name is required.");
-        }
+        if (string.IsNullOrWhiteSpace(patient.Name)) throw new ValidationException("Patient name is required.");
+        if (string.IsNullOrWhiteSpace(patient.ContactInfo)) throw new ValidationException("Patient contact information is required.");
 
-        if (string.IsNullOrWhiteSpace(patient.ContactInfo))
-        {
-            throw new ValidationException("Patient contact information is required.");
-        }
-
-        // Check if patient exists
+        // Check exists
         if (!await _patientRepository.ExistsAsync(patient.Id))
         {
             throw new NotFoundException(nameof(Patient), patient.Id);
         }
 
-        // Check uniqueness
+        // Uniqueness
         if (!await _patientRepository.IsNameUniqueAsync(patient.Name, patient.Id))
-        {
             throw new BusinessRuleException($"A patient with the name '{patient.Name}' already exists.");
-        }
 
         if (!await _patientRepository.IsContactInfoUniqueAsync(patient.ContactInfo, patient.Id))
-        {
             throw new BusinessRuleException($"A patient with the contact info '{patient.ContactInfo}' already exists.");
-        }
 
         try
         {
-            var updated = await _patientRepository.UpdateAsync(patient);
-            return updated ? patient : null;
+            // NEW: Void return
+            await _patientRepository.UpdateAsync(patient);
+            return patient;
         }
         catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
         {
@@ -134,15 +112,17 @@ public class PatientService : IPatientService
 
     public async Task<bool> DeletePatientAsync(int id)
     {
-        // Check if patient exists
-        if (!await _patientRepository.ExistsAsync(id))
-        {
-            throw new NotFoundException(nameof(Patient), id);
-        }
-
         try
         {
-            return await _patientRepository.DeleteAsync(id);
+            // NEW: Fetch entity first
+            var patient = await _patientRepository.GetByIdAsync(id);
+            if (patient == null)
+            {
+                throw new NotFoundException(nameof(Patient), id);
+            }
+
+            await _patientRepository.DeleteAsync(patient);
+            return true;
         }
         catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
         {
@@ -156,57 +136,14 @@ public class PatientService : IPatientService
         {
             return await _patientRepository.ExistsAsync(id);
         }
-        catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
+        catch (Exception ex)
         {
             throw new InfrastructureException("Failed to check patient existence.", ex);
         }
     }
 
-    public async Task<bool> IsContactInfoUniqueAsync(string contactInfo, int? currentId = null)
-    {
-        try
-        {
-            return await _patientRepository.IsContactInfoUniqueAsync(contactInfo, currentId);
-        }
-        catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
-        {
-            throw new InfrastructureException("Failed to validate contact info uniqueness.", ex);
-        }
-    }
-
-    public async Task<bool> IsNameUniqueAsync(string name, int? currentId = null)
-    {
-        try
-        {
-            return await _patientRepository.IsNameUniqueAsync(name, currentId);
-        }
-        catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
-        {
-            throw new InfrastructureException("Failed to validate name uniqueness.", ex);
-        }
-    }
-
-    public async Task<List<Patient>> GetPatientsPagedAsync(int pageNumber, int pageSize, string? searchTerm = null, string? sortOrder = null)
-    {
-        try
-        {
-            return await _patientRepository.GetPagedAsync(pageNumber, pageSize, searchTerm, sortOrder);
-        }
-        catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
-        {
-            throw new InfrastructureException("Failed to retrieve paged patients.", ex);
-        }
-    }
-
-    public async Task<int> GetPatientsCountAsync(string? searchTerm = null)
-    {
-        try
-        {
-            return await _patientRepository.GetCountAsync(searchTerm);
-        }
-        catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
-        {
-            throw new InfrastructureException("Failed to count patients.", ex);
-        }
-    }
+    public async Task<bool> IsContactInfoUniqueAsync(string contactInfo, int? currentId = null) => await _patientRepository.IsContactInfoUniqueAsync(contactInfo, currentId);
+    public async Task<bool> IsNameUniqueAsync(string name, int? currentId = null) => await _patientRepository.IsNameUniqueAsync(name, currentId);
+    public async Task<List<Patient>> GetPatientsPagedAsync(int pageNumber, int pageSize, string? searchTerm = null, string? sortOrder = null) => await _patientRepository.GetPagedAsync(pageNumber, pageSize, searchTerm, sortOrder);
+    public async Task<int> GetPatientsCountAsync(string? searchTerm = null) => await _patientRepository.GetCountAsync(searchTerm);
 }

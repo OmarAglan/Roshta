@@ -105,4 +105,24 @@ public class PatientServiceTests
         // Assert
         await act.Should().ThrowAsync<NotFoundException>();
     }
+
+    [Fact]
+    public async Task DeletePatientAsync_ShouldCallDelete_WhenPatientExists()
+    {
+        // Arrange
+        var patient = new Patient { Id = 10, Name = "To Delete" };
+
+        // Mock GetById because Service now calls it first
+        _patientRepositoryMock.Setup(r => r.GetByIdAsync(10)).ReturnsAsync(patient);
+
+        // Mock Delete (Void)
+        _patientRepositoryMock.Setup(r => r.DeleteAsync(patient)).Returns(Task.CompletedTask);
+
+        // Act
+        var result = await _service.DeletePatientAsync(10);
+
+        // Assert
+        result.Should().BeTrue();
+        _patientRepositoryMock.Verify(r => r.DeleteAsync(patient), Times.Once);
+    }
 }

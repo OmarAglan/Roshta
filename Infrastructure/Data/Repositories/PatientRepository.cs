@@ -1,204 +1,96 @@
 using Microsoft.EntityFrameworkCore;
-using Rosheta.Infrastructure.Data;
-using Rosheta.Core.Domain.Entities;
 using Rosheta.Core.Application.Contracts.Persistence;
+using Rosheta.Core.Domain.Entities;
+using Rosheta.Infrastructure.Data;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Rosheta.Infrastructure.Data.Repositories;
 
-public class PatientRepository : IPatientRepository
+public class PatientRepository : RepositoryBase<Patient>, IPatientRepository
 {
-    private readonly ApplicationDbContext _context;
-
-    public PatientRepository(ApplicationDbContext context)
+    public PatientRepository(ApplicationDbContext context) : base(context)
     {
-        _context = context;
     }
 
-    public async Task<IEnumerable<Patient>> GetAllAsync()
-    {
-        // Consider ordering for consistency, e.g., by Name
-        return await _context.Patients.OrderBy(p => p.Name).ToListAsync();
-    }
+    // Basic CRUD (Add, GetById, etc.) handled by RepositoryBase
 
     public async Task<IEnumerable<Patient>> SearchAsync(string searchTerm)
     {
         if (string.IsNullOrWhiteSpace(searchTerm))
         {
-            return await GetAllAsync(); // Return all if search term is empty
+            return await GetAllAsync();
         }
 
-        var lowerCaseSearchTerm = searchTerm.Trim().ToLower();
-
-        return await _context.Patients
-                             .Where(p => (p.Name != null && p.Name.ToLower().Contains(lowerCaseSearchTerm)) ||
-                                         (p.ContactInfo != null && p.ContactInfo.ToLower().Contains(lowerCaseSearchTerm)))
-                             .OrderBy(p => p.Name) // Keep consistent ordering
-                             .ToListAsync();
+        var lowerTerm = searchTerm.Trim().ToLower();
+        return await _dbSet
+            .Where(p => (p.Name != null && p.Name.ToLower().Contains(lowerTerm)) ||
+                        (p.ContactInfo != null && p.ContactInfo.ToLower().Contains(lowerTerm)))
+            .OrderBy(p => p.Name)
+            .ToListAsync();
     }
 
-    public async Task<Patient?> GetByIdAsync(int id)
-    {
-        // Include related data if needed often, e.g., Prescriptions
-        // return await _context.Patients.Include(p => p.Prescriptions).FirstOrDefaultAsync(p => p.Id == id);
-        return await _context.Patients.FindAsync(id);
-    }
-
-    public async Task<Patient> AddAsync(Patient patient)
-    {
-        await _context.Patients.AddAsync(patient);
-        await _context.SaveChangesAsync();
-        return patient;
-    }
-
-    public async Task<bool> UpdateAsync(Patient patient)
-    {
-        _context.Entry(patient).State = EntityState.Modified;
-        try
-        {
-            await _context.SaveChangesAsync();
-            return true;
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            return false;
-        }
-        catch (DbUpdateException)
-        {
-            return false;
-        }
-    }
-
-    public async Task<bool> DeleteAsync(int id)
-    {
-        var patient = await _context.Patients.FindAsync(id);
-        if (patient == null)
-        {
-            return false;
-        }
-
-        _context.Patients.Remove(patient);
-        try
-        {
-            await _context.SaveChangesAsync();
-            return true;
-        }
-        catch (DbUpdateException)
-        {
-            return false;
-        }
-    }
-
-    public async Task<bool> ExistsAsync(int id)
-    {
-        return await _context.Patients.AnyAsync(e => e.Id == id);
-    }
-
-    // Implementation for the new interface method
     public async Task<bool> IsContactInfoUniqueAsync(string contactInfo, int? currentId = null)
     {
-        if (string.IsNullOrWhiteSpace(contactInfo))
-        {
-            // Consider empty/whitespace contact info as non-unique or handle based on requirements
-            // If ContactInfo is nullable or not required, empty might be considered "unique"
-            return true;
-        }
+        if (string.IsNullOrWhiteSpace(contactInfo)) return true;
 
-        // Normalize for case-insensitive comparison
         var normalizedContact = contactInfo.Trim().ToLower();
-
-        bool exists = await _context.Patients
-            .Where(p => p.ContactInfo != null && p.ContactInfo.ToLower() == normalizedContact)
-            .Where(p => currentId == null || p.Id != currentId.Value) // Exclude current item if ID provided
-            .AnyAsync();
-
-        return !exists; // True if no conflicting record exists
+        return !await _dbSet.AnyAsync(p =>
+            p.ContactInfo != null &&
+            p.ContactInfo.ToLower() == normalizedContact &&
+            (!currentId.HasValue || p.Id != currentId.Value));
     }
 
-    // Implementation for Name uniqueness
     public async Task<bool> IsNameUniqueAsync(string name, int? currentId = null)
     {
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            return true; // Consider empty name unique or handle based on requirements
-        }
+        if (string.IsNullOrWhiteSpace(name)) return true;
 
         var normalizedName = name.Trim().ToLower();
-
-        bool exists = await _context.Patients
-            .Where(p => p.Name != null && p.Name.ToLower() == normalizedName)
-            .Where(p => currentId == null || p.Id != currentId.Value)
-            .AnyAsync();
-
-        return !exists;
-    }
-
-    // --- Implementation for Pagination Methods ---
-
-    public async Task<int> GetCountAsync(string? searchTerm = null)
-    {
-        IQueryable<Patient> query = _context.Patients;
-
-        if (!string.IsNullOrWhiteSpace(searchTerm))
-        {
-            var lowerCaseSearchTerm = searchTerm.Trim().ToLower();
-            query = query.Where(p => (p.Name != null && p.Name.ToLower().Contains(lowerCaseSearchTerm)) ||
-                                     (p.ContactInfo != null && p.ContactInfo.ToLower().Contains(lowerCaseSearchTerm)));
-        }
-
-        return await query.CountAsync();
+        return !await _dbSet.AnyAsync(p =>
+            p.Name != null &&
+            p.Name.ToLower() == normalizedName &&
+            (!currentId.HasValue || p.Id != currentId.Value));
     }
 
     public async Task<List<Patient>> GetPagedAsync(int pageNumber, int pageSize, string? searchTerm = null, string? sortOrder = null)
     {
-        IQueryable<Patient> query = _context.Patients;
+        var query = _dbSet.AsQueryable();
 
-        // Apply search filter
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
-            var lowerCaseSearchTerm = searchTerm.Trim().ToLower();
-            query = query.Where(p => (p.Name != null && p.Name.ToLower().Contains(lowerCaseSearchTerm)) ||
-                                     (p.ContactInfo != null && p.ContactInfo.ToLower().Contains(lowerCaseSearchTerm)));
+            var lowerTerm = searchTerm.Trim().ToLower();
+            query = query.Where(p => (p.Name != null && p.Name.ToLower().Contains(lowerTerm)) ||
+                                     (p.ContactInfo != null && p.ContactInfo.ToLower().Contains(lowerTerm)));
         }
 
-        // Apply sorting
-        switch (sortOrder)
+        query = sortOrder switch
         {
-            case "name_desc":
-                query = query.OrderByDescending(p => p.Name);
-                break;
-            case "Date":
-                query = query.OrderBy(p => p.DateOfBirth);
-                break;
-            case "date_desc":
-                query = query.OrderByDescending(p => p.DateOfBirth);
-                break;
-            case "VisitDate":
-                // Handle potential nulls by sorting them last (or first, depending on preference)
-                query = query.OrderBy(p => p.LastVisitDate == null).ThenBy(p => p.LastVisitDate);
-                break;
-            case "visitdate_desc":
-                query = query.OrderByDescending(p => p.LastVisitDate.HasValue).ThenByDescending(p => p.LastVisitDate);
-                break;
-            // Add cases for other sortable columns as needed
-            // case "ContactInfo":
-            //     query = query.OrderBy(p => p.ContactInfo);
-            //     break;
-            // case "contact_desc":
-            //     query = query.OrderByDescending(p => p.ContactInfo);
-            //     break;
-            default: // Default sort by Name ascending
-                query = query.OrderBy(p => p.Name);
-                break;
-        }
+            "name_desc" => query.OrderByDescending(p => p.Name),
+            "Date" => query.OrderBy(p => p.DateOfBirth),
+            "date_desc" => query.OrderByDescending(p => p.DateOfBirth),
+            "VisitDate" => query.OrderBy(p => p.LastVisitDate == null).ThenBy(p => p.LastVisitDate),
+            "visitdate_desc" => query.OrderByDescending(p => p.LastVisitDate.HasValue).ThenByDescending(p => p.LastVisitDate),
+            _ => query.OrderBy(p => p.Name)
+        };
 
-        // Apply pagination
-        return await query.Skip((pageNumber - 1) * pageSize)
-                          .Take(pageSize)
-                          .ToListAsync();
+        return await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
     }
 
-    // ---------------------------------------------
+    public async Task<int> GetCountAsync(string? searchTerm = null)
+    {
+        var query = _dbSet.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            var lowerTerm = searchTerm.Trim().ToLower();
+            query = query.Where(p => (p.Name != null && p.Name.ToLower().Contains(lowerTerm)) ||
+                                     (p.ContactInfo != null && p.ContactInfo.ToLower().Contains(lowerTerm)));
+        }
+
+        return await query.CountAsync();
+    }
 }
