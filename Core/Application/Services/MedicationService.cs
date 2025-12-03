@@ -103,8 +103,10 @@ public class MedicationService : IMedicationService
 
         try
         {
-            var updated = await _medicationRepository.UpdateAsync(medication);
-            return updated ? medication : null;
+            // New Signature: Returns Task (void), expects Entity
+            // We rely on EF Core change tracking or the repository attached state
+            await _medicationRepository.UpdateAsync(medication);
+            return medication;
         }
         catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
         {
@@ -114,15 +116,17 @@ public class MedicationService : IMedicationService
 
     public async Task<bool> DeleteMedicationAsync(int id)
     {
-        // Check if medication exists
-        if (!await _medicationRepository.ExistsAsync(id))
+        var medication = await _medicationRepository.GetByIdAsync(id);
+        if (medication == null)
         {
             throw new NotFoundException(nameof(Medication), id);
         }
 
         try
         {
-            return await _medicationRepository.DeleteAsync(id);
+            // New Signature: Takes Entity
+            await _medicationRepository.DeleteAsync(medication);
+            return true;
         }
         catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
         {
