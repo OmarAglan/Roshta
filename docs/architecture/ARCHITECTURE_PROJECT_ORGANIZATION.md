@@ -1,582 +1,252 @@
-# Rosheta Project Organization & Architecture Optimization
+# 🏗️ Rosheta Project Organization & Architecture Blueprint
 
-## Executive Summary
+**Status:** ✅ Phase 1 Implemented (v0.9.9.11)
+**Scope:** Current Reference & Future Roadmap
+**Last Updated:** December 2025
 
-This document outlines a comprehensive reorganization of the Rosheta project structure to align with Clean Architecture principles, prepare for MAUI migration (Phase 3), and establish sustainable patterns for long-term growth.
+## 1. Executive Summary
 
-### Key Issues Identified
+This document serves as the **Master Blueprint** for the Rosheta solution. It details the implemented **Clean Architecture** (physical project separation), the strict rules governing dependencies, and the roadmap for future expansion into .NET MAUI (Desktop/Mobile).
 
-1. **Namespace Inconsistency**: Mixed use of `Rosheta` and `Rosheta` namespaces
-2. **Layer Violations**: Razor Pages directly reference repositories instead of only services
-3. **Mixed Concerns**: ViewModels folder contains DTOs, search models, and validation models
-4. **Missing Organization**: No clear place for validators, mappers, constants, or enums
-5. **Future Scalability**: Current structure will be difficult to extract into class libraries for MAUI
+The solution has moved from a Monolithic structure to a strict 3-Tier Clean Architecture to ensure testability, maintainability, and portability.
 
-## Current vs. Proposed Architecture
+---
 
-### Current Structure (Issues)
-```
-Rosheta/
-├── Data/                          # ❌ Just DbContext, no configurations
-├── Filters/                       # ❌ Mixed with business logic
-├── Infrastructure/Storage/        # ✅ Good start, needs expansion
-├── Models/                        # ❌ Mixed domain and base entities
-├── Pages/                         # ✅ Well organized by feature
-├── Repositories/                  # ❌ Not organized by domain
-├── Services/                      # ❌ Not organized by domain
-├── Settings/                      # ❌ Mixed with configuration models
-├── ViewModels/                    # ❌ Catch-all for various DTOs
-└── wwwroot/                       # ✅ Static assets
-```
+## 2. Reference Architecture Structure
 
-### Proposed Clean Architecture Structure
-```
-Rosheta/
-├── Core/                                    # Domain + Application Layers
-│   ├── Domain/                             # Pure business entities (no dependencies)
-│   │   ├── Entities/
-│   │   │   ├── Doctor.cs
-│   │   │   ├── Patient.cs
-│   │   │   ├── Prescription.cs
-│   │   │   ├── PrescriptionItem.cs
-│   │   │   └── Medication.cs
-│   │   ├── Enums/
-│   │   │   └── PrescriptionStatus.cs
-│   │   ├── Base/
-│   │   │   ├── BaseEntity.cs
-│   │   │   ├── AuditableEntity.cs
-│   │   │   └── IAuditable.cs
-│   │   └── Constants/
-│   │       └── BusinessConstants.cs
+The solution is physically divided into three projects (`Core`, `Infrastructure`, `Web`) plus a testing project.
+
+### 2.1 The Big Picture
+
+```text
+Rosheta.sln
+├── src/
+│   ├── Rosheta.Core/            # (Class Library) The Inner Circle
+│   │   ├── Domain/              # Pure business entities (Zero Dependencies)
+│   │   ├── Application/         # Interfaces, Services, DTOs, Exceptions
+│   │   └── DependencyInjection.cs
 │   │
-│   ├── Application/                        # Business logic layer
-│   │   ├── Contracts/                      # All interfaces
-│   │   │   ├── Persistence/                # Repository contracts
-│   │   │   │   ├── IDoctorRepository.cs
-│   │   │   │   ├── IPatientRepository.cs
-│   │   │   │   ├── IPrescriptionRepository.cs
-│   │   │   │   └── IMedicationRepository.cs
-│   │   │   ├── Services/                   # Service contracts
-│   │   │   │   ├── IDoctorService.cs
-│   │   │   │   ├── IPatientService.cs
-│   │   │   │   ├── IPrescriptionService.cs
-│   │   │   │   ├── IMedicationService.cs
-│   │   │   │   ├── ILicenseService.cs
-│   │   │   │   └── ISettingsService.cs
-│   │   │   └── Infrastructure/             # Infrastructure contracts
-│   │   │       └── IFileStorageProvider.cs
-│   │   │
-│   │   ├── Services/                       # Service implementations
-│   │   │   ├── DoctorService.cs
-│   │   │   ├── PatientService.cs
-│   │   │   ├── PrescriptionService.cs
-│   │   │   ├── MedicationService.cs
-│   │   │   ├── LicenseService.cs
-│   │   │   └── SettingsService.cs
-│   │   │
-│   │   ├── DTOs/                           # Data Transfer Objects
-│   │   │   ├── Doctor/
-│   │   │   │   ├── DoctorDto.cs
-│   │   │   │   ├── UpdateDoctorProfileDto.cs
-│   │   │   │   └── DoctorSetupDto.cs
-│   │   │   ├── Patient/
-│   │   │   │   ├── PatientDto.cs
-│   │   │   │   ├── PatientSearchDto.cs
-│   │   │   │   └── CreatePatientDto.cs
-│   │   │   ├── Prescription/
-│   │   │   │   ├── PrescriptionDto.cs
-│   │   │   │   ├── PrescriptionSearchDto.cs
-│   │   │   │   └── PrescriptionDetailDto.cs
-│   │   │   └── Medication/
-│   │   │       ├── MedicationDto.cs
-│   │   │       └── MedicationSearchDto.cs
-│   │   │
-│   │   ├── Models/                         # Application-specific models
-│   │   │   ├── PagedResult.cs
-│   │   │   ├── Result.cs
-│   │   │   └── UserSettingsModel.cs
-│   │   │
-│   │   ├── Validators/                     # Business validation (future)
-│   │   │   ├── DoctorValidators/
-│   │   │   ├── PatientValidators/
-│   │   │   └── PrescriptionValidators/
-│   │   │
-│   │   └── Common/
-│   │       ├── Exceptions/
-│   │       │   ├── BusinessException.cs
-│   │       │   └── ValidationException.cs
-│   │       └── Mappings/                   # Future: AutoMapper profiles
+│   ├── Rosheta.Infrastructure/  # (Class Library) The Adapters
+│   │   ├── Data/                # EF Core Context & Repositories
+│   │   ├── Storage/             # File System Implementations
+│   │   ├── Settings/            # Configuration Models
+│   │   └── DependencyInjection.cs
 │   │
-│   └── README.md
+│   └── Rosheta.Web/             # (ASP.NET Core App) The Entry Point
+│       ├── Pages/               # Razor Pages (UI)
+│       ├── Middleware/          # Global Exception Handling
+│       └── Program.cs           # Composition Root
 │
-├── Infrastructure/                          # External dependencies layer
-│   ├── Data/
-│   │   ├── ApplicationDbContext.cs
-│   │   ├── Configurations/                 # EF entity configurations
-│   │   │   ├── DoctorConfiguration.cs
-│   │   │   ├── PatientConfiguration.cs
-│   │   │   └── PrescriptionConfiguration.cs
-│   │   └── Repositories/
-│   │       ├── DoctorRepository.cs
-│   │       ├── PatientRepository.cs
-│   │       ├── PrescriptionRepository.cs
-│   │       └── MedicationRepository.cs
-│   │
-│   ├── Storage/
-│   │   └── LocalFileStorageProvider.cs
-│   │
-│   ├── Settings/
-│   │   └── LicenseSettings.cs
-│   │
-│   └── README.md
-│
-├── Presentation/                            # UI Layer
-│   ├── Pages/
-│   │   ├── DoctorProfile/
-│   │   ├── Medications/
-│   │   ├── Patients/
-│   │   ├── Prescriptions/
-│   │   ├── Shared/
-│   │   ├── _ViewImports.cshtml
-│   │   ├── _ViewStart.cshtml
-│   │   ├── Activate.cshtml(.cs)
-│   │   ├── Error.cshtml(.cs)
-│   │   ├── Index.cshtml(.cs)
-│   │   └── Privacy.cshtml(.cs)
-│   │
-│   ├── Filters/
-│   │   └── ActivationCheckPageFilter.cs
-│   │
-│   ├── ViewModels/                         # Page-specific view models
-│   │   ├── Prescription/
-│   │   │   └── PrescriptionCreateModel.cs
-│   │   └── Common/
-│   │       └── SearchViewModel.cs
-│   │
-│   └── wwwroot/
-│       ├── css/
-│       ├── js/
-│       └── lib/
-│
-├── Migrations/                              # Keep at root (EF requirement)
-├── Properties/
-├── Program.cs
-├── appsettings.json
-└── Rosheta.csproj
+└── tests/
+    └── Rosheta.UnitTests/       # xUnit Testing Project
+        └── Core/                # Tests mirroring Core structure
 ```
 
-## Detailed Migration Plan
+---
 
-### Phase 1: Namespace Unification (Critical - Do First)
+## 3. Detailed Layer Breakdown
 
-**Why**: Inconsistent namespaces cause confusion and compilation issues.
+This section details the exact purpose and rules for every folder in the solution.
 
-**Actions**:
-1. Standardize all namespaces to `Rosheta` (not `Rosheta`)
-2. Update all `using` statements
-3. Update project file if needed
+### 3.1 🟢 Rosheta.Core (The Domain Layer)
 
-**Files to Update** (All files):
-- All `.cs` files currently using `Rosheta` namespace
-- Update `Rosheta.csproj` to `Rosheta.csproj` if needed
+**Namespace:** `Rosheta.Core`
+**Dependencies:** *None*. It depends on **zero** other projects.
 
-**Script to Help**:
-```powershell
-# Find all files with Rosheta namespace
-Get-ChildItem -Recurse -Filter "*.cs" | Select-String "namespace Rosheta" -List
-Get-ChildItem -Recurse -Filter "*.cs" | Select-String "using Rosheta" -List
-```
+#### `Domain/` (The Enterprise Business Rules)
 
-### Phase 2: Create Core Layer Structure
+Contains the heart of the business. These classes effectively ignore the existence of the database or the web.
 
-**Why**: Establishes clean domain boundaries and prepares for class library extraction.
+* **`Entities/`**: Rich domain models (`Doctor`, `Patient`, `Prescription`). They inherit from `AuditableEntity`.
+* **`Enums/`**: Domain-specific enumerations (`PrescriptionStatus`).
+* **`Base/`**: Abstract base classes (`BaseEntity`, `AuditableEntity`, `IAuditable`).
+* **`Constants/`**: System-wide business constants (e.g., maximum prescription duration).
 
-#### 2.1 Domain Layer Organization
+#### `Application/` (The Application Business Rules)
 
-**Create Structure**:
-```
-mkdir Core
-mkdir Core\Domain
-mkdir Core\Domain\Entities
-mkdir Core\Domain\Base
-mkdir Core\Domain\Enums
-mkdir Core\Domain\Constants
-```
+Orchestrates the domain objects to perform specific tasks.
 
-**File Movements**:
-| From | To | Namespace Change |
-|------|-----|-----------------|
-| `Models/Entities/*.cs` | `Core/Domain/Entities/` | `Rosheta.Models.Entities` → `Rosheta.Core.Domain.Entities` |
-| `Models/Base/*.cs` | `Core/Domain/Base/` | `Rosheta.Models.Base` → `Rosheta.Core.Domain.Base` |
-| Extract `PrescriptionStatus` enum | `Core/Domain/Enums/PrescriptionStatus.cs` | New: `Rosheta.Core.Domain.Enums` |
+* **`Contracts/`**: The "Ports" of the application.
+  * **`Persistence/`**: Interfaces for data access (`IDoctorRepository`, `IPrescriptionRepository`).
+  * **`Services/`**: Interfaces for business logic (`IDoctorService`, `ILicenseService`).
+  * **`Infrastructure/`**: Interfaces for external tools (`IFileStorageProvider`, `IEmailService`).
+* **`Services/`**: Concrete implementations of the service interfaces (`DoctorService`). These contain the actual "Thinking" code.
+* **`DTOs/`**: Data Transfer Objects grouped by feature.
+  * `DTOs/Doctor/` (`UpdateDoctorProfileDto`)
+  * `DTOs/Patient/` (`PatientSearchDto`)
+* **`Common/Exceptions/`**: Domain-specific exceptions (`ValidationException`, `NotFoundException`).
 
-#### 2.2 Application Layer Organization
+**❌ FORBIDDEN in Core:**
 
-**Create Structure**:
-```
-mkdir Core\Application
-mkdir Core\Application\Contracts
-mkdir Core\Application\Contracts\Persistence
-mkdir Core\Application\Contracts\Services
-mkdir Core\Application\Contracts\Infrastructure
-mkdir Core\Application\Services
-mkdir Core\Application\DTOs
-mkdir Core\Application\Models
-mkdir Core\Application\Common
-```
+* Referencing `Microsoft.EntityFrameworkCore` (except strictly necessary abstractions).
+* Referencing `System.Web` or `Microsoft.AspNetCore`.
+* Referencing the `Infrastructure` project.
 
-**File Movements**:
-| From | To | Namespace Change |
-|------|-----|-----------------|
-| `Services/Interfaces/*.cs` | `Core/Application/Contracts/Services/` | `Rosheta.Services.Interfaces` → `Rosheta.Core.Application.Contracts.Services` |
-| `Repositories/Interfaces/*.cs` | `Core/Application/Contracts/Persistence/` | `Rosheta.Repositories.Interfaces` → `Rosheta.Core.Application.Contracts.Persistence` |
-| `Infrastructure/Storage/Interfaces/*.cs` | `Core/Application/Contracts/Infrastructure/` | `Rosheta.Infrastructure.Storage.Interfaces` → `Rosheta.Core.Application.Contracts.Infrastructure` |
-| `Services/*.cs` | `Core/Application/Services/` | `Rosheta.Services` → `Rosheta.Core.Application.Services` |
-| `ViewModels/*SearchDto.cs` | `Core/Application/DTOs/{Feature}/` | `Rosheta.ViewModels` → `Rosheta.Core.Application.DTOs.{Feature}` |
-| `ViewModels/UpdateDoctorProfileDto.cs` | `Core/Application/DTOs/Doctor/` | `Rosheta.ViewModels` → `Rosheta.Core.Application.DTOs.Doctor` |
-| `ViewModels/UserSettingsModel.cs` | `Core/Application/Models/` | `Rosheta.ViewModels` → `Rosheta.Core.Application.Models` |
+---
 
-### Phase 3: Create Infrastructure Layer
+### 3.2 🔵 Rosheta.Infrastructure (The Interface Adapters)
 
-**Create Structure**:
-```
-mkdir Infrastructure\Data
-mkdir Infrastructure\Data\Configurations
-mkdir Infrastructure\Data\Repositories
-```
+**Namespace:** `Rosheta.Infrastructure`
+**Dependencies:** `Rosheta.Core`, `Microsoft.EntityFrameworkCore`, `Microsoft.Extensions.Configuration`.
 
-**File Movements**:
-| From | To | Namespace Change |
-|------|-----|-----------------|
-| `Data/ApplicationDbContext.cs` | `Infrastructure/Data/` | `Rosheta.Data` → `Rosheta.Infrastructure.Data` |
-| `Repositories/*.cs` | `Infrastructure/Data/Repositories/` | `Rosheta.Repositories` → `Rosheta.Infrastructure.Data.Repositories` |
-| `Settings/LicenseSettings.cs` | `Infrastructure/Settings/` | `Rosheta.Settings` → `Rosheta.Infrastructure.Settings` |
+#### `Data/` (Persistence)
 
-### Phase 4: Reorganize Presentation Layer
+* **`ApplicationDbContext.cs`**: The EF Core context. It maps Domain Entities to the Database.
+* **`Repositories/`**: Implementation of `Contracts.Persistence`.
+  * `DoctorRepository`: Implements `IDoctorRepository`. Uses `ApplicationDbContext` to fetch/save data.
+* **`Migrations/`**: Database schema history (SQLite migrations).
 
-**Create Structure**:
-```
-mkdir Presentation
-mkdir Presentation\Pages
-mkdir Presentation\Filters
-mkdir Presentation\ViewModels
-mkdir Presentation\wwwroot
-```
+#### `Storage/` (File System)
 
-**File Movements**:
-| From | To | Namespace Change |
-|------|-----|-----------------|
-| `Pages/` | `Presentation/Pages/` | `Rosheta.Pages` → `Rosheta.Presentation.Pages` |
-| `Filters/` | `Presentation/Filters/` | `Rosheta.Filters` → `Rosheta.Presentation.Filters` |
-| `ViewModels/PrescriptionCreateModel.cs` | `Presentation/ViewModels/Prescription/` | `Rosheta.ViewModels` → `Rosheta.Presentation.ViewModels.Prescription` |
-| `wwwroot/` | `Presentation/wwwroot/` | No namespace change |
+* **`LocalFileStorageProvider.cs`**: Implementation of `IFileStorageProvider`. Uses `System.IO` to read/write files to `%LOCALAPPDATA%`.
 
-### Phase 5: Update Program.cs and DI Registration
+#### `DependencyInjection.cs`
 
-**Update Paths**:
+An extension method `AddInfrastructureServices()` that encapsulates the registration of the DbContext and Repositories. This keeps `Program.cs` clean.
+
+**✅ ALLOWED in Infrastructure:**
+
+* Database-specific logic (SQL, EF Core).
+* File system access.
+* External API calls (HTTP Client).
+
+---
+
+### 3.3 🟠 Rosheta.Web (The Presentation Layer)
+
+**Namespace:** `Rosheta.Web` (and `Rosheta.Pages` for Razor Pages)
+**Dependencies:** `Rosheta.Core`, `Rosheta.Infrastructure`.
+
+#### `Pages/` (UI)
+
+Razor Pages organized by feature folders.
+
+* `Pages/DoctorProfile/`: `Edit.cshtml`, `Setup.cshtml`.
+* `Pages/Patients/`: CRUD pages for patients.
+
+#### `Middleware/` (Pipeline)
+
+* `GlobalExceptionHandlerMiddleware.cs`: Catches Domain Exceptions (like `ValidationException`) and converts them to user-friendly HTTP responses or Error Pages.
+
+#### `Program.cs` (Composition Root)
+
+The only place where all three layers meet. It wires up the Dependency Injection container:
+
 ```csharp
-// Program.cs updates
-builder.Services.AddRazorPages()
-    .AddRazorPagesOptions(options =>
-    {
-        options.RootDirectory = "/Presentation/Pages";
-    });
-
-// Static files configuration
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(
-        Path.Combine(builder.Environment.ContentRootPath, "Presentation/wwwroot")),
-    RequestPath = ""
-});
+builder.Services.AddApplicationServices();       // From Core
+builder.Services.AddInfrastructureServices(...); // From Infrastructure
 ```
 
-**Update Namespace Imports**:
-```csharp
-using Rosheta.Core.Application.Contracts.Services;
-using Rosheta.Core.Application.Contracts.Persistence;
-using Rosheta.Core.Application.Contracts.Infrastructure;
-using Rosheta.Core.Application.Services;
-using Rosheta.Infrastructure.Data;
-using Rosheta.Infrastructure.Data.Repositories;
-using Rosheta.Infrastructure.Storage;
-using Rosheta.Infrastructure.Settings;
-using Rosheta.Presentation.Filters;
-```
+---
 
-## Implementation Guide
+## 4. Architecture Decision Records (ADRs)
 
-### Safe Migration Order
+### ADR-001: Physical Project Separation
 
-1. **Backup Current State**
-   ```bash
-   git add .
-   git commit -m "Before architecture reorganization"
-   git checkout -b architecture-reorganization
-   ```
+**Context:** The application was a Monolith. Logic was leaking between layers.
+**Decision:** Split into 3 physical `.csproj` projects.
+**Consequences:**
 
-2. **Fix Namespace Inconsistencies First** (15 minutes)
-   - Find/Replace all `Rosheta` with `Rosheta`
-   - Test build
+* (+) Impossible to accidentally reference Infrastructure from Core.
+* (+) Unit tests run faster and are purer.
+* (-) Slightly more complex solution structure.
 
-3. **Create All New Folders** (5 minutes)
-   - Create entire new structure empty
-   - No files moved yet
+### ADR-002: Feature-Based Organization for DTOs
 
-4. **Move Domain Layer** (20 minutes)
-   - Move entities, base classes
-   - Update namespaces
-   - Build and fix errors
+**Context:** DTOs were scattered or grouped by type.
+**Decision:** Group DTOs by Feature (e.g., `DTOs/Doctor/`).
+**Consequences:**
 
-5. **Move Application Contracts** (15 minutes)
-   - Move all interfaces first
-   - Update namespaces
-   - Build and fix errors
+* (+) Better cohesion. All files related to "Doctor" are nearby.
+* (+) Easier to navigate for new developers.
 
-6. **Move Application Services** (20 minutes)
-   - Move service implementations
-   - Move DTOs
-   - Update namespaces
-   - Build and fix errors
+### ADR-003: Infrastructure-Centric DI Registration
 
-7. **Move Infrastructure** (20 minutes)
-   - Move DbContext
-   - Move Repositories
-   - Update namespaces
-   - Build and fix errors
+**Context:** `Program.cs` was huge and knew too much about implementation details.
+**Decision:** Use `DependencyInjection.cs` extension methods in each layer.
+**Consequences:**
 
-8. **Move Presentation** (30 minutes)
-   - Move Pages
-   - Move Filters
-   - Move remaining ViewModels
-   - Move wwwroot
-   - Update Program.cs paths
-   - Build and fix errors
+* (+) Web layer doesn't know about specific Repository implementations.
+* (+) Easy to swap Infrastructure (e.g., SQLite -> SQL Server) by changing one line.
 
-9. **Final Testing** (15 minutes)
-   - Run application
-   - Test key features
-   - Fix any runtime issues
+---
 
-**Total Estimated Time**: 2.5 hours
+## 5. Future Roadmap & Scalability
 
-## Risk Assessment & Mitigation
+This architecture is designed to support the following future phases defined in the Roadmap.
 
-### Risks
+### Phase 2: Architectural Patterns (Refinement)
 
-1. **Build Failures**
-   - **Mitigation**: Fix namespaces incrementally, build after each phase
-   
-2. **Runtime Path Issues**
-   - **Mitigation**: Carefully update Program.cs configurations
-   
-3. **EF Migrations Break**
-   - **Mitigation**: Keep Migrations folder at root, update DbContext namespace references
+* **Generic Repository:** To reduce code duplication in `Infrastructure/Data/Repositories`.
+  * *Plan:* Create `RepositoryBase<T>` implementing `IRepository<T>` in Infrastructure.
+* **Unit of Work:** To ensure atomic transactions across multiple repositories.
+  * *Plan:* Implement `IUnitOfWork` wrapping the `DbContext.SaveChanges()`.
+* **FluentValidation:** To move validation logic out of Controllers/Services.
+  * *Plan:* Add `FluentValidation` package to `Core` and scan for validators in `DependencyInjection.cs`.
 
-4. **Lost Work**
-   - **Mitigation**: Use Git branch, commit frequently
+### Phase 3: MAUI Migration (Multi-UI Support)
 
-### Rollback Plan
+The critical benefit of this architecture is **Portability**.
 
-If issues arise:
-```bash
-git stash  # Save any fixes
-git checkout main  # Return to original
-git branch -D architecture-reorganization  # Remove failed attempt
-```
+**Target Structure for Phase 3:**
 
-## Future Considerations
-
-### Phase 1.5: Testing Structure
-```
-tests/
-├── Rosheta.Core.Domain.Tests/
-├── Rosheta.Core.Application.Tests/
-├── Rosheta.Infrastructure.Tests/
-└── Rosheta.Presentation.Tests/
-```
-
-### Phase 3: MAUI Class Library Extraction
-```
+```text
 src/
-├── Rosheta.Core.Domain/        # Class library
-├── Rosheta.Core.Application/   # Class library
-├── Rosheta.Infrastructure/     # Class library
-├── Rosheta.Web/                # Current Razor Pages
-└── Rosheta.Maui/               # New MAUI app
+├── Rosheta.Core            (Shared - No changes needed)
+├── Rosheta.Infrastructure  (Shared - No changes needed)
+├── Rosheta.Web             (Existing Web UI)
+└── Rosheta.Maui            (NEW: Desktop/Mobile UI)
 ```
 
-## Benefits of New Structure
+**Strategy:**
 
-### 1. Clean Architecture Compliance
-- **Domain Independence**: Domain entities have no external dependencies
-- **Dependency Rule**: Dependencies point inward (Presentation → Application → Domain)
-- **Testability**: Each layer can be tested independently
+1. Create `Rosheta.Maui` project.
+2. Add reference to `Rosheta.Core` and `Rosheta.Infrastructure`.
+3. Call `AddApplicationServices()` and `AddInfrastructureServices()` in `MauiProgram.cs`.
+4. **Storage:** The `LocalFileStorageProvider` in Infrastructure is already compatible with Windows Desktop. For Android/iOS, we may implement `MauiFileStorageProvider` if sandboxing rules differ.
 
-### 2. MAUI Migration Ready
-- **Shared Core**: Domain and Application layers can be shared
-- **Platform-Specific UI**: Web and MAUI have separate presentation layers
-- **Minimal Refactoring**: Clean boundaries mean less code change
+### Phase 4: API Layer (Optional/Hybrid)
 
-### 3. Developer Experience
-- **Discoverability**: Clear organization by feature and layer
-- **Consistency**: Predictable file locations
-- **Onboarding**: New developers understand structure quickly
+If we move to a Client-Server model (where the DB is on a server, not local):
 
-### 4. Scalability
-- **Feature Addition**: Clear where new features go
-- **Team Scaling**: Teams can work on different layers
-- **Performance**: Future ability to split into microservices
+1. Create `Rosheta.Api` (ASP.NET Core Web API).
+2. Reference Core/Infrastructure.
+3. Expose Controllers that call `IDoctorService`, etc.
+4. `Rosheta.Maui` then calls this API instead of using `Rosheta.Infrastructure` directly.
 
-### 5. Maintainability
-- **Single Responsibility**: Each folder has clear purpose
-- **Reduced Coupling**: Layers communicate through interfaces
-- **Easier Refactoring**: Changes isolated to specific layers
+---
 
-## Architecture Decision Records (ADRs)
+## 6. Developer Guidelines
 
-### ADR-001: Separate Core into Domain and Application
-**Decision**: Split Core into Domain and Application subdirectories rather than separate projects initially.
+### Adding a New Feature (e.g., Appointments)
 
-**Rationale**:
-- Simpler initial migration
-- Can extract to class libraries later
-- Maintains clean boundaries through folder structure
+1. **Core (Domain):** Create `Appointment` entity in `Domain/Entities`.
+2. **Core (Contracts):** Define `IAppointmentRepository` in `Application/Contracts/Persistence` and `IAppointmentService` in `Application/Contracts/Services`.
+3. **Core (DTOs):** Create `CreateAppointmentDto` in `Application/DTOs/Appointments`.
+4. **Core (Service):** Implement `AppointmentService` in `Application/Services`. **Write Unit Tests.**
+5. **Infrastructure:** Implement `AppointmentRepository` in `Infrastructure/Data/Repositories`. Add `DbSet<Appointment>` to `ApplicationDbContext`.
+6. **Infrastructure (Migrations):** Run `dotnet ef migrations add AddAppointments`.
+7. **Web:** Create Razor Pages in `Pages/Appointments`. Inject `IAppointmentService`.
 
-### ADR-002: Keep Migrations at Root
-**Decision**: Leave Migrations folder at project root.
+### Testing
 
-**Rationale**:
-- EF Core convention
-- Simplifies migration commands
-- Avoid path issues
+* **Unit Tests:** Must target `Rosheta.Core`. Mock all interfaces.
+* **Integration Tests:** (Future) Will target `Rosheta.Web` or `Rosheta.Api` using `WebApplicationFactory`.
 
-### ADR-003: Group DTOs by Feature
-**Decision**: Organize DTOs in feature folders (Doctor/, Patient/, etc.).
+---
 
-**Rationale**:
-- Better cohesion
-- Easier to find related DTOs
-- Scales better with growth
+## 7. Migration History (Archived)
 
-### ADR-004: Infrastructure Contains All External Dependencies
-**Decision**: Put database, file storage, and future email/SMS in Infrastructure.
+* **Original State:** Monolithic `Rosheta.csproj`.
+* **Migration Date:** June 2025.
+* **Actions Taken:**
+    1. Standardized Namespaces.
+    2. Created Class Libraries (`Core`, `Infrastructure`).
+    3. Moved files to respect Dependency Rule.
+    4. Refactored `Program.cs` to use clean DI registration.
+    5. Abstracted File System.
 
-**Rationale**:
-- Single place for external dependencies
-- Easy to mock for testing
-- Clear boundary for what needs configuration
+---
 
-## Implementation Checklist
-
-### Pre-Migration
-- [ ] Create Git branch for safety
-- [ ] Document current working features for testing
-- [ ] Ensure all tests pass (if any exist)
-- [ ] Backup database
-
-### During Migration
-- [ ] Fix namespace inconsistencies (Rosheta → Rosheta)
-- [ ] Create new folder structure
-- [ ] Move Domain layer files
-- [ ] Move Application layer files
-- [ ] Move Infrastructure layer files
-- [ ] Move Presentation layer files
-- [ ] Update Program.cs
-- [ ] Update all namespace imports
-- [ ] Build and fix compilation errors
-- [ ] Test application runs
-
-### Post-Migration
-- [ ] Test all major features
-- [ ] Update documentation
-- [ ] Create README.md for each layer
-- [ ] Commit changes
-- [ ] Consider creating NuGet packages for Core layers
-
-## Layer-Specific README Templates
-
-### Core/README.md
-```markdown
-# Core Layer
-
-This layer contains the heart of the application - business logic and domain models.
-
-## Structure
-- **Domain/**: Pure business entities and logic
-- **Application/**: Business use cases and application logic
-
-## Rules
-- Domain has NO external dependencies
-- Application depends only on Domain
-- All external dependencies use interfaces defined here
-
-## Future
-Will be extracted to Rosheta.Core class library for sharing with MAUI.
-```
-
-### Infrastructure/README.md
-```markdown
-# Infrastructure Layer
-
-This layer implements all external dependencies.
-
-## Structure
-- **Data/**: Entity Framework, database access
-- **Storage/**: File system operations
-- **Settings/**: Configuration models
-
-## Rules
-- Implements interfaces defined in Core/Application
-- Can reference Core layer
-- Cannot reference Presentation layer
-
-## Technologies
-- Entity Framework Core
-- Local file storage (future: Azure Blob Storage)
-```
-
-### Presentation/README.md
-```markdown
-# Presentation Layer
-
-This layer contains all UI-related code.
-
-## Structure
-- **Pages/**: Razor Pages organized by feature
-- **Filters/**: ASP.NET Core filters
-- **ViewModels/**: Page-specific models
-- **wwwroot/**: Static assets (CSS, JS, images)
-
-## Rules
-- References Core and Infrastructure
-- Depends on Application Services (not repositories directly)
-- Contains no business logic
-
-## Future
-Will be one of multiple presentation layers (Web, MAUI, API).
-```
-
-## Conclusion
-
-This reorganization positions Rosheta for sustainable growth while maintaining clean architecture principles. The phased approach minimizes risk while providing clear benefits at each stage.
-
-### Immediate Benefits
-- Fixed namespace inconsistencies
-- Clear separation of concerns
-- Better code organization
-
-### Long-term Benefits
-- Ready for MAUI migration
-- Supports team growth
-- Enables independent testing
-- Facilitates future architectural changes
-
-### Recommendation
-**Proceed with this reorganization** in a dedicated branch. The 2.5-hour investment will pay dividends in:
-- Reduced technical debt
-- Easier feature development
-- Smoother MAUI migration
-- Better team collaboration
-
-The structure follows industry best practices and positions Rosheta as a professional, maintainable healthcare application ready for expansion across platforms.
+**Document Version:** 2.1 (Comprehensive Reference)
+**Last Updated:** December 3, 2025
