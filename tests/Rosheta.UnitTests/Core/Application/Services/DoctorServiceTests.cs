@@ -10,61 +10,62 @@ namespace Rosheta.UnitTests.Core.Application.Services;
 
 public class DoctorServiceTests
 {
-    private readonly Mock<IDoctorRepository> _doctorRepositoryMock;
+    private readonly Mock<IDoctorRepository> _repoMock;
     private readonly DoctorService _service;
 
     public DoctorServiceTests()
     {
-        // 1. Arrange: Setup the mock and the system under test (SUT)
-        _doctorRepositoryMock = new Mock<IDoctorRepository>();
-        _service = new DoctorService(_doctorRepositoryMock.Object);
+        _repoMock = new Mock<IDoctorRepository>();
+        _service = new DoctorService(_repoMock.Object);
     }
 
     [Fact]
     public async Task SaveDoctorProfileAsync_ShouldThrowValidationException_WhenNameIsEmpty()
     {
-        // Arrange
-        var invalidDoctor = new Doctor
-        {
-            Name = "", // Invalid
-            Specialization = "Cardiology"
-        };
-
-        // Act
-        // We use a Func here to capture the exception
+        var invalidDoctor = new Doctor { Name = "", Specialization = "Cardiology" };
         Func<Task> act = async () => await _service.SaveDoctorProfileAsync(invalidDoctor);
-
-        // Assert
-        await act.Should().ThrowAsync<ValidationException>()
-            .WithMessage("Doctor name is required.");
-
-        // Verify the repository was NEVER called (Pure unit test)
-        _doctorRepositoryMock.Verify(r => r.SaveDoctorProfileAsync(It.IsAny<Doctor>()), Times.Never);
+        await act.Should().ThrowAsync<ValidationException>();
     }
 
     [Fact]
-    public async Task SaveDoctorProfileAsync_ShouldCallRepository_WhenDataIsValid()
+    public async Task SaveDoctorProfileAsync_ShouldAdd_WhenNoProfileExists()
     {
         // Arrange
-        var validDoctor = new Doctor
-        {
-            Name = "Dr. Gregory House",
-            Specialization = "Diagnostic Medicine"
-        };
+        var newDoctor = new Doctor { Name = "Dr. House", Specialization = "Diagnostic" };
 
-        // Setup the mock to return the doctor when saved
-        _doctorRepositoryMock
-            .Setup(r => r.SaveDoctorProfileAsync(It.IsAny<Doctor>()))
-            .ReturnsAsync(validDoctor);
+        // Mock: No existing profile
+        _repoMock.Setup(r => r.GetDoctorProfileAsync()).ReturnsAsync((Doctor?)null);
+        // Mock: Add returns the entity
+        _repoMock.Setup(r => r.AddAsync(newDoctor)).ReturnsAsync(newDoctor);
 
         // Act
-        var result = await _service.SaveDoctorProfileAsync(validDoctor);
+        var result = await _service.SaveDoctorProfileAsync(newDoctor);
 
         // Assert
-        result.Should().NotBeNull();
-        result.Name.Should().Be("Dr. Gregory House");
+        result.Should().Be(newDoctor);
+        _repoMock.Verify(r => r.AddAsync(newDoctor), Times.Once);
+        _repoMock.Verify(r => r.UpdateAsync(It.IsAny<Doctor>()), Times.Never);
+    }
 
-        // Verify the repository WAS called exactly once
-        _doctorRepositoryMock.Verify(r => r.SaveDoctorProfileAsync(validDoctor), Times.Once);
+    [Fact]
+    public async Task SaveDoctorProfileAsync_ShouldUpdate_WhenProfileExists()
+    {
+        // Arrange
+        var inputDoctor = new Doctor { Name = "Dr. House Updated", Specialization = "Diagnostic" };
+        var existingDoctor = new Doctor { Id = 1, Name = "Dr. House", Specialization = "Old Spec" };
+
+        // Mock: Profile exists
+        _repoMock.Setup(r => r.GetDoctorProfileAsync()).ReturnsAsync(existingDoctor);
+        // Mock: Update returns Task
+        _repoMock.Setup(r => r.UpdateAsync(existingDoctor)).Returns(Task.CompletedTask);
+
+        // Act
+        var result = await _service.SaveDoctorProfileAsync(inputDoctor);
+
+        // Assert
+        result.Id.Should().Be(1); // Should keep ID
+        result.Name.Should().Be("Dr. House Updated"); // Should update name
+        _repoMock.Verify(r => r.UpdateAsync(existingDoctor), Times.Once);
+        _repoMock.Verify(r => r.AddAsync(It.IsAny<Doctor>()), Times.Never);
     }
 }

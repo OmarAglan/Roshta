@@ -1,38 +1,13 @@
 using Rosheta.Core.Domain.Entities;
-using Rosheta.Core.Application.DTOs;
-using Rosheta.Core.Application.DTOs.Doctor;
-using Rosheta.Core.Application.Models;
 using System.Threading.Tasks;
 
 namespace Rosheta.Core.Application.Contracts.Persistence;
 
-public interface IDoctorRepository
+public interface IDoctorRepository : IRepository<Doctor>
 {
-    /// <summary>
-    /// Gets the single Doctor profile stored in the database.
-    /// </summary>
-    /// <returns>The Doctor profile, or null if none exists.</returns>
+    // Specific method to get the "primary" profile (usually the first one)
     Task<Doctor?> GetDoctorProfileAsync();
 
-    /// <summary>
-    /// Gets the Doctor profile stored in the database by ID.
-    /// </summary>
-    /// <param name="doctorId">The ID of the Doctor to retrieve.</param>
-    /// <returns>The Doctor profile, or null if none exists.</returns>
-    Task<Doctor?> GetDoctorProfileAsync(int doctorId);
-
-    /// <summary>
-    /// Saves the Doctor profile (creates if none exists, updates if one does).
-    /// </summary>
-    /// <param name="doctor">The Doctor profile to save.</param>
-    /// <returns>The saved Doctor profile (with ID assigned if new).</returns>
-    Task<Doctor> SaveDoctorProfileAsync(Doctor doctor);
-
-    /// <summary>
-    /// Updates the Doctor profile stored in the database.
-    /// </summary>
-    /// <param name="doctorId">The ID of the Doctor to update.</param>
-    /// <param name="profileDto">The updated Doctor profile data transfer object.</param>
-    /// <returns>True if the update was successful, false otherwise.</returns>
-    Task<bool> UpdateDoctorProfileAsync(int doctorId, UpdateDoctorProfileDto profileDto);
+    // NOTE: SaveDoctorProfileAsync and UpdateDoctorProfileAsync(DTO) are removed.
+    // The Service will use the generic AddAsync and UpdateAsync instead.
 }
