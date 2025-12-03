@@ -2,7 +2,7 @@ using Microsoft.Extensions.Options;
 using Rosheta.Core.Application.Contracts.Infrastructure;
 using Rosheta.Core.Application.Contracts.Services;
 using Rosheta.Core.Application.Common.Exceptions;
-using Rosheta.Configuration.Settings;
+using Rosheta.Core.Application.Settings;
 
 namespace Rosheta.Core.Application.Services;
 

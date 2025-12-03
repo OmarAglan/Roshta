@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>Rosheta.Core</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Folder Include="Application\Settings\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <!-- Core abstractions need MS Extensions Options for settings pattern -->
+        <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
+        <!-- DataAnnotations for Entities/DTOs -->
+        <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+    </ItemGroup>
+
+</Project>

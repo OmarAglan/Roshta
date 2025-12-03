@@ -1,4 +1,4 @@
-namespace Rosheta.Configuration.Settings;
+namespace Rosheta.Core.Application.Settings;
 
 public class LicenseSettings
 {

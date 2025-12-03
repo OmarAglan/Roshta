@@ -6,7 +6,7 @@ using Rosheta.Infrastructure.Data.Repositories;
 using Rosheta.Core.Application.Contracts.Persistence;
 using Rosheta.Core.Application.Services;
 using Rosheta.Core.Application.Contracts.Services;
-using Rosheta.Configuration.Settings;
+using Rosheta.Core.Application.Settings;
 using Rosheta.Filters;
 using Rosheta.Presentation.Middleware;
 
@@ -69,10 +69,10 @@ else
 {
     // Use custom global exception handler
     app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
-    
+
     // Use default error page as fallback
     app.UseExceptionHandler("/Error");
-    
+
     // HSTS
     app.UseHsts();
 }
