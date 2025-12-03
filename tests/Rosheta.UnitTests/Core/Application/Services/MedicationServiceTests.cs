@@ -69,6 +69,25 @@ public class MedicationServiceTests
     }
 
     [Fact]
+    public async Task UpdateMedicationAsync_ShouldCallRepository_WhenValid()
+    {
+        // Arrange
+        var medication = new Medication { Id = 1, Name = "Updated Name" };
+
+        _repoMock.Setup(r => r.ExistsAsync(1)).ReturnsAsync(true);
+        _repoMock.Setup(r => r.IsNameUniqueAsync(medication.Name, 1)).ReturnsAsync(true);
+        // NEW: UpdateAsync returns Task, so we use Returns(Task.CompletedTask)
+        _repoMock.Setup(r => r.UpdateAsync(medication)).Returns(Task.CompletedTask);
+
+        // Act
+        var result = await _service.UpdateMedicationAsync(medication);
+
+        // Assert
+        result.Should().BeEquivalentTo(medication);
+        _repoMock.Verify(r => r.UpdateAsync(medication), Times.Once);
+    }
+
+    [Fact]
     public async Task GetMedicationByIdAsync_ShouldReturnMedication_WhenExists()
     {
         // Arrange
@@ -81,5 +100,22 @@ public class MedicationServiceTests
         // Assert
         result.Should().NotBeNull();
         result!.Name.Should().Be("Aspirin");
+    }
+
+    [Fact]
+    public async Task DeleteMedicationAsync_ShouldCallDelete_WhenExists()
+    {
+        // Arrange
+        var medication = new Medication { Id = 1, Name = "To Delete" };
+        // We must mock GetByIdAsync because the service now fetches before deleting
+        _repoMock.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(medication);
+        _repoMock.Setup(r => r.DeleteAsync(medication)).Returns(Task.CompletedTask);
+
+        // Act
+        var result = await _service.DeleteMedicationAsync(1);
+
+        // Assert
+        result.Should().BeTrue();
+        _repoMock.Verify(r => r.DeleteAsync(medication), Times.Once);
     }
 }

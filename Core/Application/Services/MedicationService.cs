@@ -20,7 +20,7 @@ public class MedicationService : IMedicationService
         {
             return await _medicationRepository.GetAllAsync();
         }
-        catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
+        catch (Exception ex)
         {
             throw new InfrastructureException("Failed to retrieve medications.", ex);
         }
@@ -32,7 +32,7 @@ public class MedicationService : IMedicationService
         {
             return await _medicationRepository.SearchAsync(searchTerm);
         }
-        catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
+        catch (Exception ex)
         {
             throw new InfrastructureException("Failed to search medications.", ex);
         }
@@ -95,7 +95,7 @@ public class MedicationService : IMedicationService
             throw new NotFoundException(nameof(Medication), medication.Id);
         }
 
-        // Check uniqueness
+        // Check uniqueness (excluding self)
         if (!await _medicationRepository.IsNameUniqueAsync(medication.Name, medication.Id))
         {
             throw new BusinessRuleException($"A medication with the name '{medication.Name}' already exists.");
@@ -103,8 +103,7 @@ public class MedicationService : IMedicationService
 
         try
         {
-            // New Signature: Returns Task (void), expects Entity
-            // We rely on EF Core change tracking or the repository attached state
+            // NEW: Generic Repository Update returns void (Task)
             await _medicationRepository.UpdateAsync(medication);
             return medication;
         }
@@ -116,15 +115,16 @@ public class MedicationService : IMedicationService
 
     public async Task<bool> DeleteMedicationAsync(int id)
     {
-        var medication = await _medicationRepository.GetByIdAsync(id);
-        if (medication == null)
-        {
-            throw new NotFoundException(nameof(Medication), id);
-        }
-
         try
         {
-            // New Signature: Takes Entity
+            // NEW: We must fetch the entity first because the Generic Delete takes an Entity
+            var medication = await _medicationRepository.GetByIdAsync(id);
+
+            if (medication == null)
+            {
+                throw new NotFoundException(nameof(Medication), id);
+            }
+
             await _medicationRepository.DeleteAsync(medication);
             return true;
         }
@@ -140,7 +140,7 @@ public class MedicationService : IMedicationService
         {
             return await _medicationRepository.ExistsAsync(id);
         }
-        catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
+        catch (Exception ex)
         {
             throw new InfrastructureException("Failed to check medication existence.", ex);
         }
@@ -152,7 +152,7 @@ public class MedicationService : IMedicationService
         {
             return await _medicationRepository.IsNameUniqueAsync(name, currentId);
         }
-        catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
+        catch (Exception ex)
         {
             throw new InfrastructureException("Failed to validate name uniqueness.", ex);
         }
@@ -164,7 +164,7 @@ public class MedicationService : IMedicationService
         {
             return await _medicationRepository.GetPagedAsync(pageNumber, pageSize, searchTerm, sortOrder);
         }
-        catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
+        catch (Exception ex)
         {
             throw new InfrastructureException("Failed to retrieve paged medications.", ex);
         }
@@ -176,7 +176,7 @@ public class MedicationService : IMedicationService
         {
             return await _medicationRepository.GetCountAsync(searchTerm);
         }
-        catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
+        catch (Exception ex)
         {
             throw new InfrastructureException("Failed to count medications.", ex);
         }

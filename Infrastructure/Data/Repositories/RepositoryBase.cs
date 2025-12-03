@@ -7,6 +7,10 @@ using System.Threading.Tasks;
 
 namespace Rosheta.Infrastructure.Data.Repositories;
 
+/// <summary>
+/// Generic repository implementation using EF Core.
+/// </summary>
+/// <typeparam name="T">The entity type.</typeparam>
 public class RepositoryBase<T> : IRepository<T> where T : BaseEntity
 {
     protected readonly ApplicationDbContext _dbContext;

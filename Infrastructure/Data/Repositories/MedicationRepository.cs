@@ -14,7 +14,7 @@ public class MedicationRepository : RepositoryBase<Medication>, IMedicationRepos
     {
     }
 
-    // Basic CRUD is handled by RepositoryBase!
+    // Basic CRUD methods (GetById, Add, Update, Delete) are now handled by RepositoryBase!
 
     public async Task<IEnumerable<Medication>> SearchAsync(string searchTerm)
     {
@@ -40,10 +40,11 @@ public class MedicationRepository : RepositoryBase<Medication>, IMedicationRepos
             query = query.Where(m => m.Name.ToLower().Contains(lowerTerm));
         }
 
+        // Apply sorting
         query = sortOrder switch
         {
             "name_desc" => query.OrderByDescending(m => m.Name),
-            _ => query.OrderBy(m => m.Name)
+            _ => query.OrderBy(m => m.Name) // Default sort
         };
 
         return await query
@@ -67,9 +68,13 @@ public class MedicationRepository : RepositoryBase<Medication>, IMedicationRepos
 
     public async Task<bool> IsNameUniqueAsync(string name, int? currentId = null)
     {
-        if (string.IsNullOrWhiteSpace(name)) return true;
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return true;
+        }
 
         var lowerName = name.Trim().ToLower();
+
         return !await _dbSet.AnyAsync(m =>
             m.Name.ToLower() == lowerName &&
             (!currentId.HasValue || m.Id != currentId.Value));
