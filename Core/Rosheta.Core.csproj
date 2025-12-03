@@ -13,6 +13,7 @@
 
     <ItemGroup>
         <!-- Core abstractions need MS Extensions Options for settings pattern -->
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
         <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.0" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
         <!-- DataAnnotations for Entities/DTOs -->
