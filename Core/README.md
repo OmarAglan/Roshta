@@ -1,39 +1,34 @@
-# Core Layer
+# 🟢 Rosheta.Core
 
-This layer contains the **Domain** and **Application** logic, representing the heart of the application.
+**Layer:** Domain & Application (The "Inner Circle")
+**Type:** Class Library (.NET 9.0)
+**Dependencies:** *None* (Strictly Enforced)
 
-## Structure
+## 📖 Overview
 
-### Domain (`Core/Domain/`)
-Contains the **business entities** and **domain logic** that are independent of any external concerns.
+This project contains the **Enterprise Business Rules** and **Application Business Rules**. It is the heart of the system and has no knowledge of the database, the file system, or the web user interface.
 
-- **`Entities/`** - Domain entities (Doctor, Patient, Prescription, Medication, etc.)
-- **`Enums/`** - Domain enumerations (PrescriptionStatus, etc.)
-- **`Base/`** - Base classes for entities (BaseEntity, AuditableEntity)
-- **`Constants/`** - Domain constants
+## 📂 Structure
 
-**Key Principle:** Domain entities should have no dependencies on infrastructure, UI, or external libraries.
+### 1. Domain (`/Domain`)
 
-### Application (`Core/Application/`)
-Contains **application logic**, **use cases**, and **abstractions** for external dependencies.
+Contains the pure entities and logic that represent the business concepts. These classes are "POCOs" (Plain Old CLR Objects).
 
-- **`Contracts/`** - Interfaces that define contracts for services and repositories
-  - **`Services/`** - Service interfaces (IDoctorService, IPatientService, etc.)
-  - **`Persistence/`** - Repository interfaces (IDoctorRepository, IPatientRepository, etc.)
-  - **`Infrastructure/`** - Infrastructure service interfaces (IFileStorageProvider, etc.)
-- **`Services/`** - Application service implementations
-- **`DTOs/`** - Data Transfer Objects organized by feature
-- **`Models/`** - Application-specific models (UserSettingsModel, etc.)
+* **`Entities/`**: Database-agnostic classes (`Doctor`, `Patient`, `Prescription`). They inherit from `AuditableEntity` or `BaseEntity`.
+* **`Enums/`**: Strongly typed options (`PrescriptionStatus`).
+* **`Base/`**: Shared abstractions (`BaseEntity`, `IAuditable`).
 
-**Key Principle:** The Application layer defines **what** the system does, but not **how** it does it. It depends on abstractions (interfaces) rather than concrete implementations.
+### 2. Application (`/Application`)
 
-## Dependencies
+Contains the logic that orchestrates the domain entities to perform specific tasks.
 
-- **No external dependencies** - This layer should be completely independent
-- **Direction:** All other layers depend on Core, but Core doesn't depend on anything
+* **`Contracts/`**: Interfaces defining *what* the system needs (e.g., `IDoctorRepository`, `IFileStorageProvider`). **The implementations live in Infrastructure.**
+* **`Services/`**: The concrete implementation of business use cases (`DoctorService`, `PrescriptionService`). This is where the "thinking" happens.
+* **`DTOs/`**: Data Transfer Objects, grouped by feature (e.g., `DTOs/Doctor/`), used to decouple the internal domain from the UI.
+* **`Common/Exceptions/`**: Typed exceptions (`ValidationException`, `NotFoundException`) used to handle errors gracefully.
 
-## Namespace Convention
+## 🛡️ Architectural Rules
 
-All code in this layer uses the `Rosheta.Core.*` namespace pattern:
-- Domain: `Rosheta.Core.Domain.*`
-- Application: `Rosheta.Core.Application.*`
+1. **Dependency Rule:** This project must **never** reference `Rosheta.Infrastructure` or `Rosheta.Web`.
+2. **No Infrastructure Leakage:** Do not reference `Microsoft.EntityFrameworkCore` (except for basic abstractions if absolutely necessary) or `System.Web`.
+3. **Composition:** All services are registered via the `AddApplicationServices()` extension method in `DependencyInjection.cs`.

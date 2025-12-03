@@ -1,173 +1,83 @@
-# Error Handling & Logging - Rosheta
+# 📉 Error Handling & Logging Strategy
 
-## Overview
+**Scope:** Cross-Cutting Concern
+**Components:** Core (Exceptions), Web (Middleware), Infrastructure (Logger)
 
-Rosheta implements a comprehensive, multi-layer error handling system following ASP.NET Core best practices. This document describes the error handling strategy, exception hierarchy, and logging configuration.
+## 1. Overview
 
----
-
-## Architecture
-
-### 1. Custom Exception Hierarchy
-
-Located in `Core/Application/Common/Exceptions/`, our custom exceptions provide type-safe error handling:
-
-```
-ApplicationException (abstract base)
-├── ValidationException
-├── NotFoundException
-├── BusinessRuleException
-└── InfrastructureException
-```
-
-#### Exception Types
-
-**`ApplicationException`** (Base Class)
-- Abstract base for all application-specific exceptions
-- Inherits from `System.Exception`
-- Located: [`Core/Application/Common/Exceptions/ApplicationException.cs`](../../Core/Application/Common/Exceptions/ApplicationException.cs)
-
-**`ValidationException`**
-- **When to use**: User input validation failures
-- **HTTP Status**: 400 (Bad Request)
-- **Example**:
-  ```csharp
-  if (string.IsNullOrWhiteSpace(patient.Name))
-  {
-      throw new ValidationException("Patient name is required.");
-  }
-  ```
-
-**`NotFoundException`**
-- **When to use**: Requested entity doesn't exist
-- **HTTP Status**: 404 (Not Found)
-- **Example**:
-  ```csharp
-  var patient = await _patientRepository.GetByIdAsync(id);
-  if (patient == null)
-  {
-      throw new NotFoundException(nameof(Patient), id);
-  }
-  ```
-
-**`BusinessRuleException`**
-- **When to use**: Business logic violations
-- **HTTP Status**: 422 (Unprocessable Entity)
-- **Example**:
-  ```csharp
-  if (prescription.Status == PrescriptionStatus.Filled)
-  {
-      throw new BusinessRuleException("Cannot cancel a prescription that has been filled.");
-  }
-  ```
-
-**`InfrastructureException`**
-- **When to use**: Database, file system, or external service failures
-- **HTTP Status**: 503 (Service Unavailable)
-- **Example**:
-  ```csharp
-  try
-  {
-      return await _repository.GetAllAsync();
-  }
-  catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
-  {
-      throw new InfrastructureException("Failed to retrieve patients.", ex);
-  }
-  ```
+Rosheta implements a centralized, type-safe error handling system compliant with Clean Architecture. It avoids "try-catch" noise in business logic by using **Domain Exceptions** and **Global Middleware**.
 
 ---
 
-## 2. Global Exception Handler Middleware
+## 2. Architecture Components
 
-Located in [`Presentation/Middleware/GlobalExceptionHandlerMiddleware.cs`](../../Presentation/Middleware/GlobalExceptionHandlerMiddleware.cs)
+### A. Custom Exception Hierarchy (`Rosheta.Core`)
 
-### Features
+Located in `Core/Application/Common/Exceptions/`. These are "Business Logic" errors, not "System" errors.
 
-- ✅ Centralized exception handling
-- ✅ Automatic logging of all exceptions
-- ✅ Different behavior for Development vs Production
-- ✅ Separate handling for API vs Razor Pages
-- ✅ User-friendly error messages
-- ✅ Request ID tracking for troubleshooting
+| Exception Type | HTTP Status | Usage Scenario |
+|----------------|-------------|----------------|
+| **`ValidationException`** | 400 Bad Request | User input failed business rules (e.g., "Name required"). |
+| **`NotFoundException`** | 404 Not Found | ID does not exist in DB (e.g., "Patient 99 not found"). |
+| **`BusinessRuleException`** | 422 Unprocessable | Logic violation (e.g., "Cannot cancel filled prescription"). |
+| **`InfrastructureException`** | 503 Unavailable | DB/File System failure (wrapped by Infrastructure layer). |
 
-### Exception to HTTP Status Code Mapping
+**Base Class:** `ApplicationException` (Inherits from `System.Exception`).
 
-| Exception Type | HTTP Status | Title | Production Message |
-|----------------|-------------|-------|-------------------|
-| `ValidationException` | 400 | Validation Error | Exception message |
-| `NotFoundException` | 404 | Resource Not Found | Exception message |
-| `BusinessRuleException` | 422 | Business Rule Violation | Exception message |
-| `InfrastructureException` | 503 | Service Unavailable | "A service error occurred. Please try again later." |
-| Other | 500 | Internal Server Error | "An unexpected error occurred. Please try again later." |
+### B. Global Middleware (`Rosheta.Web`)
 
-### API vs Razor Pages
+Located in `Presentation/Middleware/GlobalExceptionHandlerMiddleware.cs`.
 
-**For API Endpoints** (`/api/*`):
-- Returns JSON Problem Details (RFC 7807 compliant)
-- Includes: type, title, status, detail, instance, timestamp
-
-**For Razor Pages**:
-- Redirects to `/Error?statusCode={code}`
-- Shows user-friendly error page
-- Includes Request ID for support
+* **Role:** Intercepts ALL exceptions thrown during a request.
+* **Behavior:**
+  * **API Requests:** Returns JSON `ProblemDetails` (RFC 7807).
+  * **Page Requests:** Redirects to `/Error` page with a friendly message.
+  * **Logging:** Logs the full stack trace and Request ID automatically.
 
 ---
 
-## 3. Error Page
+## 3. Implementation Pattern
 
-Enhanced error page at [`Presentation/Pages/Error.cshtml`](../../Presentation/Pages/Error.cshtml)
+### Service Layer (`Rosheta.Core`)
 
-### Features
-
-- Dynamic error messages based on status code
-- Request ID display for troubleshooting
-- Quick action buttons (Dashboard, Go Back)
-- Status code-specific help (e.g., 404 shows common pages)
-- Bootstrap-styled, responsive design
-
----
-
-## 4. Service Layer Exception Handling
-
-All services in `Core/Application/Services/` implement consistent error handling:
-
-### Pattern
+Services **do not** catch exceptions unless they can fix them. They simply throw specific Domain Exceptions.
 
 ```csharp
-public async Task<Entity> GetByIdAsync(int id)
+public async Task<Patient> GetByIdAsync(int id)
 {
-    try
+    var patient = await _repo.GetByIdAsync(id);
+    if (patient == null)
     {
-        var entity = await _repository.GetByIdAsync(id);
-        
-        if (entity == null)
-        {
-            throw new NotFoundException(nameof(Entity), id);
-        }
-        
-        return entity;
+        // 1. Throw Domain Exception
+        throw new NotFoundException(nameof(Patient), id); 
     }
-    catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
-    {
-        throw new InfrastructureException("Failed to retrieve entity.", ex);
-    }
+    return patient;
 }
 ```
 
-### Key Points
+### Infrastructure Layer (`Rosheta.Infrastructure`)
 
-1. **Validate inputs** → throw `ValidationException`
-2. **Check entity existence** → throw `NotFoundException`
-3. **Enforce business rules** → throw `BusinessRuleException`
-4. **Wrap infrastructure errors** → throw `InfrastructureException`
-5. **Let custom exceptions bubble up** → use `when (ex is not ApplicationException)`
+Repositories catch low-level System Exceptions and wrap them if necessary, or let them bubble up.
+
+```csharp
+try 
+{
+    await File.WriteAllTextAsync(path, content);
+}
+catch (IOException ex)
+{
+    // 2. Wrap System Exception in Domain Exception
+    throw new InfrastructureException("Disk write failed", ex);
+}
+```
 
 ---
 
-## 5. Logging Configuration
+## 4. Logging Configuration
 
-### Production ([`appsettings.json`](../../appsettings.json))
+Logging is configured in the **Presentation Layer** (`Rosheta.Web`).
+
+### `appsettings.json` (Production)
 
 ```json
 {
@@ -181,163 +91,34 @@ public async Task<Entity> GetByIdAsync(int id)
 }
 ```
 
-### Development ([`appsettings.Development.json`](../../appsettings.Development.json))
+### `appsettings.Development.json` (Debug)
 
 ```json
 {
   "Logging": {
     "LogLevel": {
       "Default": "Debug",
-      "Microsoft.AspNetCore": "Information",
-      "Rosheta": "Debug",
-      "Rosheta.Presentation.Middleware": "Debug"
-    },
-    "Console": {
-      "IncludeScopes": true,
-      "TimestampFormat": "[yyyy-MM-dd HH:mm:ss] "
+      "Rosheta.Core": "Debug",
+      "Rosheta.Infrastructure": "Debug"
     }
   }
 }
 ```
 
-### Log Levels by Namespace
+---
 
-| Namespace | Production | Development |
-|-----------|-----------|-------------|
-| `Default` | Information | Debug |
-| `Rosheta.*` | Information | Debug |
-| `Microsoft.AspNetCore` | Warning | Information |
-| `Microsoft.EntityFrameworkCore` | - | Information |
+## 5. Troubleshooting Guide
+
+### Issue: "Error Page shows generic message"
+
+* **Cause:** The exception thrown was not one of the custom types (`ApplicationException`), so the middleware treated it as a generic 500 Server Error to prevent leaking sensitive info.
+* **Fix:** Ensure your Service throws `ValidationException` or `BusinessRuleException` for known error states.
+
+### Issue: "Logs are empty"
+
+* **Cause:** Incorrect LogLevel in `appsettings.json`.
+* **Fix:** Ensure `Rosheta` namespace is set to `Information` or `Debug`.
 
 ---
 
-## Best Practices
-
-### ✅ DO
-
-- **Use specific exception types** for different error scenarios
-- **Include meaningful error messages** that help users understand what went wrong
-- **Log exceptions at appropriate levels** (Error for unexpected, Warning for validation)
-- **Provide Request IDs** for troubleshooting production issues
-- **Hide sensitive information** in production error messages
-- **Validate early** in service methods before touching infrastructure
-- **Wrap infrastructure exceptions** to provide context
-
-### ❌ DON'T
-
-- **Don't catch exceptions without rethrowing or logging**
-  ```csharp
-  // BAD
-  try { /* code */ } catch { }
-  
-  // GOOD
-  try { /* code */ } catch (Exception ex) { _logger.LogError(ex, "..."); throw; }
-  ```
-
-- **Don't use generic `Exception` in throw statements**
-  ```csharp
-  // BAD
-  throw new Exception("Something failed");
-  
-  // GOOD
-  throw new ValidationException("Patient name is required.");
-  ```
-
-- **Don't expose sensitive data in error messages**
-  ```csharp
-  // BAD
-  throw new Exception($"Database connection failed: {connectionString}");
-  
-  // GOOD
-  throw new InfrastructureException("Database connection failed.");
-  ```
-
-- **Don't log sensitive information**
-  - Passwords, license keys, personal data, connection strings
-
----
-
-## Testing Error Scenarios
-
-### 1. Trigger a 404 Error
-Navigate to a non-existent page:
-```
-https://localhost:5001/NonExistentPage
-```
-
-### 2. Trigger a Validation Error
-Try to create a patient with missing required fields:
-```csharp
-var patient = new Patient { Name = "", ContactInfo = "" };
-await _patientService.AddPatientAsync(patient);
-```
-
-### 3. Trigger a Not Found Error
-Try to get a non-existent entity:
-```csharp
-await _patientService.GetPatientByIdAsync(99999);
-```
-
-### 4. Trigger a Business Rule Error
-Try to cancel an already-filled prescription:
-```csharp
-await _prescriptionService.CancelPrescriptionAsync(alreadyFilledId);
-```
-
----
-
-## Troubleshooting
-
-### Error Page Not Showing
-
-1. Check that middleware is registered in [`Program.cs`](../../Program.cs):
-   ```csharp
-   app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
-   ```
-
-2. Verify error page exists at `Presentation/Pages/Error.cshtml`
-
-### Exceptions Not Being Caught
-
-1. Ensure you're throwing custom exceptions (not `System.Exception`)
-2. Check middleware order in `Program.cs`
-3. Verify exception type matches one in the middleware's switch statement
-
-### Logs Not Appearing
-
-1. Check `appsettings.json` log levels
-2. Ensure logger is injected in service constructor
-3. Verify log level is appropriate (Debug, Info, Warning, Error)
-
----
-
-## Future Enhancements
-
-- [ ] Add structured logging with Serilog
-- [ ] Implement log file rotation
-- [ ] Add Application Insights integration
-- [ ] Create error analytics dashboard
-- [ ] Add custom error pages for specific status codes (401, 403)
-- [ ] Implement retry policies for transient failures
-- [ ] Add correlation IDs for distributed tracing
-
----
-
-## References
-
-- [ASP.NET Core Error Handling](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/error-handling)
-- [Logging in .NET](https://docs.microsoft.com/en-us/dotnet/core/extensions/logging)
-- [RFC 7807 - Problem Details](https://tools.ietf.org/html/rfc7807)
-- [Exception Best Practices](https://docs.microsoft.com/en-us/dotnet/standard/exceptions/best-practices-for-exceptions)
-
----
-
-## Support
-
-For questions or issues related to error handling:
-1. Check this documentation
-2. Review the exception hierarchy in `Core/Application/Common/Exceptions/`
-3. Examine middleware implementation in `Presentation/Middleware/`
-4. Test with development environment for detailed error messages
-
-**Last Updated**: 2025-01-13
+**Note:** In Phase 2, we plan to implement **Structured Logging** (Serilog) to export logs to files or external systems.

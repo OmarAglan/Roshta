@@ -1,68 +1,55 @@
-# Presentation Layer
+# 🟠 Rosheta.Web
 
-This layer contains all **UI-related code** for the ASP.NET Core Razor Pages application.
+**Layer:** Presentation (User Interface)
+**Type:** ASP.NET Core 9.0 Web Application
+**Dependencies:** `Rosheta.Core`, `Rosheta.Infrastructure`
 
-## Structure
+## 📖 Overview
 
-### Pages (`Presentation/Pages/`)
-Contains **Razor Pages** (.cshtml) and their **PageModels** (.cshtml.cs).
+This project is the **Entry Point** and **Composition Root** of the application. It contains the UI logic (Razor Pages), static assets (CSS/JS), and the application startup configuration. It is responsible for interacting with the user and delegating business logic to the Core layer.
 
-**Organization:**
-- Root pages (Index, Privacy, Activate, Error)
-- **`DoctorProfile/`** - Doctor profile management pages
-- **`Medications/`** - Medication CRUD pages
-- **`Patients/`** - Patient CRUD pages
-- **`Prescriptions/`** - Prescription management pages
-- **`Shared/`** - Shared layouts and partial views
+## 📂 Structure
 
-### Filters (`Presentation/Filters/`)
-Contains **action filters** and **page filters**.
+### 1. Root Components
 
-- **`ActivationCheckPageFilter.cs`** - Global filter for license activation check
+* **`Program.cs`**: The application entry point. It wires together the `Core` and `Infrastructure` layers using their dependency injection extensions.
+* **`appsettings.json`**: Configuration file (Connection strings, Logging, License settings).
 
-### ViewModels (`Presentation/ViewModels/`)
-Contains **view-specific models** (if needed for complex UI scenarios).
+### 2. Pages (`/Pages`)
 
-**Note:** Most DTOs are in `Core/Application/DTOs/` for reusability.
+Contains the Razor Pages (`.cshtml` and `.cshtml.cs`). Organized by feature:
 
-### wwwroot (`Presentation/wwwroot/`)
-Contains **static files**.
+* **`DoctorProfile/`**: Setup and Edit profile logic.
+* **`Patients/`**: CRUD operations for patients.
+* **`Prescriptions/`**: Prescription management.
+* **`Shared/`**: Layouts (`_Layout.cshtml`) and partial views.
 
-- **`css/`** - Stylesheets
-- **`js/`** - JavaScript files (live-search, validation, etc.)
-- **`lib/`** - Client-side libraries (Bootstrap, jQuery, etc.)
+### 3. Middleware (`/Middleware`)
 
-## Key Responsibilities
+* **`GlobalExceptionHandlerMiddleware.cs`**: Catches specific Domain Exceptions thrown by the Core layer (e.g., `ValidationException`) and converts them into user-friendly responses or error pages.
 
-1. **User Interface** - Render HTML pages using Razor syntax
-2. **User Input** - Handle form submissions and validation
-3. **Navigation** - Route handling and page flow
-4. **Client-side Logic** - JavaScript for interactive features
+### 4. Filters (`/Filters`)
 
-## Dependencies
+* **`ActivationCheckPageFilter.cs`**: Enforces license activation rules across the application.
 
-- **Depends on:** Core.Application layer (for services and DTOs)
-- **Does NOT depend on:** Infrastructure layer (uses DI for services)
+### 5. Static Assets (`/wwwroot`)
 
-## Namespace Convention
+Standard ASP.NET Core static files:
 
-Due to ASP.NET Core Razor Pages constraints with custom `RootDirectory`, namespaces use the following pattern:
-- Root pages: `Rosheta.Pages`
-- Feature pages: `Rosheta.Pages_{Feature}` (e.g., `Rosheta.Pages_Medications`)
-- Filters: `Rosheta.Filters`
+* `css/`: Stylesheets (Bootstrap, Custom site.css).
+* `js/`: JavaScript logic (Validation helpers, Live Search, Advanced Tables).
+* `lib/`: Third-party libraries.
 
-**Note:** The underscore naming is a Razor compiler requirement when using custom root directories.
+## 🛡️ Architectural Rules
 
-## Important Notes
+1. **Passive View:** The PageModels should contain minimal business logic. They should validate input, call a Service in `Rosheta.Core`, and render the result.
+2. **No Direct Data Access:** Razor Pages must **never** inject `DbContext` or Repositories directly. They must use **Services** (e.g., `IDoctorService`).
+3. **Composition Root:** `Program.cs` is the only place allowed to know about all layers to wire them together.
 
-- **Razor Pages Configuration:** The `RootDirectory` is set to `/Presentation/Pages` in `Program.cs`
-- **Static Files:** Served from `Presentation/wwwroot` via custom configuration
-- **Filters:** Global filters are registered in `Program.cs`
-- **View Imports:** Common namespaces are defined in `_ViewImports.cshtml`
+## 🚀 How to Run
 
-## Future Considerations
+This is the startup project.
 
-When migrating to .NET MAUI:
-- This layer will be replaced with MAUI views
-- Business logic in PageModels should be minimal (delegate to services)
-- Keep UI logic separate from application logic for easier migration
+```bash
+dotnet run --project Presentation/Rosheta.Web.csproj
+```

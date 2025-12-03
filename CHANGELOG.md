@@ -4,6 +4,34 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.9.9.11] - 2025-12-03
+
+### 🏗️ Architectural Overhaul (Clean Architecture)
+
+This release represents a complete structural rewrite of the solution to strictly adhere to **Clean Architecture** principles.
+
+### Changed
+
+* **Project Structure:** Split the monolithic `Rosheta.csproj` into three physical projects:
+  * **`Rosheta.Core`**: Domain entities, Interfaces, and Business Logic (Zero dependencies).
+  * **`Rosheta.Infrastructure`**: EF Core Data Access, File Storage, and External Adapters.
+  * **`Rosheta.Web`**: The ASP.NET Core Razor Pages presentation layer.
+* **Dependency Injection:** Replaced manual registration in `Program.cs` with specific Extension Methods (`AddApplicationServices`, `AddInfrastructureServices`) to enforce the Open/Closed principle.
+* **Namespace Standardization:** Unified all namespaces to `Rosheta.*` to match the directory structure.
+* **Documentation:** Restructured documentation into a centralized `docs/` folder with a comprehensive `DEVELOPER_GUIDE.md`.
+
+### Added
+
+* **Unit Testing Project:** Added `Rosheta.UnitTests` using xUnit, Moq, and FluentAssertions.
+* **Service Tests:** Implemented initial unit test coverage for `DoctorService`, `PatientService`, and `PrescriptionService` covering critical business logic and validation.
+* **Domain Exceptions:** Introduced strongly-typed exceptions (`ValidationException`, `NotFoundException`, etc.) to replace generic exceptions.
+* **Global Exception Middleware:** Centralized error handling pipeline to catch domain exceptions and render appropriate HTTP responses.
+
+### Removed
+
+* **Root Clutter:** Moved `ARCH_*.md` files to `docs/architecture/`.
+* **Circular Dependencies:** Eliminated direct references between Data Repositories and Web PageModels.
+
 ## [0.9.9.10] - 2025-06-18
 
 ### Added

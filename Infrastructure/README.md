@@ -1,47 +1,57 @@
-# Infrastructure Layer
+# 🔵 Rosheta.Infrastructure
 
-This layer contains **concrete implementations** of the abstractions defined in the Core layer, handling all **external dependencies** and **technical concerns**.
+**Layer:** Infrastructure (Interface Adapters)
+**Type:** Class Library (.NET 9.0)
+**Dependencies:** `Rosheta.Core`, `Microsoft.EntityFrameworkCore.Sqlite`
 
-## Structure
+## 📖 Overview
 
-### Data (`Infrastructure/Data/`)
-Contains **database-related** implementations.
+This project contains the **concrete implementations** of the interfaces defined in `Rosheta.Core`. It handles all "messy" external concerns like database connections, file I/O, and third-party integrations.
 
-- **`ApplicationDbContext.cs`** - Entity Framework Core DbContext
-- **`Repositories/`** - Repository implementations (DoctorRepository, PatientRepository, etc.)
-- **`Configurations/`** - Entity Framework entity configurations (for future use)
+## 📂 Structure
 
-**Technologies:** Entity Framework Core, SQLite
+### 1. Data (`/Data`)
 
-### Storage (`Infrastructure/Storage/`)
-Contains **file storage** implementations.
+Contains the persistence logic.
 
-- **`LocalFileStorageProvider.cs`** - Local file system storage implementation
-- **`Interfaces/`** - Storage-specific interfaces (if needed)
+* **`ApplicationDbContext.cs`**: The EF Core Context. It maps the Domain Entities to SQLite tables.
+* **`Repositories/`**: Implementation of Core interfaces (`DoctorRepository`, `PatientRepository`). These classes use the `DbContext` to fetch/save data.
+* **`Migrations/`**: The history of database schema changes.
 
-**Technologies:** System.IO, ASP.NET Core file handling
+### 2. Storage (`/Storage`)
 
-## Key Responsibilities
+Contains file system logic.
 
-1. **Data Access** - Implement repository interfaces using Entity Framework Core
-2. **File Storage** - Implement file storage providers (local, cloud, etc.)
-3. **External Services** - Any third-party service integrations
-4. **Technical Infrastructure** - Logging, caching, email, etc. (when added)
+* **`LocalFileStorageProvider.cs`**: Implements `IFileStorageProvider`. Uses `System.IO` to read/write files to the user's local application data folder.
 
-## Dependencies
+### 3. DependencyInjection.cs
 
-- **Depends on:** Core layer (for interfaces and entities)
-- **External packages:** Entity Framework Core, database providers, etc.
+The `AddInfrastructureServices()` extension method. This is where the `DbContext` is configured and where Repositories are registered as Scoped services.
 
-## Namespace Convention
+## 🛠️ Usage Guides
 
-All code in this layer uses the `Rosheta.Infrastructure.*` namespace pattern:
-- Data: `Rosheta.Infrastructure.Data.*`
-- Storage: `Rosheta.Infrastructure.Storage.*`
+### Running Migrations
 
-## Important Notes
+Because the `DbContext` lives here but the *Startup Project* is `Rosheta.Web`, you must specify paths explicitly:
 
-- **Never reference the Presentation layer** from Infrastructure
-- All database configurations should eventually move to `Data/Configurations/`
-- Follow the Repository pattern for data access
-- Use dependency injection for all infrastructure services
+**Create Migration:**
+
+```bash
+dotnet ef migrations add <Name> -p Infrastructure/Rosheta.Infrastructure.csproj -s Presentation/Rosheta.Web.csproj
+```
+
+**Update Database:**
+
+```bash
+dotnet ef database update -p Infrastructure/Rosheta.Infrastructure.csproj -s Presentation/Rosheta.Web.csproj
+```
+
+### Adding a New Repository
+
+1. Define the Interface in `Rosheta.Core`.
+2. Implement the class here in `Infrastructure/Data/Repositories`.
+3. Register it in `DependencyInjection.cs`:
+
+    ```csharp
+    services.AddScoped<IMyRepository, MyRepository>();
+    ```
