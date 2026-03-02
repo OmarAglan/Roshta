@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Core\Rosheta.Core.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Rosheta.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
