@@ -54,16 +54,16 @@ namespace Rosheta.Pages_Patients
             var patient = await _patientService.GetPatientByIdAsync(id.Value);
             var patientName = patient?.Name ?? $"ID {id.Value}"; // Fallback to ID if name not found
 
-            var deleted = await _patientService.DeletePatientAsync(id.Value);
+            var deleteResult = await _patientService.DeletePatientResultAsync(id.Value);
 
-            if (deleted)
+            if (deleteResult.IsSuccess)
             {
                 TempData["SuccessMessage"] = $"Patient '{patientName}' deleted successfully.";
             }
             else
             {
                 // This might happen if the patient was deleted between OnGet and OnPost, or DB error
-                TempData["ErrorMessage"] = $"Could not delete patient '{patientName}'. Please try again or contact support.";
+                TempData["ErrorMessage"] = deleteResult.ErrorMessage;
             }
 
             return RedirectToPage("./Index");

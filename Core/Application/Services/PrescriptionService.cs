@@ -5,6 +5,9 @@ using Rosheta.Core.Application.DTOs;
 using Rosheta.Core.Application.DTOs.Doctor;
 using Rosheta.Core.Application.Models;
 using Rosheta.Core.Application.Common.Exceptions;
+using Rosheta.Core.Application.Common.Persistence;
+using Rosheta.Core.Application.Common.Results;
+using Rosheta.Core.Application.Common.Validation;
 using Microsoft.Extensions.Logging;
 using Rosheta.Core.Domain.Enums;
 
@@ -13,35 +16,51 @@ namespace Rosheta.Core.Application.Services;
 public class PrescriptionService : IPrescriptionService
 {
     private readonly IPrescriptionRepository _prescriptionRepository;
-    private readonly IPatientRepository _patientRepository; // To validate PatientId
-    // private readonly IDoctorRepository _doctorRepository; // Needed later when we have Doctor repo
-    // Potentially IMedicationRepository if validation is needed here
+    private readonly IPatientRepository _patientRepository;
     private readonly ILogger<PrescriptionService> _logger;
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IValidationService _validationService;
 
     public PrescriptionService(IPrescriptionRepository prescriptionRepository,
                                IPatientRepository patientRepository,
                                ILogger<PrescriptionService> logger)
+        : this(prescriptionRepository, patientRepository, logger, new NoOpUnitOfWork(), new NoOpValidationService())
     {
-        _prescriptionRepository = prescriptionRepository;
-        _patientRepository = patientRepository;
-        _logger = logger;
     }
 
-    public async Task<Prescription?> CreatePrescriptionAsync(PrescriptionCreateModel model, int doctorId)
+    public PrescriptionService(
+        IPrescriptionRepository prescriptionRepository,
+        IPatientRepository patientRepository,
+        ILogger<PrescriptionService> logger,
+        IUnitOfWork unitOfWork,
+        IValidationService validationService)
     {
-        // Map ViewModel to Model
+        _prescriptionRepository = prescriptionRepository;
+        _patientRepository = patientRepository; 
+        _logger = logger;
+        _unitOfWork = unitOfWork;
+        _validationService = validationService;
+    }
+
+    public async Task<Result<Prescription>> CreatePrescriptionResultAsync(PrescriptionCreateModel model, int doctorId)
+    {
+        var validation = await _validationService.ValidateAsync(model);
+        if (validation.IsFailure)
+        {
+            return Result<Prescription>.Failure(validation.ErrorCode, validation.ErrorMessage);
+        }
+
         var prescription = new Prescription
         {
             PatientId = model.PatientId,
-            DoctorId = doctorId, // Use the ID passed from the license service
-            DateIssued = DateTime.UtcNow, // Set issue date on creation
+            DoctorId = doctorId,
+            DateIssued = DateTime.UtcNow,
             ExpiryDate = model.ExpiryDate,
             NextAppointmentDate = model.NextAppointmentDate,
-            Status = PrescriptionStatus.Active, // Default status
+            Status = PrescriptionStatus.Active,
             PrescriptionItems = new List<PrescriptionItem>()
         };
 
-        // Add PrescriptionItems
         foreach (var itemModel in model.Items)
         {
             if (itemModel.MedicationId > 0 && !string.IsNullOrWhiteSpace(itemModel.Instructions))
@@ -53,31 +72,40 @@ public class PrescriptionService : IPrescriptionService
                     Frequency = itemModel.Frequency,
                     Duration = itemModel.Duration,
                     Instructions = itemModel.Instructions,
-                    Prescription = prescription // Link back to parent
+                    Quantity = itemModel.Quantity,
+                    Refills = itemModel.Refills,
+                    Notes = itemModel.Notes,
+                    Prescription = prescription
                 });
             }
         }
 
-        // Validate
-        if (!prescription.PrescriptionItems.Any())
-        {
-            throw new ValidationException("Prescription must have at least one medication item.");
-        }
-
-        // Verify patient exists
         if (!await _patientRepository.ExistsAsync(prescription.PatientId))
         {
-            throw new NotFoundException(nameof(Patient), prescription.PatientId);
+            return Result<Prescription>.Failure("NotFound", $"Entity \"Patient\" with key ({prescription.PatientId}) was not found.");
         }
 
         try
         {
-            return await _prescriptionRepository.AddAsync(prescription);
+            var created = await _prescriptionRepository.AddAsync(prescription);
+            await _unitOfWork.SaveChangesAsync();
+            return Result<Prescription>.Success(created);
         }
-        catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
+        catch (Exception ex)
         {
-            throw new InfrastructureException("Failed to create prescription.", ex);
+            return Result<Prescription>.Failure("Infrastructure", $"Failed to create prescription. {ex.Message}");
         }
+    }
+
+    public async Task<Prescription?> CreatePrescriptionAsync(PrescriptionCreateModel model, int doctorId)
+    {
+        var result = await CreatePrescriptionResultAsync(model, doctorId);
+        if (result.IsSuccess)
+        {
+            return result.Value;
+        }
+
+        throw ToException(result);
     }
 
     public async Task<IEnumerable<Prescription>> GetAllPrescriptionsAsync()
@@ -125,35 +153,46 @@ public class PrescriptionService : IPrescriptionService
 
     public async Task<bool> CancelPrescriptionAsync(int prescriptionId)
     {
+        var result = await CancelPrescriptionResultAsync(prescriptionId);
+        if (result.IsSuccess)
+        {
+            return true;
+        }
+
+        throw ToException(result);
+    }
+
+    public async Task<Result> CancelPrescriptionResultAsync(int prescriptionId)
+    {
         _logger.LogInformation("Attempting to cancel prescription ID {PrescriptionId}", prescriptionId);
 
-        // Verify prescription exists and get its status
         var prescription = await _prescriptionRepository.GetByIdAsync(prescriptionId);
-
         if (prescription == null)
         {
-            throw new NotFoundException(nameof(Prescription), prescriptionId);
+            return Result.Failure("NotFound", $"Entity \"Prescription\" with key ({prescriptionId}) was not found.");
         }
-
-        // Business rule: can't cancel already cancelled prescriptions
         if (prescription.Status == PrescriptionStatus.Cancelled)
         {
-            throw new BusinessRuleException("Cannot cancel a prescription that is already cancelled.");
+            return Result.Failure("BusinessRule", "Cannot cancel a prescription that is already cancelled.");
         }
-
-        // Business rule: can't cancel filled prescriptions
         if (prescription.Status == PrescriptionStatus.Filled)
         {
-            throw new BusinessRuleException("Cannot cancel a prescription that has been filled.");
+            return Result.Failure("BusinessRule", "Cannot cancel a prescription that has been filled.");
         }
 
         try
         {
-            return await _prescriptionRepository.CancelAsync(prescriptionId);
+            var canceled = await _prescriptionRepository.CancelAsync(prescriptionId);
+            if (!canceled)
+            {
+                return Result.Failure("NotFound", $"Entity \"Prescription\" with key ({prescriptionId}) was not found.");
+            }
+            await _unitOfWork.SaveChangesAsync();
+            return Result.Success();
         }
-        catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
+        catch (Exception ex)
         {
-            throw new InfrastructureException("Failed to cancel prescription.", ex);
+            return Result.Failure("Infrastructure", $"Failed to cancel prescription. {ex.Message}");
         }
     }
 
@@ -186,4 +225,22 @@ public class PrescriptionService : IPrescriptionService
     }
 
     // ---------------------------------------------
+
+    private static Exception ToException(Result result)
+    {
+        if (result.ErrorCode == "Validation")
+        {
+            return new ValidationException(result.ErrorMessage);
+        }
+        if (result.ErrorCode == "BusinessRule")
+        {
+            return new BusinessRuleException(result.ErrorMessage);
+        }
+        if (result.ErrorCode == "NotFound")
+        {
+            return new NotFoundException(result.ErrorMessage);
+        }
+
+        return new InfrastructureException(result.ErrorMessage);
+    }
 }

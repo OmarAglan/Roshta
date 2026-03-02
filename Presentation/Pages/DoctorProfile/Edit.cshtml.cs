@@ -123,41 +123,33 @@ public class EditModel : PageModel, IValidatableObject
             return Page(); // Re-display the form with validation errors
         }
 
-        try
+        // Map the Input Model to DTO
+        var updateDto = new UpdateDoctorProfileDto
         {
-            // Map the Input Model to DTO
-            var updateDto = new UpdateDoctorProfileDto
-            {
-                Name = DoctorProfile.Name,
-                Specialization = DoctorProfile.Specialization ?? string.Empty,
-                LicenseNumber = DoctorProfile.LicenseNumber ?? string.Empty,
-                Phone = DoctorProfile.ContactPhone ?? string.Empty,
-                Email = DoctorProfile.ContactEmail ?? string.Empty
-            };
+            Name = DoctorProfile.Name,
+            Specialization = DoctorProfile.Specialization ?? string.Empty,
+            LicenseNumber = DoctorProfile.LicenseNumber ?? string.Empty,
+            Phone = DoctorProfile.ContactPhone ?? string.Empty,
+            Email = DoctorProfile.ContactEmail ?? string.Empty
+        };
 
-            bool success = await _doctorService.UpdateDoctorProfileAsync(currentDoctorId.Value, updateDto);
-
-            if (success)
-            {
-                _logger.LogInformation("Doctor profile updated successfully for Doctor ID: {DoctorId}", currentDoctorId.Value);
-                TempData["SuccessMessage"] = "Profile updated successfully!";
-                // It's good practice to redirect after POST to prevent re-submission
-                // Redirect back to the same page to show the success message and updated data
-                return RedirectToPage();
-            }
-            else
-            {
-                _logger.LogWarning("UpdateDoctorProfileAsync returned false for Doctor ID: {DoctorId}", currentDoctorId.Value);
-                ModelState.AddModelError(string.Empty, "Could not update the profile. The data might be invalid or unchanged.");
-                return Page();
-            }
-        }
-        catch (Exception ex)
+        var result = await _doctorService.UpdateDoctorProfileResultAsync(currentDoctorId.Value, updateDto);
+        if (result.IsFailure)
         {
-            _logger.LogError(ex, "Error updating doctor profile for Doctor ID: {DoctorId}", currentDoctorId.Value);
-            ModelState.AddModelError(string.Empty, "An error occurred while saving the profile. Please try again.");
+            _logger.LogWarning(
+                "Doctor profile update failed for Doctor ID: {DoctorId}. Code: {ErrorCode}, Message: {ErrorMessage}",
+                currentDoctorId.Value,
+                result.ErrorCode,
+                result.ErrorMessage);
+            ModelState.AddModelError(string.Empty, result.ErrorMessage);
             return Page();
         }
+
+        _logger.LogInformation("Doctor profile updated successfully for Doctor ID: {DoctorId}", currentDoctorId.Value);
+        TempData["SuccessMessage"] = "Profile updated successfully!";
+        // It's good practice to redirect after POST to prevent re-submission
+        // Redirect back to the same page to show the success message and updated data
+        return RedirectToPage();
     }
 
     public async Task<IActionResult> OnPostSaveSettingsAsync()

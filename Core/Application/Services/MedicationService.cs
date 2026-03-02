@@ -2,16 +2,31 @@ using Rosheta.Core.Domain.Entities;
 using Rosheta.Core.Application.Contracts.Persistence;
 using Rosheta.Core.Application.Contracts.Services;
 using Rosheta.Core.Application.Common.Exceptions;
+using Rosheta.Core.Application.Common.Persistence;
+using Rosheta.Core.Application.Common.Results;
+using Rosheta.Core.Application.Common.Validation;
 
 namespace Rosheta.Core.Application.Services;
 
 public class MedicationService : IMedicationService
 {
     private readonly IMedicationRepository _medicationRepository;
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IValidationService _validationService;
 
     public MedicationService(IMedicationRepository medicationRepository)
+        : this(medicationRepository, new NoOpUnitOfWork(), new NoOpValidationService())
+    {
+    }
+
+    public MedicationService(
+        IMedicationRepository medicationRepository,
+        IUnitOfWork unitOfWork,
+        IValidationService validationService)
     {
         _medicationRepository = medicationRepository;
+        _unitOfWork = unitOfWork;
+        _validationService = validationService;
     }
 
     public async Task<IEnumerable<Medication>> GetAllMedicationsAsync()
@@ -59,78 +74,110 @@ public class MedicationService : IMedicationService
 
     public async Task<Medication> AddMedicationAsync(Medication medication)
     {
-        // Validation
-        if (string.IsNullOrWhiteSpace(medication.Name))
+        var result = await AddMedicationResultAsync(medication);
+        if (result.IsSuccess && result.Value != null)
         {
-            throw new ValidationException("Medication name is required.");
+            return result.Value;
         }
 
-        // Check uniqueness
+        throw ToException(result);
+    }
+
+    public async Task<Result<Medication>> AddMedicationResultAsync(Medication medication)
+    {
+        var validation = await _validationService.ValidateAsync(medication);
+        if (validation.IsFailure)
+        {
+            return Result<Medication>.Failure(validation.ErrorCode, validation.ErrorMessage);
+        }
+
         if (!await _medicationRepository.IsNameUniqueAsync(medication.Name))
         {
-            throw new BusinessRuleException($"A medication with the name '{medication.Name}' already exists.");
+            return Result<Medication>.Failure("BusinessRule", $"A medication with the name '{medication.Name}' already exists.");
         }
 
         try
         {
-            return await _medicationRepository.AddAsync(medication);
+            var created = await _medicationRepository.AddAsync(medication);
+            await _unitOfWork.SaveChangesAsync();
+            return Result<Medication>.Success(created);
         }
-        catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
+        catch (Exception ex)
         {
-            throw new InfrastructureException("Failed to add medication.", ex);
+            return Result<Medication>.Failure("Infrastructure", $"Failed to add medication. {ex.Message}");
         }
     }
 
     public async Task<Medication?> UpdateMedicationAsync(Medication medication)
     {
-        // Validation
-        if (string.IsNullOrWhiteSpace(medication.Name))
+        var result = await UpdateMedicationResultAsync(medication);
+        if (result.IsSuccess)
         {
-            throw new ValidationException("Medication name is required.");
+            return result.Value;
         }
 
-        // Check if medication exists
+        throw ToException(result);
+    }
+
+    public async Task<Result<Medication>> UpdateMedicationResultAsync(Medication medication)
+    {
+        var validation = await _validationService.ValidateAsync(medication);
+        if (validation.IsFailure)
+        {
+            return Result<Medication>.Failure(validation.ErrorCode, validation.ErrorMessage);
+        }
+
         if (!await _medicationRepository.ExistsAsync(medication.Id))
         {
-            throw new NotFoundException(nameof(Medication), medication.Id);
+            return Result<Medication>.Failure("NotFound", $"Entity \"Medication\" with key ({medication.Id}) was not found.");
         }
 
-        // Check uniqueness (excluding self)
         if (!await _medicationRepository.IsNameUniqueAsync(medication.Name, medication.Id))
         {
-            throw new BusinessRuleException($"A medication with the name '{medication.Name}' already exists.");
+            return Result<Medication>.Failure("BusinessRule", $"A medication with the name '{medication.Name}' already exists.");
         }
 
         try
         {
-            // NEW: Generic Repository Update returns void (Task)
             await _medicationRepository.UpdateAsync(medication);
-            return medication;
+            await _unitOfWork.SaveChangesAsync();
+            return Result<Medication>.Success(medication);
         }
-        catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
+        catch (Exception ex)
         {
-            throw new InfrastructureException("Failed to update medication.", ex);
+            return Result<Medication>.Failure("Infrastructure", $"Failed to update medication. {ex.Message}");
         }
     }
 
     public async Task<bool> DeleteMedicationAsync(int id)
     {
+        var result = await DeleteMedicationResultAsync(id);
+        if (result.IsSuccess)
+        {
+            return true;
+        }
+
+        throw ToException(result);
+    }
+
+    public async Task<Result> DeleteMedicationResultAsync(int id)
+    {
         try
         {
-            // NEW: We must fetch the entity first because the Generic Delete takes an Entity
             var medication = await _medicationRepository.GetByIdAsync(id);
 
             if (medication == null)
             {
-                throw new NotFoundException(nameof(Medication), id);
+                return Result.Failure("NotFound", $"Entity \"Medication\" with key ({id}) was not found.");
             }
 
             await _medicationRepository.DeleteAsync(medication);
-            return true;
+            await _unitOfWork.SaveChangesAsync();
+            return Result.Success();
         }
-        catch (Exception ex) when (ex is not Rosheta.Core.Application.Common.Exceptions.ApplicationException)
+        catch (Exception ex)
         {
-            throw new InfrastructureException("Failed to delete medication.", ex);
+            return Result.Failure("Infrastructure", $"Failed to delete medication. {ex.Message}");
         }
     }
 
@@ -180,5 +227,23 @@ public class MedicationService : IMedicationService
         {
             throw new InfrastructureException("Failed to count medications.", ex);
         }
+    }
+
+    private static Exception ToException(Result result)
+    {
+        if (result.ErrorCode == "Validation")
+        {
+            return new ValidationException(result.ErrorMessage);
+        }
+        if (result.ErrorCode == "BusinessRule")
+        {
+            return new BusinessRuleException(result.ErrorMessage);
+        }
+        if (result.ErrorCode == "NotFound")
+        {
+            return new NotFoundException(result.ErrorMessage);
+        }
+
+        return new InfrastructureException(result.ErrorMessage);
     }
 }

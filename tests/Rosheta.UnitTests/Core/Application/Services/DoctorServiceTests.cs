@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Moq;
 using Rosheta.Core.Application.Common.Exceptions;
+using Rosheta.Core.Application.Common.Validation;
 using Rosheta.Core.Application.Contracts.Persistence;
 using Rosheta.Core.Application.DTOs.Doctor;
 using Rosheta.Core.Application.Services;
@@ -12,12 +13,20 @@ namespace Rosheta.UnitTests.Core.Application.Services;
 public class DoctorServiceTests
 {
     private readonly Mock<IDoctorRepository> _repoMock;
+    private readonly Mock<IUnitOfWork> _unitOfWorkMock;
+    private readonly IValidationService _validationService;
     private readonly DoctorService _service;
 
     public DoctorServiceTests()
     {
         _repoMock = new Mock<IDoctorRepository>();
-        _service = new DoctorService(_repoMock.Object);
+        _unitOfWorkMock = new Mock<IUnitOfWork>();
+        _unitOfWorkMock
+            .Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(1);
+        _validationService = TestValidationServiceFactory.Create();
+
+        _service = new DoctorService(_repoMock.Object, _unitOfWorkMock.Object, _validationService);
     }
 
     [Fact]
@@ -46,6 +55,7 @@ public class DoctorServiceTests
         result.Should().Be(newDoctor);
         _repoMock.Verify(r => r.AddAsync(newDoctor), Times.Once);
         _repoMock.Verify(r => r.UpdateAsync(It.IsAny<Doctor>()), Times.Never);
+        _unitOfWorkMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -68,6 +78,7 @@ public class DoctorServiceTests
         result.Name.Should().Be("Dr. House Updated"); // Should update name
         _repoMock.Verify(r => r.UpdateAsync(existingDoctor), Times.Once);
         _repoMock.Verify(r => r.AddAsync(It.IsAny<Doctor>()), Times.Never);
+        _unitOfWorkMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -125,6 +136,7 @@ public class DoctorServiceTests
         existing.Name.Should().Be("New");
         existing.Specialization.Should().Be("Cardiology");
         _repoMock.Verify(r => r.UpdateAsync(existing), Times.Once);
+        _unitOfWorkMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -135,6 +147,6 @@ public class DoctorServiceTests
         Func<Task> act = async () => await _service.UpdateDoctorProfileAsync(1, dto);
 
         await act.Should().ThrowAsync<ValidationException>()
-            .WithMessage("Doctor specialization is required.");
+            .WithMessage("*Doctor specialization is required.*");
     }
 }

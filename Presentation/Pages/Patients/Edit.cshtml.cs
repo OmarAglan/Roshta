@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using Rosheta.Infrastructure.Data;
 using Rosheta.Core.Domain.Entities;
 using Rosheta.Core.Application.Contracts.Services;
@@ -71,20 +70,16 @@ namespace Rosheta.Pages_Patients
                 return Page();
             }
 
-            try
+            var updateResult = await _patientService.UpdatePatientResultAsync(Patient);
+            if (updateResult.IsFailure)
             {
-                await _patientService.UpdatePatientAsync(Patient);
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!await PatientExistsAsync(Patient.Id))
+                if (updateResult.ErrorCode == "NotFound")
                 {
                     return NotFound();
                 }
-                else
-                {
-                    throw;
-                }
+
+                ModelState.AddModelError(string.Empty, updateResult.ErrorMessage);
+                return Page();
             }
 
             // Add success message before redirecting

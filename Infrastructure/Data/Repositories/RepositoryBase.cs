@@ -35,20 +35,19 @@ public class RepositoryBase<T> : IRepository<T> where T : BaseEntity
     public virtual async Task<T> AddAsync(T entity)
     {
         await _dbSet.AddAsync(entity);
-        await _dbContext.SaveChangesAsync();
         return entity;
     }
 
     public virtual async Task UpdateAsync(T entity)
     {
         _dbContext.Entry(entity).State = EntityState.Modified;
-        await _dbContext.SaveChangesAsync();
+        await Task.CompletedTask;
     }
 
     public virtual async Task DeleteAsync(T entity)
     {
         _dbSet.Remove(entity);
-        await _dbContext.SaveChangesAsync();
+        await Task.CompletedTask;
     }
 
     public virtual async Task<bool> ExistsAsync(int id)

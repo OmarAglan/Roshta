@@ -137,27 +137,23 @@ namespace Rosheta.Pages.Prescriptions
             }
             // ---------------------------------------------------
 
-            try
+            var createResult = await _prescriptionService.CreatePrescriptionResultAsync(PrescriptionCreate, currentDoctorId.Value);
+            if (createResult.IsFailure || createResult.Value == null)
             {
-                var createdPrescription = await _prescriptionService.CreatePrescriptionAsync(PrescriptionCreate, currentDoctorId.Value);
-                _logger.LogInformation("Prescription created successfully with ID {PrescriptionId}", createdPrescription.Id);
-                TempData["SuccessMessage"] = "Prescription created successfully!";
-                return RedirectToPage("./Index");
-            }
-            catch (ArgumentException argEx)
-            {
-                _logger.LogWarning(argEx, "Invalid argument during prescription creation for Patient ID {PatientId}", PrescriptionCreate.PatientId);
-                ModelState.AddModelError(string.Empty, argEx.Message);
+                _logger.LogWarning(
+                    "Prescription creation failed for Patient ID {PatientId}. Code: {ErrorCode}, Message: {ErrorMessage}",
+                    PrescriptionCreate.PatientId,
+                    createResult.ErrorCode,
+                    createResult.ErrorMessage);
+                ModelState.AddModelError(string.Empty, createResult.ErrorMessage);
                 await OnGetAsync(null); // Re-populate lists
                 return Page();
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error creating prescription for Patient ID {PatientId}", PrescriptionCreate.PatientId);
-                ModelState.AddModelError(string.Empty, "An unexpected error occurred while creating the prescription. Please try again or contact support.");
-                await OnGetAsync(null); // Re-populate lists
-                return Page();
-            }
+
+            var createdPrescription = createResult.Value;
+            _logger.LogInformation("Prescription created successfully with ID {PrescriptionId}", createdPrescription.Id);
+            TempData["SuccessMessage"] = "Prescription created successfully!";
+            return RedirectToPage("./Index");
         }
 
         // AJAX Handler to check if a medication ID exists

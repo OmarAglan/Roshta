@@ -67,16 +67,7 @@ public class PrescriptionRepository : RepositoryBase<Prescription>, IPrescriptio
         prescription.Status = PrescriptionStatus.Cancelled;
         prescription.UpdatedAt = DateTime.UtcNow;
         _dbContext.Entry(prescription).State = EntityState.Modified;
-
-        try
-        {
-            await _dbContext.SaveChangesAsync();
-            return true;
-        }
-        catch (DbUpdateException)
-        {
-            return false;
-        }
+        return true;
     }
 
     public async Task<int> GetCountAsync(string? searchTerm = null)

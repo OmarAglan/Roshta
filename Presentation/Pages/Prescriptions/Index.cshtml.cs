@@ -111,17 +111,20 @@ public class IndexModel : PageModel
     public async Task<IActionResult> OnPostCancelAsync(int id)
     {
         _logger.LogInformation("Received request to cancel prescription ID {PrescriptionId}", id);
-        bool success = await _prescriptionService.CancelPrescriptionAsync(id);
+        var result = await _prescriptionService.CancelPrescriptionResultAsync(id);
 
-        if (success)
+        if (result.IsSuccess)
         {
             TempData["SuccessMessage"] = $"Prescription ID {id} cancelled successfully.";
         }
         else
         {
-            // Log error? Service/Repo should log specific DB errors.
-            _logger.LogWarning("Failed to cancel prescription ID {PrescriptionId}. It might not exist or was already cancelled.", id);
-            TempData["ErrorMessage"] = $"Could not cancel prescription ID {id}. It might have already been cancelled or an error occurred.";
+            _logger.LogWarning(
+                "Failed to cancel prescription ID {PrescriptionId}. Code: {ErrorCode}, Message: {ErrorMessage}",
+                id,
+                result.ErrorCode,
+                result.ErrorMessage);
+            TempData["ErrorMessage"] = result.ErrorMessage;
         }
 
         // Redirect back to the index page (will refresh the list)

@@ -1,4 +1,5 @@
 using Rosheta.Core.Domain.Entities;
+using Rosheta.Core.Application.Common.Results;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -6,6 +7,10 @@ namespace Rosheta.Core.Application.Contracts.Services;
 
 public interface IPatientService
 {
+    Task<Result<Patient>> AddPatientResultAsync(Patient patient);
+    Task<Result<Patient>> UpdatePatientResultAsync(Patient patient);
+    Task<Result> DeletePatientResultAsync(int id);
+
     Task<IEnumerable<Patient>> GetAllPatientsAsync(); // Keep for potential other uses
     Task<IEnumerable<Patient>> SearchPatientsAsync(string searchTerm); // Keep for potential other uses
 

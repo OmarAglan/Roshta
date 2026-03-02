@@ -1,7 +1,7 @@
 # 📋 Project Task Tracking
 
-**Current Focus:** Phase 1.5 (Unit Testing)
-**Status:** On Track
+**Current Focus:** Phase 3 (MAUI Preparation)
+**Status:** Phase 2 Complete
 
 ---
 
@@ -33,7 +33,7 @@
 
 ---
 
-## 🧪 Phase 1.5: Quality Assurance (IN PROGRESS) 🚧
+## 🧪 Phase 1.5: Quality Assurance (COMPLETE) ✅
 
 **Goal:** Ensure core business logic is correct and regression-free via automated tests.
 
@@ -56,7 +56,7 @@
 
 ---
 
-## 🎨 Phase 2: Architectural Patterns (PLANNED) 📅
+## 🎨 Phase 2: Architectural Patterns (COMPLETE) ✅
 
 **Goal:** Remove code duplication and enforce consistency across the application.
 
@@ -64,17 +64,17 @@
   - [x] Define `IRepository<T>` interface.
   - [x] Implement `RepositoryBase<T>` in Infrastructure.
   - [x] Refactor repositories to inherit from base (`Doctor`, `Patient`, `Medication`, `Prescription`).
-- [ ] **T006: Unit of Work Pattern**
-  - [ ] Define `IUnitOfWork`.
-  - [ ] Implement `UnitOfWork` in Infrastructure (wrapping `DbContext`).
-  - [ ] Update Services to use UoW for transactional integrity.
-- [ ] **T007: FluentValidation**
-  - [ ] Install FluentValidation package in Core.
-  - [ ] Move validation logic from Services/Entities to Validator classes.
-  - [ ] Implement automatic validation pipeline in DI.
-- [ ] **T008: Result Pattern**
-  - [ ] Create `Result<T>` class (Success/Failure wrapper).
-  - [ ] Refactor Services to return `Result` instead of throwing exceptions for control flow.
+- [x] **T006: Unit of Work Pattern**
+  - [x] Define `IUnitOfWork`.
+  - [x] Implement `UnitOfWork` in Infrastructure (wrapping `DbContext`).
+  - [x] Update Services to use UoW for transactional integrity.
+- [x] **T007: FluentValidation**
+  - [x] Install FluentValidation package in Core.
+  - [x] Move validation logic from Services/Entities to Validator classes.
+  - [x] Implement automatic validation pipeline in DI.
+- [x] **T008: Result Pattern**
+  - [x] Create `Result<T>` class (Success/Failure wrapper).
+  - [x] Refactor Services to return `Result` for mutation/control-flow outcomes.
 
 ---
 

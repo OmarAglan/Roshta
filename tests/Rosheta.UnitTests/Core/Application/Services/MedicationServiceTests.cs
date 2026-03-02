@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Moq;
 using Rosheta.Core.Application.Common.Exceptions;
+using Rosheta.Core.Application.Common.Validation;
 using Rosheta.Core.Application.Contracts.Persistence;
 using Rosheta.Core.Application.Services;
 using Rosheta.Core.Domain.Entities;
@@ -11,12 +12,20 @@ namespace Rosheta.UnitTests.Core.Application.Services;
 public class MedicationServiceTests
 {
     private readonly Mock<IMedicationRepository> _repoMock;
+    private readonly Mock<IUnitOfWork> _unitOfWorkMock;
+    private readonly IValidationService _validationService;
     private readonly MedicationService _service;
 
     public MedicationServiceTests()
     {
         _repoMock = new Mock<IMedicationRepository>();
-        _service = new MedicationService(_repoMock.Object);
+        _unitOfWorkMock = new Mock<IUnitOfWork>();
+        _unitOfWorkMock
+            .Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(1);
+        _validationService = TestValidationServiceFactory.Create();
+
+        _service = new MedicationService(_repoMock.Object, _unitOfWorkMock.Object, _validationService);
     }
 
     [Fact]
@@ -30,7 +39,7 @@ public class MedicationServiceTests
 
         // Assert
         await act.Should().ThrowAsync<ValidationException>()
-            .WithMessage("Medication name is required.");
+            .WithMessage("*Medication name is required.*");
     }
 
     [Fact]
@@ -85,6 +94,7 @@ public class MedicationServiceTests
         // Assert
         result.Should().BeEquivalentTo(medication);
         _repoMock.Verify(r => r.UpdateAsync(medication), Times.Once);
+        _unitOfWorkMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -117,6 +127,7 @@ public class MedicationServiceTests
         // Assert
         result.Should().BeTrue();
         _repoMock.Verify(r => r.DeleteAsync(medication), Times.Once);
+        _unitOfWorkMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]

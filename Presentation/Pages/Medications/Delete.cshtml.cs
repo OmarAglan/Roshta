@@ -49,16 +49,16 @@ namespace Rosheta.Pages_Medications
             var medication = await _medicationService.GetMedicationByIdAsync(id.Value);
             var medicationName = medication?.Name ?? $"ID {id.Value}"; // Fallback to ID
 
-            var deleted = await _medicationService.DeleteMedicationAsync(id.Value);
+            var deleteResult = await _medicationService.DeleteMedicationResultAsync(id.Value);
 
-            if (deleted)
+            if (deleteResult.IsSuccess)
             {
                 TempData["SuccessMessage"] = $"Medication '{medicationName}' deleted successfully.";
             }
             else
             {
                 // This might happen if the medication was deleted between OnGet and OnPost, or DB error
-                TempData["ErrorMessage"] = $"Could not delete medication '{medicationName}'. Please try again or contact support.";
+                TempData["ErrorMessage"] = deleteResult.ErrorMessage;
             }
 
             return RedirectToPage("./Index");

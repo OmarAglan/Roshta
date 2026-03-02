@@ -57,7 +57,14 @@ namespace Rosheta.Pages_Patients
                 return Page();
             }
 
-            var createdPatient = await _patientService.AddPatientAsync(Patient);
+            var createResult = await _patientService.AddPatientResultAsync(Patient);
+            if (createResult.IsFailure || createResult.Value == null)
+            {
+                ModelState.AddModelError(string.Empty, createResult.ErrorMessage);
+                return Page();
+            }
+
+            var createdPatient = createResult.Value;
 
             // Add success message
             TempData["SuccessMessage"] = $"Patient '{createdPatient.Name}' created successfully.";

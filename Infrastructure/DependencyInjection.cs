@@ -25,6 +25,8 @@ public static class DependencyInjection
             options.UseSqlite(connectionString));
 
         // 2. Repositories
+        services.AddScoped(typeof(IRepository<>), typeof(RepositoryBase<>));
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IDoctorRepository, DoctorRepository>();
         services.AddScoped<IPatientRepository, PatientRepository>();
         services.AddScoped<IMedicationRepository, MedicationRepository>();

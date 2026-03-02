@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Moq;
 using Rosheta.Core.Application.Common.Exceptions;
+using Rosheta.Core.Application.Common.Validation;
 using Rosheta.Core.Application.Contracts.Persistence;
 using Rosheta.Core.Application.Services;
 using Rosheta.Core.Domain.Entities;
@@ -11,12 +12,20 @@ namespace Rosheta.UnitTests.Core.Application.Services;
 public class PatientServiceTests
 {
     private readonly Mock<IPatientRepository> _patientRepositoryMock;
+    private readonly Mock<IUnitOfWork> _unitOfWorkMock;
+    private readonly IValidationService _validationService;
     private readonly PatientService _service;
 
     public PatientServiceTests()
     {
         _patientRepositoryMock = new Mock<IPatientRepository>();
-        _service = new PatientService(_patientRepositoryMock.Object);
+        _unitOfWorkMock = new Mock<IUnitOfWork>();
+        _unitOfWorkMock
+            .Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(1);
+        _validationService = TestValidationServiceFactory.Create();
+
+        _service = new PatientService(_patientRepositoryMock.Object, _unitOfWorkMock.Object, _validationService);
     }
 
     [Fact]
@@ -30,7 +39,7 @@ public class PatientServiceTests
 
         // Assert
         await act.Should().ThrowAsync<ValidationException>()
-            .WithMessage("Patient name is required.");
+            .WithMessage("*Patient name is required.*");
     }
 
     [Fact]
@@ -90,6 +99,7 @@ public class PatientServiceTests
         // Assert
         result.Should().NotBeNull();
         _patientRepositoryMock.Verify(r => r.AddAsync(patient), Times.Once);
+        _unitOfWorkMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -124,6 +134,7 @@ public class PatientServiceTests
         // Assert
         result.Should().BeTrue();
         _patientRepositoryMock.Verify(r => r.DeleteAsync(patient), Times.Once);
+        _unitOfWorkMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -175,6 +186,7 @@ public class PatientServiceTests
 
         result.Should().Be(patient);
         _patientRepositoryMock.Verify(r => r.UpdateAsync(patient), Times.Once);
+        _unitOfWorkMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]

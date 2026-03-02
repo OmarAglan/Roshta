@@ -21,15 +21,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Core\Rosheta.Core.csproj" />
     <Compile Include="..\..\Infrastructure\Data\ApplicationDbContext.cs" Link="Infrastructure\Data\ApplicationDbContext.cs" />
     <Compile Include="..\..\Infrastructure\Data\Repositories\RepositoryBase.cs" Link="Infrastructure\Data\Repositories\RepositoryBase.cs" />
     <Compile Include="..\..\Infrastructure\Data\Repositories\PrescriptionRepository.cs" Link="Infrastructure\Data\Repositories\PrescriptionRepository.cs" />
+    <Compile Include="..\..\Infrastructure\Data\UnitOfWork.cs" Link="Infrastructure\Data\UnitOfWork.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Rosheta.Core">
-      <HintPath>..\..\Core\bin\Debug\net9.0\Rosheta.Core.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.Data.Sqlite">
       <HintPath>..\..\Presentation\bin\Debug\net9.0\Microsoft.Data.Sqlite.dll</HintPath>
     </Reference>

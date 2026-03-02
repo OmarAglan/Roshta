@@ -39,7 +39,14 @@ namespace Rosheta.Pages_Medications
                 return Page();
             }
 
-            var createdMedication = await _medicationService.AddMedicationAsync(Medication);
+            var createResult = await _medicationService.AddMedicationResultAsync(Medication);
+            if (createResult.IsFailure || createResult.Value == null)
+            {
+                ModelState.AddModelError(string.Empty, createResult.ErrorMessage);
+                return Page();
+            }
+
+            var createdMedication = createResult.Value;
 
             // Add success message
             TempData["SuccessMessage"] = $"Medication '{createdMedication.Name}' created successfully.";

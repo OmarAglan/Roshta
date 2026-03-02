@@ -2,6 +2,7 @@ using Rosheta.Core.Domain.Entities;
 using Rosheta.Core.Application.DTOs;
 using Rosheta.Core.Application.DTOs.Doctor;
 using Rosheta.Core.Application.Models;
+using Rosheta.Core.Application.Common.Results;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -9,6 +10,9 @@ namespace Rosheta.Core.Application.Contracts.Services;
 
 public interface IPrescriptionService
 {
+    Task<Result<Prescription>> CreatePrescriptionResultAsync(PrescriptionCreateModel model, int doctorId);
+    Task<Result> CancelPrescriptionResultAsync(int prescriptionId);
+
     // Takes the view model and the ID of the doctor creating the prescription
     Task<Prescription?> CreatePrescriptionAsync(PrescriptionCreateModel model, int doctorId);
     Task<IEnumerable<Prescription>> GetAllPrescriptionsAsync(); // Keep for potential other uses

@@ -110,23 +110,25 @@ public class SetupModel : PageModel, IValidatableObject
         // IsSubscribed would typically be managed elsewhere/later
         // doctorToSave.IsSubscribed = true; // Don't set here unless license implies subscription
 
-        try
+        var saveResult = await _doctorService.SaveDoctorProfileResultAsync(doctorToSave);
+        if (saveResult.IsFailure || saveResult.Value == null)
         {
-            var savedDoctor = await _doctorService.SaveDoctorProfileAsync(doctorToSave);
-
-            // Mark profile as setup with the saved doctor's ID
-            await _licenseService.MarkProfileAsSetupAsync(savedDoctor.Id);
-
-            _logger.LogInformation("Doctor profile setup completed for Doctor ID: {DoctorId}", savedDoctor.Id);
-            TempData["SuccessMessage"] = "Doctor profile saved successfully!";
-            return RedirectToPage("/Index"); // Redirect to main app page
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error saving doctor profile.");
-            ModelState.AddModelError(string.Empty, "An error occurred while saving the profile. Please try again.");
+            _logger.LogWarning(
+                "Doctor profile setup failed. Code: {ErrorCode}, Message: {ErrorMessage}",
+                saveResult.ErrorCode,
+                saveResult.ErrorMessage);
+            ModelState.AddModelError(string.Empty, saveResult.ErrorMessage);
             return Page();
         }
+
+        var savedDoctor = saveResult.Value;
+
+        // Mark profile as setup with the saved doctor's ID
+        await _licenseService.MarkProfileAsSetupAsync(savedDoctor.Id);
+
+        _logger.LogInformation("Doctor profile setup completed for Doctor ID: {DoctorId}", savedDoctor.Id);
+        TempData["SuccessMessage"] = "Doctor profile saved successfully!";
+        return RedirectToPage("/Index"); // Redirect to main app page
     }
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

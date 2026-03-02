@@ -2,6 +2,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Rosheta.Core.Application.Common.Exceptions;
+using Rosheta.Core.Application.Common.Validation;
 using Rosheta.Core.Application.Contracts.Persistence;
 using Rosheta.Core.Application.DTOs;
 using Rosheta.Core.Application.Services;
@@ -16,6 +17,8 @@ public class PrescriptionServiceTests
     private readonly Mock<IPrescriptionRepository> _prescriptionRepoMock;
     private readonly Mock<IPatientRepository> _patientRepoMock;
     private readonly Mock<ILogger<PrescriptionService>> _loggerMock;
+    private readonly Mock<IUnitOfWork> _unitOfWorkMock;
+    private readonly IValidationService _validationService;
     private readonly PrescriptionService _service;
 
     public PrescriptionServiceTests()
@@ -23,11 +26,18 @@ public class PrescriptionServiceTests
         _prescriptionRepoMock = new Mock<IPrescriptionRepository>();
         _patientRepoMock = new Mock<IPatientRepository>();
         _loggerMock = new Mock<ILogger<PrescriptionService>>();
+        _unitOfWorkMock = new Mock<IUnitOfWork>();
+        _unitOfWorkMock
+            .Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(1);
+        _validationService = TestValidationServiceFactory.Create();
 
         _service = new PrescriptionService(
             _prescriptionRepoMock.Object,
             _patientRepoMock.Object,
-            _loggerMock.Object
+            _loggerMock.Object,
+            _unitOfWorkMock.Object,
+            _validationService
         );
     }
 
@@ -46,7 +56,7 @@ public class PrescriptionServiceTests
 
         // Assert
         await act.Should().ThrowAsync<ValidationException>()
-            .WithMessage("Prescription must have at least one medication item.");
+            .WithMessage("Items: The prescription must contain at least one medication item.");
     }
 
     [Fact]
@@ -99,6 +109,7 @@ public class PrescriptionServiceTests
         result.DoctorId.Should().Be(5);
         result.PrescriptionItems.Should().HaveCount(1);
         result.PrescriptionItems.First().MedicationId.Should().Be(10);
+        _unitOfWorkMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -167,6 +178,7 @@ public class PrescriptionServiceTests
         var result = await _service.CancelPrescriptionAsync(1);
 
         result.Should().BeTrue();
+        _unitOfWorkMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
