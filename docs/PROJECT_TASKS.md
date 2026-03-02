@@ -40,13 +40,13 @@
 - [x] **T004.5: Test Infrastructure Setup**
   - [x] Create `Rosheta.UnitTests` project (xUnit).
   - [x] Configure Moq and FluentAssertions.
-- [ ] **T004.6: Service Layer Unit Tests**
+- [x] **T004.6: Service Layer Unit Tests**
   - [x] `DoctorService` (Validation logic).
   - [x] `PatientService` (Uniqueness checks).
   - [x] `PrescriptionService` (Complex creation logic).
-  - [ ] `MedicationService` (CRUD & Validation).
-  - [ ] `LicenseService` (File I/O mocking).
-  - [ ] `SettingsService` (Serialization mocking).
+  - [x] `MedicationService` (CRUD & Validation).
+  - [x] `LicenseService` (File I/O mocking).
+  - [x] `SettingsService` (Serialization mocking).
 - [ ] **T004.7: Repository Layer Tests**
   - [ ] Setup InMemory Database / Sqlite Memory fixture.
   - [ ] Test `PrescriptionRepository` filters and eager loading (Includes).
@@ -59,10 +59,10 @@
 
 **Goal:** Remove code duplication and enforce consistency across the application.
 
-- [ ] **T005: Generic Repository Pattern**
-  - [ ] Define `IRepository<T>` interface.
-  - [ ] Implement `RepositoryBase<T>` in Infrastructure.
-  - [ ] Refactor existing repositories to inherit from base to remove boilerplate.
+- [x] **T005: Generic Repository Pattern**
+  - [x] Define `IRepository<T>` interface.
+  - [x] Implement `RepositoryBase<T>` in Infrastructure.
+  - [x] Refactor repositories to inherit from base (`Doctor`, `Patient`, `Medication`, `Prescription`).
 - [ ] **T006: Unit of Work Pattern**
   - [ ] Define `IUnitOfWork`.
   - [ ] Implement `UnitOfWork` in Infrastructure (wrapping `DbContext`).

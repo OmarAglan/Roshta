@@ -4,11 +4,10 @@ using System.Threading.Tasks;
 
 namespace Rosheta.Core.Application.Contracts.Persistence;
 
-public interface IPrescriptionRepository
+public interface IPrescriptionRepository : IRepository<Prescription>
 {
-    // We'll likely add Get methods later for viewing prescriptions
-    Task<IEnumerable<Prescription>> GetAllAsync(); // Keep for potential other uses
-    Task<IEnumerable<Prescription>> SearchAsync(string searchTerm); // Keep for potential other uses
+    // Specific methods that are NOT in the generic repository
+    Task<IEnumerable<Prescription>> SearchAsync(string searchTerm);
 
     // --- Methods for Pagination ---
     /// <summary>
@@ -30,8 +29,5 @@ public interface IPrescriptionRepository
     Task<int> GetCountAsync(string? searchTerm = null);
     // -----------------------------
 
-    Task<Prescription?> GetByIdAsync(int id); // Renamed from GetPrescriptionByIdAsync
-    Task<Prescription> AddAsync(Prescription prescription); // Renamed from CreatePrescriptionAsync
-    Task<bool> CancelAsync(int prescriptionId); // Add this
-    // Consider adding Update/Delete if needed
+    Task<bool> CancelAsync(int prescriptionId);
 }

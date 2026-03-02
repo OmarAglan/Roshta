@@ -34,7 +34,7 @@
 
 *   ✅ **Test Infrastructure:** Setup xUnit, Moq, and FluentAssertions.
 *   ✅ **Critical Service Tests:** Covered `DoctorService`, `PatientService`, and `PrescriptionService`.
-*   [ ] **Remaining Service Tests:** Cover `MedicationService`, `LicenseService`, and `SettingsService`.
+*   ✅ **Service Tests:** Covered `DoctorService`, `PatientService`, `PrescriptionService`, `MedicationService`, `LicenseService`, and `SettingsService`.
 *   [ ] **Repository Tests:** Setup InMemory/SQLite tests for Data Layer.
 *   [ ] **Code Coverage:** Target >70% coverage for Core logic.
 
@@ -43,7 +43,7 @@
 ## 📅 Phase 2: Architectural Patterns (Next Up)
 **Goal:** Eliminate boilerplate code and enforce consistency.
 
-*   **Generic Repository Pattern:** Implement `IRepository<T>` to reduce repetitive data access code.
+*   ✅ **Generic Repository Pattern:** Completed (`IRepository<T>` + `RepositoryBase<T>` adopted by `Doctor`, `Patient`, `Medication`, and `Prescription` repositories).
 *   **Unit of Work:** Implement `IUnitOfWork` to handle transactions across multiple repositories.
 *   **FluentValidation:** Separate validation rules from Entities/Services into dedicated Validators.
 *   **Result Pattern:** Replace Exception-driven flow control with a functional `Result<T>` pattern.
