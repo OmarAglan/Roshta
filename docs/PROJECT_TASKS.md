@@ -47,9 +47,9 @@
   - [x] `MedicationService` (CRUD & Validation).
   - [x] `LicenseService` (File I/O mocking).
   - [x] `SettingsService` (Serialization mocking).
-- [ ] **T004.7: Repository Layer Tests**
-  - [ ] Setup InMemory Database / Sqlite Memory fixture.
-  - [ ] Test `PrescriptionRepository` filters and eager loading (Includes).
+- [x] **T004.7: Repository Layer Tests**
+  - [x] Setup Sqlite in-memory fixture.
+  - [x] Test `PrescriptionRepository` includes, filtering, paging, sorting, counting, and cancel flow.
 - [ ] **T004.8: Code Coverage**
   - [ ] Achieve >70% line coverage on `Rosheta.Core`.
 

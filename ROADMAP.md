@@ -35,7 +35,7 @@
 *   ✅ **Test Infrastructure:** Setup xUnit, Moq, and FluentAssertions.
 *   ✅ **Critical Service Tests:** Covered `DoctorService`, `PatientService`, and `PrescriptionService`.
 *   ✅ **Service Tests:** Covered `DoctorService`, `PatientService`, `PrescriptionService`, `MedicationService`, `LicenseService`, and `SettingsService`.
-*   [ ] **Repository Tests:** Setup InMemory/SQLite tests for Data Layer.
+*   ✅ **Repository Tests:** Added SQLite in-memory integration tests for `PrescriptionRepository` (includes, filtering, paging/sorting, count, cancel flow).
 *   [ ] **Code Coverage:** Target >70% coverage for Core logic.
 
 ---

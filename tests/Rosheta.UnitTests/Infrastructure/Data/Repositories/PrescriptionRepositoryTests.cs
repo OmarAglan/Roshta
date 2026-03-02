@@ -11,6 +11,11 @@ namespace Rosheta.UnitTests.Infrastructure.Data.Repositories;
 
 public class PrescriptionRepositoryTests
 {
+    static PrescriptionRepositoryTests()
+    {
+        SQLitePCL.Batteries.Init();
+    }
+
     [Fact]
     public async Task GetByIdAsync_ShouldIncludePatientDoctorItemsAndMedication()
     {
