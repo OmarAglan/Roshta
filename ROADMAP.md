@@ -36,7 +36,7 @@
 *   ✅ **Critical Service Tests:** Covered `DoctorService`, `PatientService`, and `PrescriptionService`.
 *   ✅ **Service Tests:** Covered `DoctorService`, `PatientService`, `PrescriptionService`, `MedicationService`, `LicenseService`, and `SettingsService`.
 *   ✅ **Repository Tests:** Added SQLite in-memory integration tests for `PrescriptionRepository` (includes, filtering, paging/sorting, count, cancel flow).
-*   [ ] **Code Coverage:** Target >70% coverage for Core logic.
+*   ✅ **Code Coverage:** `Rosheta.Core` line coverage exceeds 70% (enforced via `scripts/check-core-coverage.ps1`).
 
 ---
 

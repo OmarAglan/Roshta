@@ -50,8 +50,9 @@
 - [x] **T004.7: Repository Layer Tests**
   - [x] Setup Sqlite in-memory fixture.
   - [x] Test `PrescriptionRepository` includes, filtering, paging, sorting, counting, and cancel flow.
-- [ ] **T004.8: Code Coverage**
-  - [ ] Achieve >70% line coverage on `Rosheta.Core`.
+- [x] **T004.8: Code Coverage**
+  - [x] Achieve >70% line coverage on `Rosheta.Core`.
+  - [x] Add automated coverage gate script: `scripts/check-core-coverage.ps1`.
 
 ---
 

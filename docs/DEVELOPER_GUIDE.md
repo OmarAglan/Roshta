@@ -119,6 +119,12 @@ public async Task Create_ShouldFail_WhenNameIsEmpty() {
 dotnet test
 ```
 
+**Run Coverage Gate (`Rosheta.Core` >= 70% line coverage):**
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/check-core-coverage.ps1
+```
+
 ---
 
 ## 6. 📝 Coding Standards

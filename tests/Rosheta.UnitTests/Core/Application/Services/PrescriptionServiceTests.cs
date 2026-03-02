@@ -6,6 +6,7 @@ using Rosheta.Core.Application.Contracts.Persistence;
 using Rosheta.Core.Application.DTOs;
 using Rosheta.Core.Application.Services;
 using Rosheta.Core.Domain.Entities;
+using Rosheta.Core.Domain.Enums;
 using Xunit;
 
 namespace Rosheta.UnitTests.Core.Application.Services;
@@ -98,5 +99,98 @@ public class PrescriptionServiceTests
         result.DoctorId.Should().Be(5);
         result.PrescriptionItems.Should().HaveCount(1);
         result.PrescriptionItems.First().MedicationId.Should().Be(10);
+    }
+
+    [Fact]
+    public async Task GetAllPrescriptionsAsync_ShouldReturnData_WhenRepositorySucceeds()
+    {
+        _prescriptionRepoMock.Setup(r => r.GetAllAsync())
+            .ReturnsAsync(new List<Prescription> { new() { Id = 1 } });
+
+        var result = await _service.GetAllPrescriptionsAsync();
+
+        result.Should().ContainSingle();
+    }
+
+    [Fact]
+    public async Task SearchPrescriptionsAsync_ShouldReturnData_WhenRepositorySucceeds()
+    {
+        _prescriptionRepoMock.Setup(r => r.SearchAsync("ah"))
+            .ReturnsAsync(new List<Prescription> { new() { Id = 2 } });
+
+        var result = await _service.SearchPrescriptionsAsync("ah");
+
+        result.Should().ContainSingle(x => x.Id == 2);
+    }
+
+    [Fact]
+    public async Task GetPrescriptionByIdAsync_ShouldThrowNotFoundException_WhenMissing()
+    {
+        _prescriptionRepoMock.Setup(r => r.GetByIdAsync(99)).ReturnsAsync((Prescription?)null);
+
+        Func<Task> act = async () => await _service.GetPrescriptionByIdAsync(99);
+
+        await act.Should().ThrowAsync<NotFoundException>();
+    }
+
+    [Fact]
+    public async Task CancelPrescriptionAsync_ShouldThrowBusinessRuleException_WhenAlreadyCancelled()
+    {
+        _prescriptionRepoMock.Setup(r => r.GetByIdAsync(1))
+            .ReturnsAsync(new Prescription { Id = 1, Status = PrescriptionStatus.Cancelled });
+
+        Func<Task> act = async () => await _service.CancelPrescriptionAsync(1);
+
+        await act.Should().ThrowAsync<BusinessRuleException>()
+            .WithMessage("Cannot cancel a prescription that is already cancelled.");
+    }
+
+    [Fact]
+    public async Task CancelPrescriptionAsync_ShouldThrowBusinessRuleException_WhenFilled()
+    {
+        _prescriptionRepoMock.Setup(r => r.GetByIdAsync(1))
+            .ReturnsAsync(new Prescription { Id = 1, Status = PrescriptionStatus.Filled });
+
+        Func<Task> act = async () => await _service.CancelPrescriptionAsync(1);
+
+        await act.Should().ThrowAsync<BusinessRuleException>()
+            .WithMessage("Cannot cancel a prescription that has been filled.");
+    }
+
+    [Fact]
+    public async Task CancelPrescriptionAsync_ShouldReturnTrue_WhenActive()
+    {
+        _prescriptionRepoMock.Setup(r => r.GetByIdAsync(1))
+            .ReturnsAsync(new Prescription { Id = 1, Status = PrescriptionStatus.Active });
+        _prescriptionRepoMock.Setup(r => r.CancelAsync(1)).ReturnsAsync(true);
+
+        var result = await _service.CancelPrescriptionAsync(1);
+
+        result.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task PagingMethods_ShouldDelegateToRepository()
+    {
+        _prescriptionRepoMock.Setup(r => r.GetPagedAsync(1, 10, "ah", "date_desc"))
+            .ReturnsAsync(new List<Prescription> { new() { Id = 5 } });
+        _prescriptionRepoMock.Setup(r => r.GetCountAsync("ah")).ReturnsAsync(1);
+
+        var paged = await _service.GetPrescriptionsPagedAsync(1, 10, "ah", "date_desc");
+        var count = await _service.GetPrescriptionsCountAsync("ah");
+
+        paged.Should().ContainSingle(x => x.Id == 5);
+        count.Should().Be(1);
+    }
+
+    [Fact]
+    public async Task GetAllPrescriptionsAsync_ShouldWrapException_AsInfrastructureException()
+    {
+        _prescriptionRepoMock.Setup(r => r.GetAllAsync()).ThrowsAsync(new Exception("db"));
+
+        Func<Task> act = async () => await _service.GetAllPrescriptionsAsync();
+
+        await act.Should().ThrowAsync<InfrastructureException>()
+            .WithMessage("Failed to retrieve prescriptions.");
     }
 }

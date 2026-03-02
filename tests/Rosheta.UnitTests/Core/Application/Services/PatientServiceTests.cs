@@ -125,4 +125,96 @@ public class PatientServiceTests
         result.Should().BeTrue();
         _patientRepositoryMock.Verify(r => r.DeleteAsync(patient), Times.Once);
     }
+
+    [Fact]
+    public async Task GetAllPatientsAsync_ShouldReturnPatients_WhenRepositorySucceeds()
+    {
+        var data = new List<Patient> { new() { Id = 1, Name = "A", ContactInfo = "x" } };
+        _patientRepositoryMock.Setup(r => r.GetAllAsync()).ReturnsAsync(data);
+
+        var result = await _service.GetAllPatientsAsync();
+
+        result.Should().HaveCount(1);
+    }
+
+    [Fact]
+    public async Task SearchPatientsAsync_ShouldReturnFilteredPatients_WhenRepositorySucceeds()
+    {
+        var data = new List<Patient> { new() { Id = 1, Name = "Ahmed", ContactInfo = "x" } };
+        _patientRepositoryMock.Setup(r => r.SearchAsync("ah")).ReturnsAsync(data);
+
+        var result = await _service.SearchPatientsAsync("ah");
+
+        result.Should().ContainSingle(p => p.Name == "Ahmed");
+    }
+
+    [Fact]
+    public async Task UpdatePatientAsync_ShouldThrowBusinessRuleException_WhenContactInfoDuplicate()
+    {
+        var patient = new Patient { Id = 1, Name = "Unique", ContactInfo = "dup" };
+        _patientRepositoryMock.Setup(r => r.ExistsAsync(1)).ReturnsAsync(true);
+        _patientRepositoryMock.Setup(r => r.IsNameUniqueAsync(patient.Name, 1)).ReturnsAsync(true);
+        _patientRepositoryMock.Setup(r => r.IsContactInfoUniqueAsync(patient.ContactInfo, 1)).ReturnsAsync(false);
+
+        Func<Task> act = async () => await _service.UpdatePatientAsync(patient);
+
+        await act.Should().ThrowAsync<BusinessRuleException>()
+            .WithMessage("A patient with the contact info 'dup' already exists.");
+    }
+
+    [Fact]
+    public async Task UpdatePatientAsync_ShouldReturnPatient_WhenValid()
+    {
+        var patient = new Patient { Id = 4, Name = "Updated", ContactInfo = "0101" };
+        _patientRepositoryMock.Setup(r => r.ExistsAsync(4)).ReturnsAsync(true);
+        _patientRepositoryMock.Setup(r => r.IsNameUniqueAsync(patient.Name, 4)).ReturnsAsync(true);
+        _patientRepositoryMock.Setup(r => r.IsContactInfoUniqueAsync(patient.ContactInfo, 4)).ReturnsAsync(true);
+        _patientRepositoryMock.Setup(r => r.UpdateAsync(patient)).Returns(Task.CompletedTask);
+
+        var result = await _service.UpdatePatientAsync(patient);
+
+        result.Should().Be(patient);
+        _patientRepositoryMock.Verify(r => r.UpdateAsync(patient), Times.Once);
+    }
+
+    [Fact]
+    public async Task DeletePatientAsync_ShouldThrowNotFoundException_WhenPatientMissing()
+    {
+        _patientRepositoryMock.Setup(r => r.GetByIdAsync(50)).ReturnsAsync((Patient?)null);
+
+        Func<Task> act = async () => await _service.DeletePatientAsync(50);
+
+        await act.Should().ThrowAsync<NotFoundException>();
+    }
+
+    [Fact]
+    public async Task PatientExistsAsync_ShouldWrapException_AsInfrastructureException()
+    {
+        _patientRepositoryMock.Setup(r => r.ExistsAsync(1)).ThrowsAsync(new Exception("db"));
+
+        Func<Task> act = async () => await _service.PatientExistsAsync(1);
+
+        await act.Should().ThrowAsync<InfrastructureException>()
+            .WithMessage("Failed to check patient existence.");
+    }
+
+    [Fact]
+    public async Task UtilityMethods_ShouldDelegateToRepository()
+    {
+        _patientRepositoryMock.Setup(r => r.IsContactInfoUniqueAsync("x", 1)).ReturnsAsync(true);
+        _patientRepositoryMock.Setup(r => r.IsNameUniqueAsync("n", 1)).ReturnsAsync(true);
+        _patientRepositoryMock.Setup(r => r.GetPagedAsync(1, 10, "s", "name_desc"))
+            .ReturnsAsync(new List<Patient> { new() { Id = 7, Name = "P", ContactInfo = "x" } });
+        _patientRepositoryMock.Setup(r => r.GetCountAsync("s")).ReturnsAsync(1);
+
+        var uniqueContact = await _service.IsContactInfoUniqueAsync("x", 1);
+        var uniqueName = await _service.IsNameUniqueAsync("n", 1);
+        var paged = await _service.GetPatientsPagedAsync(1, 10, "s", "name_desc");
+        var count = await _service.GetPatientsCountAsync("s");
+
+        uniqueContact.Should().BeTrue();
+        uniqueName.Should().BeTrue();
+        paged.Should().ContainSingle();
+        count.Should().Be(1);
+    }
 }

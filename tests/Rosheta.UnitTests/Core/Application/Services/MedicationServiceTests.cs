@@ -118,4 +118,77 @@ public class MedicationServiceTests
         result.Should().BeTrue();
         _repoMock.Verify(r => r.DeleteAsync(medication), Times.Once);
     }
+
+    [Fact]
+    public async Task GetMedicationByIdAsync_ShouldThrowNotFoundException_WhenMissing()
+    {
+        _repoMock.Setup(r => r.GetByIdAsync(123)).ReturnsAsync((Medication?)null);
+
+        Func<Task> act = async () => await _service.GetMedicationByIdAsync(123);
+
+        await act.Should().ThrowAsync<NotFoundException>();
+    }
+
+    [Fact]
+    public async Task GetAllMedicationsAsync_ShouldReturnData_WhenRepositorySucceeds()
+    {
+        _repoMock.Setup(r => r.GetAllAsync())
+            .ReturnsAsync(new List<Medication> { new() { Id = 1, Name = "Aspirin" } });
+
+        var result = await _service.GetAllMedicationsAsync();
+
+        result.Should().ContainSingle();
+    }
+
+    [Fact]
+    public async Task SearchMedicationsAsync_ShouldReturnData_WhenRepositorySucceeds()
+    {
+        _repoMock.Setup(r => r.SearchAsync("asp"))
+            .ReturnsAsync(new List<Medication> { new() { Id = 1, Name = "Aspirin" } });
+
+        var result = await _service.SearchMedicationsAsync("asp");
+
+        result.Should().ContainSingle(x => x.Name == "Aspirin");
+    }
+
+    [Fact]
+    public async Task DeleteMedicationAsync_ShouldThrowNotFoundException_WhenMissing()
+    {
+        _repoMock.Setup(r => r.GetByIdAsync(404)).ReturnsAsync((Medication?)null);
+
+        Func<Task> act = async () => await _service.DeleteMedicationAsync(404);
+
+        await act.Should().ThrowAsync<NotFoundException>();
+    }
+
+    [Fact]
+    public async Task UtilityMethods_ShouldDelegateToRepository()
+    {
+        _repoMock.Setup(r => r.ExistsAsync(1)).ReturnsAsync(true);
+        _repoMock.Setup(r => r.IsNameUniqueAsync("Aspirin", 1)).ReturnsAsync(true);
+        _repoMock.Setup(r => r.GetPagedAsync(1, 10, "asp", "name_desc"))
+            .ReturnsAsync(new List<Medication> { new() { Id = 1, Name = "Aspirin" } });
+        _repoMock.Setup(r => r.GetCountAsync("asp")).ReturnsAsync(1);
+
+        var exists = await _service.MedicationExistsAsync(1);
+        var unique = await _service.IsNameUniqueAsync("Aspirin", 1);
+        var paged = await _service.GetMedicationsPagedAsync(1, 10, "asp", "name_desc");
+        var count = await _service.GetMedicationsCountAsync("asp");
+
+        exists.Should().BeTrue();
+        unique.Should().BeTrue();
+        paged.Should().ContainSingle();
+        count.Should().Be(1);
+    }
+
+    [Fact]
+    public async Task GetAllMedicationsAsync_ShouldWrapException_AsInfrastructureException()
+    {
+        _repoMock.Setup(r => r.GetAllAsync()).ThrowsAsync(new Exception("db"));
+
+        Func<Task> act = async () => await _service.GetAllMedicationsAsync();
+
+        await act.Should().ThrowAsync<InfrastructureException>()
+            .WithMessage("Failed to retrieve medications.");
+    }
 }

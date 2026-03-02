@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Microsoft.Extensions.Options;
 using Moq;
+using Rosheta.Core.Application.Common.Exceptions;
 using Rosheta.Core.Application.Contracts.Infrastructure;
 using Rosheta.Core.Application.Services;
 using Rosheta.Core.Application.Settings;
@@ -84,5 +85,85 @@ public class LicenseServiceTests
             It.Is<string>(s => s.Contains(".activated")), 
             string.Empty), 
             Times.Once);
+    }
+
+    [Fact]
+    public async Task IsProfileSetupAsync_ShouldReturnFalse_WhenDoctorIdFileMissing()
+    {
+        _fileStorageMock.Setup(x => x.FileExists(It.Is<string>(s => s.Contains(".doctorid"))))
+            .Returns(false);
+
+        var result = await _service.IsProfileSetupAsync();
+
+        result.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task MarkProfileAsSetupAsync_ShouldPersistDoctorId_AndEnableCachedLookup()
+    {
+        await _service.MarkProfileAsSetupAsync(42);
+
+        _fileStorageMock.Verify(x => x.WriteAllTextAsync(
+            It.Is<string>(s => s.Contains(".doctorid")),
+            "42"), Times.Once);
+
+        var first = await _service.GetCurrentDoctorIdAsync();
+        var second = await _service.GetCurrentDoctorIdAsync();
+
+        first.Should().Be(42);
+        second.Should().Be(42);
+        _fileStorageMock.Verify(x => x.ReadAllTextAsync(It.IsAny<string>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task GetCurrentDoctorIdAsync_ShouldReadAndParseDoctorId_WhenFileExists()
+    {
+        _fileStorageMock.Setup(x => x.FileExists(It.Is<string>(s => s.Contains(".doctorid"))))
+            .Returns(true);
+        _fileStorageMock.Setup(x => x.ReadAllTextAsync(It.Is<string>(s => s.Contains(".doctorid"))))
+            .ReturnsAsync("7");
+
+        var result = await _service.GetCurrentDoctorIdAsync();
+
+        result.Should().Be(7);
+    }
+
+    [Fact]
+    public async Task GetCurrentDoctorIdAsync_ShouldReturnNull_WhenFileContentInvalid()
+    {
+        _fileStorageMock.Setup(x => x.FileExists(It.Is<string>(s => s.Contains(".doctorid"))))
+            .Returns(true);
+        _fileStorageMock.Setup(x => x.ReadAllTextAsync(It.Is<string>(s => s.Contains(".doctorid"))))
+            .ReturnsAsync("not-int");
+
+        var result = await _service.GetCurrentDoctorIdAsync();
+
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task GetCurrentDoctorIdAsync_ShouldThrowInfrastructureException_WhenReadFails()
+    {
+        _fileStorageMock.Setup(x => x.FileExists(It.Is<string>(s => s.Contains(".doctorid"))))
+            .Returns(true);
+        _fileStorageMock.Setup(x => x.ReadAllTextAsync(It.Is<string>(s => s.Contains(".doctorid"))))
+            .ThrowsAsync(new Exception("disk fail"));
+
+        Func<Task> act = async () => await _service.GetCurrentDoctorIdAsync();
+
+        await act.Should().ThrowAsync<InfrastructureException>()
+            .WithMessage("Failed to retrieve current doctor ID.");
+    }
+
+    [Fact]
+    public async Task MarkAsActivatedAsync_ShouldThrowInfrastructureException_WhenWriteFails()
+    {
+        _fileStorageMock.Setup(x => x.WriteAllTextAsync(It.IsAny<string>(), It.IsAny<string>()))
+            .ThrowsAsync(new Exception("disk fail"));
+
+        Func<Task> act = async () => await _service.MarkAsActivatedAsync();
+
+        await act.Should().ThrowAsync<InfrastructureException>()
+            .WithMessage("Failed to mark application as activated.");
     }
 }
